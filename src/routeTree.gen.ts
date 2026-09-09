@@ -13,6 +13,9 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteRouteImport } from './routes/app/route'
 import { Route as DriverRouteRouteImport } from './routes/driver/route'
 import { Route as PortalRouteRouteImport } from './routes/portal/route'
+import { Route as AppDashboardRouteImport } from './routes/app/dashboard'
+import { Route as AppBookingsIndexRouteImport } from './routes/app/bookings/index'
+import { Route as AppBookingsNewRouteImport } from './routes/app/bookings/new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,37 +37,83 @@ const PortalRouteRoute = PortalRouteRouteImport.update({
   path: '/portal',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppBookingsIndexRoute = AppBookingsIndexRouteImport.update({
+  id: '/bookings/',
+  path: '/bookings/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppBookingsNewRoute = AppBookingsNewRouteImport.update({
+  id: '/bookings/new',
+  path: '/bookings/new',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/app': typeof AppRouteRoute
+  '/app': typeof AppRouteRouteWithChildren
   '/driver': typeof DriverRouteRoute
   '/portal': typeof PortalRouteRoute
+  '/app/dashboard': typeof AppDashboardRoute
+  '/app/bookings/new': typeof AppBookingsNewRoute
+  '/app/bookings/': typeof AppBookingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/app': typeof AppRouteRoute
+  '/app': typeof AppRouteRouteWithChildren
   '/driver': typeof DriverRouteRoute
   '/portal': typeof PortalRouteRoute
+  '/app/dashboard': typeof AppDashboardRoute
+  '/app/bookings/new': typeof AppBookingsNewRoute
+  '/app/bookings': typeof AppBookingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/app': typeof AppRouteRoute
+  '/app': typeof AppRouteRouteWithChildren
   '/driver': typeof DriverRouteRoute
   '/portal': typeof PortalRouteRoute
+  '/app/dashboard': typeof AppDashboardRoute
+  '/app/bookings/new': typeof AppBookingsNewRoute
+  '/app/bookings/': typeof AppBookingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/app' | '/driver' | '/portal'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/driver'
+    | '/portal'
+    | '/app/dashboard'
+    | '/app/bookings/new'
+    | '/app/bookings/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/app' | '/driver' | '/portal'
-  id: '__root__' | '/' | '/app' | '/driver' | '/portal'
+  to:
+    | '/'
+    | '/app'
+    | '/driver'
+    | '/portal'
+    | '/app/dashboard'
+    | '/app/bookings/new'
+    | '/app/bookings'
+  id:
+    | '__root__'
+    | '/'
+    | '/app'
+    | '/driver'
+    | '/portal'
+    | '/app/dashboard'
+    | '/app/bookings/new'
+    | '/app/bookings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AppRouteRoute: typeof AppRouteRoute
+  AppRouteRoute: typeof AppRouteRouteWithChildren
   DriverRouteRoute: typeof DriverRouteRoute
   PortalRouteRoute: typeof PortalRouteRoute
 }
@@ -99,12 +148,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/dashboard': {
+      id: '/app/dashboard'
+      path: '/dashboard'
+      fullPath: '/app/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/bookings/': {
+      id: '/app/bookings/'
+      path: '/bookings'
+      fullPath: '/app/bookings/'
+      preLoaderRoute: typeof AppBookingsIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/bookings/new': {
+      id: '/app/bookings/new'
+      path: '/bookings/new'
+      fullPath: '/app/bookings/new'
+      preLoaderRoute: typeof AppBookingsNewRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
   }
 }
 
+interface AppRouteRouteChildren {
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppBookingsNewRoute: typeof AppBookingsNewRoute
+  AppBookingsIndexRoute: typeof AppBookingsIndexRoute
+}
+
+const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppDashboardRoute: AppDashboardRoute,
+  AppBookingsNewRoute: AppBookingsNewRoute,
+  AppBookingsIndexRoute: AppBookingsIndexRoute,
+}
+
+const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
+  AppRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AppRouteRoute: AppRouteRoute,
+  AppRouteRoute: AppRouteRouteWithChildren,
   DriverRouteRoute: DriverRouteRoute,
   PortalRouteRoute: PortalRouteRoute,
 }
