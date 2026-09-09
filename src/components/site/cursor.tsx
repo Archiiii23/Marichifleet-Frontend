@@ -25,7 +25,7 @@ export function Cursor() {
       tx = e.clientX;
       ty = e.clientY;
       const el = (e.target as HTMLElement | null)?.closest?.("[data-cursor]") as HTMLElement | null;
-      setLabel(el?.dataset.cursor ?? null);
+      setLabel(el?.dataset["cursor"] ?? null);
     };
     const loop = () => {
       x += (tx - x) * 0.22;
