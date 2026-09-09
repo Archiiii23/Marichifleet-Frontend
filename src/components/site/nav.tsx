@@ -67,14 +67,14 @@ export function SiteNav() {
 
         <div className="flex items-center gap-2 sm:gap-4">
           <Link
-            to="/app/dashboard"
+            to="/auth"
             className="hidden text-[11px] uppercase tracking-[0.26em] text-muted-foreground transition-colors hover:text-foreground sm:block"
           >
             Login
           </Link>
           <ThemePicker theme={theme} onChange={setTheme} className="hidden xl:flex" />
           <Link
-            to="/app/dashboard"
+            to="/auth"
             className="inline-flex h-9 items-center border border-foreground/30 px-4 text-[11px] uppercase tracking-[0.14em] text-foreground transition-colors hover:border-primary hover:bg-primary hover:text-primary-foreground sm:px-5"
           >
             Get started

@@ -2,7 +2,11 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export type Theme = "dark" | "light" | "system";
+/**
+ * "default" preserves the approved MarichiFleet appearance exactly (the original
+ * dark art direction). light / dark / system are optional user overrides.
+ */
+export type Theme = "default" | "dark" | "light" | "system";
 export type ResolvedTheme = "dark" | "light";
 
 interface ThemeValue {
@@ -14,10 +18,14 @@ interface ThemeValue {
 
 const Ctx = createContext<ThemeValue | null>(null);
 const KEY = "marichifleet.theme";
+const THEMES: Theme[] = ["default", "dark", "light", "system"];
 
 function resolve(theme: Theme): ResolvedTheme {
-  if (theme !== "system") return theme;
-  return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  if (theme === "light") return "light";
+  if (theme === "dark" || theme === "default") return "dark";
+  return typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: light)").matches
+    ? "light"
+    : "dark";
 }
 
 function apply(theme: Theme) {
@@ -30,12 +38,12 @@ function apply(theme: Theme) {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("dark");
+  const [theme, setThemeState] = useState<Theme>("default");
   const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>("dark");
 
   useEffect(() => {
     const saved = window.localStorage.getItem(KEY) as Theme | null;
-    const initial: Theme = saved === "light" || saved === "dark" || saved === "system" ? saved : "system";
+    const initial: Theme = saved && THEMES.includes(saved) ? saved : "default";
     setThemeState(initial);
     setResolvedTheme(resolve(initial));
     apply(initial);
@@ -76,17 +84,17 @@ export function useTheme() {
 
 /** Sun / moon switch used in every product shell top bar. */
 export function ThemeToggle({ className }: { className?: string }) {
-  const { theme, toggle } = useTheme();
+  const { resolvedTheme, toggle } = useTheme();
   return (
     <Button
       variant="ghost"
       size="icon"
       className={className}
       onClick={toggle}
-      aria-label={theme === "dark" ? "Switch to light appearance" : "Switch to dark appearance"}
-      title={theme === "dark" ? "Light appearance" : "Dark appearance"}
+      aria-label={resolvedTheme === "dark" ? "Switch to light appearance" : "Switch to dark appearance"}
+      title={resolvedTheme === "dark" ? "Light appearance" : "Dark appearance"}
     >
-      {theme === "dark" ? <Sun className="size-4.5" aria-hidden /> : <Moon className="size-4.5" aria-hidden />}
+      {resolvedTheme === "dark" ? <Sun className="size-4.5" aria-hidden /> : <Moon className="size-4.5" aria-hidden />}
     </Button>
   );
 }
