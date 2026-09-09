@@ -1,8 +1,9 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
-  Activity, BadgeIndianRupee, Bell, Boxes, ClipboardCheck, Command as CommandIcon, Fuel,
-  LayoutDashboard, LogOut, Map, MessageSquare, Package, Radio, ShieldCheck, Truck, Users, Wrench,
-  UserCircle2, Menu, X,
+  Activity, BadgeIndianRupee, BarChart3, Bell, Boxes, Building2, ClipboardCheck,
+  Command as CommandIcon, Fuel, Handshake, LayoutDashboard, LogOut, Map, MessageSquare, Package,
+  Radio, Settings, ShieldCheck, Truck, Users, UsersRound, Warehouse, Wrench,
+  UserCircle2, Menu,
 } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
