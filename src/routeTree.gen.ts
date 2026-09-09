@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AppRouteRouteImport } from './routes/app/route'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as DriverRouteRouteImport } from './routes/driver/route'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
@@ -73,6 +74,11 @@ const AdminRoute = AdminRouteImport.update({
 const AppRouteRoute = AppRouteRouteImport.update({
   id: '/app',
   path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DriverRouteRoute = DriverRouteRouteImport.update({
@@ -318,6 +324,7 @@ export interface FileRoutesByFullPath {
   '/driver': typeof DriverRouteRouteWithChildren
   '/portal': typeof PortalRouteRouteWithChildren
   '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/app/audit': typeof AppAuditRoute
@@ -368,6 +375,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppRouteRouteWithChildren
   '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/app/audit': typeof AppAuditRoute
@@ -421,6 +429,7 @@ export interface FileRoutesById {
   '/driver': typeof DriverRouteRouteWithChildren
   '/portal': typeof PortalRouteRouteWithChildren
   '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/app/audit': typeof AppAuditRoute
@@ -475,6 +484,7 @@ export interface FileRouteTypes {
     | '/driver'
     | '/portal'
     | '/admin'
+    | '/auth'
     | '/login'
     | '/onboarding'
     | '/app/audit'
@@ -525,6 +535,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/admin'
+    | '/auth'
     | '/login'
     | '/onboarding'
     | '/app/audit'
@@ -577,6 +588,7 @@ export interface FileRouteTypes {
     | '/driver'
     | '/portal'
     | '/admin'
+    | '/auth'
     | '/login'
     | '/onboarding'
     | '/app/audit'
@@ -630,6 +642,7 @@ export interface RootRouteChildren {
   DriverRouteRoute: typeof DriverRouteRouteWithChildren
   PortalRouteRoute: typeof PortalRouteRouteWithChildren
   AdminRoute: typeof AdminRoute
+  AuthRoute: typeof AuthRoute
   LoginRoute: typeof LoginRoute
   OnboardingRoute: typeof OnboardingRoute
   TrackTokenRoute: typeof TrackTokenRoute
@@ -656,6 +669,13 @@ declare module '@tanstack/react-router' {
       path: '/app'
       fullPath: '/app'
       preLoaderRoute: typeof AppRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/driver': {
@@ -1110,6 +1130,7 @@ const rootRouteChildren: RootRouteChildren = {
   DriverRouteRoute: DriverRouteRouteWithChildren,
   PortalRouteRoute: PortalRouteRouteWithChildren,
   AdminRoute: AdminRoute,
+  AuthRoute: AuthRoute,
   LoginRoute: LoginRoute,
   OnboardingRoute: OnboardingRoute,
   TrackTokenRoute: TrackTokenRoute,
