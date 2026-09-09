@@ -20,6 +20,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useDb, timeAgo } from "@/domain/hooks";
 import { PERSONAS, roleLabel, useSession, type Capability } from "@/domain/session";
 import { tickSimulation, bump } from "@/domain/store";
+import { ThemeToggle } from "@/domain/theme";
 import { cn } from "@/lib/utils";
 import { StatusBadge } from "./primitives";
 
@@ -185,6 +186,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </button>
 
           <div className="ml-auto flex items-center gap-1">
+            <ThemeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">

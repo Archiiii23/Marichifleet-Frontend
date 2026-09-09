@@ -3,6 +3,7 @@ import { LogOut, Truck } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/domain/session";
+import { ThemeToggle } from "@/domain/theme";
 import { cn } from "@/lib/utils";
 
 const NAV = [
