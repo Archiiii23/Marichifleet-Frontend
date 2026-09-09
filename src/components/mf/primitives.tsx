@@ -61,9 +61,10 @@ export function PageHeader({
             <span key={b.label} className="flex items-center gap-1">
               {i > 0 && <span aria-hidden>/</span>}
               {b.to ? (
-                <Link to={b.to} className="hover:text-foreground">
+                <Link to={b.to as "/"} className="hover:text-foreground">
                   {b.label}
                 </Link>
+
               ) : (
                 <span>{b.label}</span>
               )}
@@ -123,8 +124,9 @@ export function KpiCard({
     </div>
   );
   return to ? (
-    <Link to={to} className="block h-full">
+    <Link to={to as "/"} className="block h-full">
       {body}
+
     </Link>
   ) : (
     body
