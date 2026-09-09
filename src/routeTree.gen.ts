@@ -13,9 +13,24 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteRouteImport } from './routes/app/route'
 import { Route as DriverRouteRouteImport } from './routes/driver/route'
 import { Route as PortalRouteRouteImport } from './routes/portal/route'
+import { Route as AppAuditRouteImport } from './routes/app/audit'
+import { Route as AppCommunicationsRouteImport } from './routes/app/communications'
 import { Route as AppDashboardRouteImport } from './routes/app/dashboard'
+import { Route as AppDispatchRouteImport } from './routes/app/dispatch'
+import { Route as AppPodRouteImport } from './routes/app/pod'
+import { Route as AppTrackingRouteImport } from './routes/app/tracking'
 import { Route as AppBookingsIndexRouteImport } from './routes/app/bookings/index'
+import { Route as AppBookingsBookingIdRouteImport } from './routes/app/bookings/$bookingId'
 import { Route as AppBookingsNewRouteImport } from './routes/app/bookings/new'
+import { Route as AppDriversIndexRouteImport } from './routes/app/drivers/index'
+import { Route as AppDriversDriverIdRouteImport } from './routes/app/drivers/$driverId'
+import { Route as AppFinanceReceivablesRouteImport } from './routes/app/finance/receivables'
+import { Route as AppTripsIndexRouteImport } from './routes/app/trips/index'
+import { Route as AppTripsTripIdRouteImport } from './routes/app/trips/$tripId'
+import { Route as AppVehiclesIndexRouteImport } from './routes/app/vehicles/index'
+import { Route as AppVehiclesVehicleIdRouteImport } from './routes/app/vehicles/$vehicleId'
+import { Route as AppFinanceInvoicesIndexRouteImport } from './routes/app/finance/invoices/index'
+import { Route as AppFinanceInvoicesInvoiceIdRouteImport } from './routes/app/finance/invoices/$invoiceId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -37,9 +52,34 @@ const PortalRouteRoute = PortalRouteRouteImport.update({
   path: '/portal',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppAuditRoute = AppAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppCommunicationsRoute = AppCommunicationsRouteImport.update({
+  id: '/communications',
+  path: '/communications',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppDispatchRoute = AppDispatchRouteImport.update({
+  id: '/dispatch',
+  path: '/dispatch',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppPodRoute = AppPodRouteImport.update({
+  id: '/pod',
+  path: '/pod',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppTrackingRoute = AppTrackingRouteImport.update({
+  id: '/tracking',
+  path: '/tracking',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppBookingsIndexRoute = AppBookingsIndexRouteImport.update({
@@ -47,29 +87,110 @@ const AppBookingsIndexRoute = AppBookingsIndexRouteImport.update({
   path: '/bookings/',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppBookingsBookingIdRoute = AppBookingsBookingIdRouteImport.update({
+  id: '/bookings/$bookingId',
+  path: '/bookings/$bookingId',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppBookingsNewRoute = AppBookingsNewRouteImport.update({
   id: '/bookings/new',
   path: '/bookings/new',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppDriversIndexRoute = AppDriversIndexRouteImport.update({
+  id: '/drivers/',
+  path: '/drivers/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppDriversDriverIdRoute = AppDriversDriverIdRouteImport.update({
+  id: '/drivers/$driverId',
+  path: '/drivers/$driverId',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppFinanceReceivablesRoute = AppFinanceReceivablesRouteImport.update({
+  id: '/finance/receivables',
+  path: '/finance/receivables',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppTripsIndexRoute = AppTripsIndexRouteImport.update({
+  id: '/trips/',
+  path: '/trips/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppTripsTripIdRoute = AppTripsTripIdRouteImport.update({
+  id: '/trips/$tripId',
+  path: '/trips/$tripId',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppVehiclesIndexRoute = AppVehiclesIndexRouteImport.update({
+  id: '/vehicles/',
+  path: '/vehicles/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppVehiclesVehicleIdRoute = AppVehiclesVehicleIdRouteImport.update({
+  id: '/vehicles/$vehicleId',
+  path: '/vehicles/$vehicleId',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppFinanceInvoicesIndexRoute = AppFinanceInvoicesIndexRouteImport.update({
+  id: '/finance/invoices/',
+  path: '/finance/invoices/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppFinanceInvoicesInvoiceIdRoute =
+  AppFinanceInvoicesInvoiceIdRouteImport.update({
+    id: '/finance/invoices/$invoiceId',
+    path: '/finance/invoices/$invoiceId',
+    getParentRoute: () => AppRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteRouteWithChildren
   '/driver': typeof DriverRouteRoute
   '/portal': typeof PortalRouteRoute
+  '/app/audit': typeof AppAuditRoute
+  '/app/communications': typeof AppCommunicationsRoute
   '/app/dashboard': typeof AppDashboardRoute
+  '/app/dispatch': typeof AppDispatchRoute
+  '/app/pod': typeof AppPodRoute
+  '/app/tracking': typeof AppTrackingRoute
+  '/app/bookings/$bookingId': typeof AppBookingsBookingIdRoute
   '/app/bookings/new': typeof AppBookingsNewRoute
+  '/app/drivers/$driverId': typeof AppDriversDriverIdRoute
+  '/app/finance/receivables': typeof AppFinanceReceivablesRoute
+  '/app/trips/$tripId': typeof AppTripsTripIdRoute
+  '/app/vehicles/$vehicleId': typeof AppVehiclesVehicleIdRoute
   '/app/bookings/': typeof AppBookingsIndexRoute
+  '/app/drivers/': typeof AppDriversIndexRoute
+  '/app/trips/': typeof AppTripsIndexRoute
+  '/app/vehicles/': typeof AppVehiclesIndexRoute
+  '/app/finance/invoices/$invoiceId': typeof AppFinanceInvoicesInvoiceIdRoute
+  '/app/finance/invoices/': typeof AppFinanceInvoicesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppRouteRouteWithChildren
   '/driver': typeof DriverRouteRoute
   '/portal': typeof PortalRouteRoute
+  '/app/audit': typeof AppAuditRoute
+  '/app/communications': typeof AppCommunicationsRoute
   '/app/dashboard': typeof AppDashboardRoute
+  '/app/dispatch': typeof AppDispatchRoute
+  '/app/pod': typeof AppPodRoute
+  '/app/tracking': typeof AppTrackingRoute
+  '/app/bookings/$bookingId': typeof AppBookingsBookingIdRoute
   '/app/bookings/new': typeof AppBookingsNewRoute
+  '/app/drivers/$driverId': typeof AppDriversDriverIdRoute
+  '/app/finance/receivables': typeof AppFinanceReceivablesRoute
+  '/app/trips/$tripId': typeof AppTripsTripIdRoute
+  '/app/vehicles/$vehicleId': typeof AppVehiclesVehicleIdRoute
   '/app/bookings': typeof AppBookingsIndexRoute
+  '/app/drivers': typeof AppDriversIndexRoute
+  '/app/trips': typeof AppTripsIndexRoute
+  '/app/vehicles': typeof AppVehiclesIndexRoute
+  '/app/finance/invoices/$invoiceId': typeof AppFinanceInvoicesInvoiceIdRoute
+  '/app/finance/invoices': typeof AppFinanceInvoicesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,9 +198,24 @@ export interface FileRoutesById {
   '/app': typeof AppRouteRouteWithChildren
   '/driver': typeof DriverRouteRoute
   '/portal': typeof PortalRouteRoute
+  '/app/audit': typeof AppAuditRoute
+  '/app/communications': typeof AppCommunicationsRoute
   '/app/dashboard': typeof AppDashboardRoute
+  '/app/dispatch': typeof AppDispatchRoute
+  '/app/pod': typeof AppPodRoute
+  '/app/tracking': typeof AppTrackingRoute
+  '/app/bookings/$bookingId': typeof AppBookingsBookingIdRoute
   '/app/bookings/new': typeof AppBookingsNewRoute
+  '/app/drivers/$driverId': typeof AppDriversDriverIdRoute
+  '/app/finance/receivables': typeof AppFinanceReceivablesRoute
+  '/app/trips/$tripId': typeof AppTripsTripIdRoute
+  '/app/vehicles/$vehicleId': typeof AppVehiclesVehicleIdRoute
   '/app/bookings/': typeof AppBookingsIndexRoute
+  '/app/drivers/': typeof AppDriversIndexRoute
+  '/app/trips/': typeof AppTripsIndexRoute
+  '/app/vehicles/': typeof AppVehiclesIndexRoute
+  '/app/finance/invoices/$invoiceId': typeof AppFinanceInvoicesInvoiceIdRoute
+  '/app/finance/invoices/': typeof AppFinanceInvoicesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -88,27 +224,72 @@ export interface FileRouteTypes {
     | '/app'
     | '/driver'
     | '/portal'
+    | '/app/audit'
+    | '/app/communications'
     | '/app/dashboard'
+    | '/app/dispatch'
+    | '/app/pod'
+    | '/app/tracking'
+    | '/app/bookings/$bookingId'
     | '/app/bookings/new'
+    | '/app/drivers/$driverId'
+    | '/app/finance/receivables'
+    | '/app/trips/$tripId'
+    | '/app/vehicles/$vehicleId'
     | '/app/bookings/'
+    | '/app/drivers/'
+    | '/app/trips/'
+    | '/app/vehicles/'
+    | '/app/finance/invoices/$invoiceId'
+    | '/app/finance/invoices/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/app'
     | '/driver'
     | '/portal'
+    | '/app/audit'
+    | '/app/communications'
     | '/app/dashboard'
+    | '/app/dispatch'
+    | '/app/pod'
+    | '/app/tracking'
+    | '/app/bookings/$bookingId'
     | '/app/bookings/new'
+    | '/app/drivers/$driverId'
+    | '/app/finance/receivables'
+    | '/app/trips/$tripId'
+    | '/app/vehicles/$vehicleId'
     | '/app/bookings'
+    | '/app/drivers'
+    | '/app/trips'
+    | '/app/vehicles'
+    | '/app/finance/invoices/$invoiceId'
+    | '/app/finance/invoices'
   id:
     | '__root__'
     | '/'
     | '/app'
     | '/driver'
     | '/portal'
+    | '/app/audit'
+    | '/app/communications'
     | '/app/dashboard'
+    | '/app/dispatch'
+    | '/app/pod'
+    | '/app/tracking'
+    | '/app/bookings/$bookingId'
     | '/app/bookings/new'
+    | '/app/drivers/$driverId'
+    | '/app/finance/receivables'
+    | '/app/trips/$tripId'
+    | '/app/vehicles/$vehicleId'
     | '/app/bookings/'
+    | '/app/drivers/'
+    | '/app/trips/'
+    | '/app/vehicles/'
+    | '/app/finance/invoices/$invoiceId'
+    | '/app/finance/invoices/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -148,11 +329,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/audit': {
+      id: '/app/audit'
+      path: '/audit'
+      fullPath: '/app/audit'
+      preLoaderRoute: typeof AppAuditRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/communications': {
+      id: '/app/communications'
+      path: '/communications'
+      fullPath: '/app/communications'
+      preLoaderRoute: typeof AppCommunicationsRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/app/dashboard': {
       id: '/app/dashboard'
       path: '/dashboard'
       fullPath: '/app/dashboard'
       preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/dispatch': {
+      id: '/app/dispatch'
+      path: '/dispatch'
+      fullPath: '/app/dispatch'
+      preLoaderRoute: typeof AppDispatchRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/pod': {
+      id: '/app/pod'
+      path: '/pod'
+      fullPath: '/app/pod'
+      preLoaderRoute: typeof AppPodRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/tracking': {
+      id: '/app/tracking'
+      path: '/tracking'
+      fullPath: '/app/tracking'
+      preLoaderRoute: typeof AppTrackingRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/app/bookings/': {
@@ -162,6 +378,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBookingsIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/bookings/$bookingId': {
+      id: '/app/bookings/$bookingId'
+      path: '/bookings/$bookingId'
+      fullPath: '/app/bookings/$bookingId'
+      preLoaderRoute: typeof AppBookingsBookingIdRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/app/bookings/new': {
       id: '/app/bookings/new'
       path: '/bookings/new'
@@ -169,19 +392,112 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBookingsNewRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/drivers/': {
+      id: '/app/drivers/'
+      path: '/drivers'
+      fullPath: '/app/drivers/'
+      preLoaderRoute: typeof AppDriversIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/drivers/$driverId': {
+      id: '/app/drivers/$driverId'
+      path: '/drivers/$driverId'
+      fullPath: '/app/drivers/$driverId'
+      preLoaderRoute: typeof AppDriversDriverIdRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/finance/receivables': {
+      id: '/app/finance/receivables'
+      path: '/finance/receivables'
+      fullPath: '/app/finance/receivables'
+      preLoaderRoute: typeof AppFinanceReceivablesRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/trips/': {
+      id: '/app/trips/'
+      path: '/trips'
+      fullPath: '/app/trips/'
+      preLoaderRoute: typeof AppTripsIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/trips/$tripId': {
+      id: '/app/trips/$tripId'
+      path: '/trips/$tripId'
+      fullPath: '/app/trips/$tripId'
+      preLoaderRoute: typeof AppTripsTripIdRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/vehicles/': {
+      id: '/app/vehicles/'
+      path: '/vehicles'
+      fullPath: '/app/vehicles/'
+      preLoaderRoute: typeof AppVehiclesIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/vehicles/$vehicleId': {
+      id: '/app/vehicles/$vehicleId'
+      path: '/vehicles/$vehicleId'
+      fullPath: '/app/vehicles/$vehicleId'
+      preLoaderRoute: typeof AppVehiclesVehicleIdRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/finance/invoices/': {
+      id: '/app/finance/invoices/'
+      path: '/finance/invoices'
+      fullPath: '/app/finance/invoices/'
+      preLoaderRoute: typeof AppFinanceInvoicesIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/finance/invoices/$invoiceId': {
+      id: '/app/finance/invoices/$invoiceId'
+      path: '/finance/invoices/$invoiceId'
+      fullPath: '/app/finance/invoices/$invoiceId'
+      preLoaderRoute: typeof AppFinanceInvoicesInvoiceIdRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
   }
 }
 
 interface AppRouteRouteChildren {
+  AppAuditRoute: typeof AppAuditRoute
+  AppCommunicationsRoute: typeof AppCommunicationsRoute
   AppDashboardRoute: typeof AppDashboardRoute
+  AppDispatchRoute: typeof AppDispatchRoute
+  AppPodRoute: typeof AppPodRoute
+  AppTrackingRoute: typeof AppTrackingRoute
+  AppBookingsBookingIdRoute: typeof AppBookingsBookingIdRoute
   AppBookingsNewRoute: typeof AppBookingsNewRoute
+  AppDriversDriverIdRoute: typeof AppDriversDriverIdRoute
+  AppFinanceReceivablesRoute: typeof AppFinanceReceivablesRoute
+  AppTripsTripIdRoute: typeof AppTripsTripIdRoute
+  AppVehiclesVehicleIdRoute: typeof AppVehiclesVehicleIdRoute
   AppBookingsIndexRoute: typeof AppBookingsIndexRoute
+  AppDriversIndexRoute: typeof AppDriversIndexRoute
+  AppTripsIndexRoute: typeof AppTripsIndexRoute
+  AppVehiclesIndexRoute: typeof AppVehiclesIndexRoute
+  AppFinanceInvoicesInvoiceIdRoute: typeof AppFinanceInvoicesInvoiceIdRoute
+  AppFinanceInvoicesIndexRoute: typeof AppFinanceInvoicesIndexRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppAuditRoute: AppAuditRoute,
+  AppCommunicationsRoute: AppCommunicationsRoute,
   AppDashboardRoute: AppDashboardRoute,
+  AppDispatchRoute: AppDispatchRoute,
+  AppPodRoute: AppPodRoute,
+  AppTrackingRoute: AppTrackingRoute,
+  AppBookingsBookingIdRoute: AppBookingsBookingIdRoute,
   AppBookingsNewRoute: AppBookingsNewRoute,
+  AppDriversDriverIdRoute: AppDriversDriverIdRoute,
+  AppFinanceReceivablesRoute: AppFinanceReceivablesRoute,
+  AppTripsTripIdRoute: AppTripsTripIdRoute,
+  AppVehiclesVehicleIdRoute: AppVehiclesVehicleIdRoute,
   AppBookingsIndexRoute: AppBookingsIndexRoute,
+  AppDriversIndexRoute: AppDriversIndexRoute,
+  AppTripsIndexRoute: AppTripsIndexRoute,
+  AppVehiclesIndexRoute: AppVehiclesIndexRoute,
+  AppFinanceInvoicesInvoiceIdRoute: AppFinanceInvoicesInvoiceIdRoute,
+  AppFinanceInvoicesIndexRoute: AppFinanceInvoicesIndexRoute,
 }
 
 const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
