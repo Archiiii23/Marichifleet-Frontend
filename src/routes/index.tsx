@@ -35,7 +35,7 @@ export const Route = createFileRoute("/")({
 
 function Landing() {
   return (
-    <>
+    <div className="force-dark">
       <BootSequence />
       <SmoothScroll />
       <Cursor />
@@ -90,6 +90,6 @@ function Landing() {
         {/* FINAL */}
         <FinalMoment />
       </main>
-    </>
+    </div>
   );
 }
