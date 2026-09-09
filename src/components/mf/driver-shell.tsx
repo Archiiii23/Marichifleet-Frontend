@@ -3,6 +3,7 @@ import { CloudOff, Cloud, Fuel, Home, LogOut, Route as RouteIcon, TriangleAlert 
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/domain/session";
+import { ThemeToggle } from "@/domain/theme";
 import { cn } from "@/lib/utils";
 
 const TABS = [
@@ -33,6 +34,7 @@ export function DriverShell({ children }: { children: ReactNode }) {
           {online ? <Cloud className="size-3.5" /> : <CloudOff className="size-3.5" />}
           {online ? "Online" : "Offline"}
         </Button>
+        <ThemeToggle />
         <Button
           size="icon"
           variant="ghost"

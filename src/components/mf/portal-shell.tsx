@@ -3,6 +3,7 @@ import { LogOut, Truck } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/domain/session";
+import { ThemeToggle } from "@/domain/theme";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -45,6 +46,7 @@ export function PortalShell({ children }: { children: ReactNode }) {
               <span className="block font-medium">{persona.name}</span>
               <span className="block text-muted-foreground">{persona.title}</span>
             </span>
+            <ThemeToggle />
             <Button
               size="icon"
               variant="ghost"

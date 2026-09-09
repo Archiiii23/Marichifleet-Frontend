@@ -1,14 +1,19 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { DataTable } from "@/components/mf/data-table";
 import { KpiCard, PageHeader, StatusBadge } from "@/components/mf/primitives";
-import { fmtDate, useDb } from "@/domain/hooks";
+import { Button } from "@/components/ui/button";
+import { fmtDate, useAction, useDb } from "@/domain/hooks";
+import { useSession } from "@/domain/session";
+import { advanceDocument } from "@/domain/store";
 import type { ComplianceDoc } from "@/domain/types";
 
 export const Route = createFileRoute("/app/compliance")({
   head: () => ({
     meta: [
-      { title: "Compliance — MarichiFleet" },
-      { name: "description", content: "Permits, insurance, fitness and licences with expiry alerts." },
+      { title: "Compliance & renewals — MarichiFleet" },
+      { name: "description", content: "Permits, insurance, fitness and licences with expiry alerts and renewal tracking." },
+      { property: "og:title", content: "Compliance & renewals — MarichiFleet" },
+      { property: "og:description", content: "Never dispatch on an expired permit, licence or insurance again." },
     ],
   }),
   component: Compliance,
@@ -17,6 +22,9 @@ export const Route = createFileRoute("/app/compliance")({
 function Compliance() {
   const db = useDb();
   const navigate = useNavigate();
+  const run = useAction();
+  const { persona, can } = useSession();
+  const canRenew = can("edit_fleet") || can("view_admin");
 
   const owner = (d: ComplianceDoc) =>
     d.entityType === "vehicle"
@@ -54,6 +62,40 @@ function Compliance() {
           { key: "number", header: "Number", cell: (d) => <span className="numeric">{d.number}</span>, hideOnMobile: true },
           { key: "expiry", header: "Expiry", cell: (d) => fmtDate(d.expiryISO), sortValue: (d) => d.expiryISO },
           { key: "status", header: "Status", cell: (d) => <StatusBadge status={d.status} /> },
+          {
+            key: "renewal",
+            header: "Renewal",
+            cell: (d) =>
+              !canRenew ? (
+                <span className="text-xs text-muted-foreground">—</span>
+              ) : d.status === "renewal_pending" ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 px-2 text-xs"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    run(() => advanceDocument(d.id, "renewed", persona.name), "Document renewed");
+                  }}
+                >
+                  Mark renewed
+                </Button>
+              ) : d.status === "expiring" || d.status === "expired" ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 px-2 text-xs"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    run(() => advanceDocument(d.id, "renewal_pending", persona.name), "Renewal requested");
+                  }}
+                >
+                  Start renewal
+                </Button>
+              ) : (
+                <span className="text-xs text-muted-foreground">Up to date</span>
+              ),
+          },
         ]}
       />
     </>

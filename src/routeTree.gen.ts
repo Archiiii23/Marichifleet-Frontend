@@ -10,8 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AppRouteRouteImport } from './routes/app/route'
 import { Route as DriverRouteRouteImport } from './routes/driver/route'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as PortalRouteRouteImport } from './routes/portal/route'
 import { Route as AppAuditRouteImport } from './routes/app/audit'
 import { Route as AppCommunicationsRouteImport } from './routes/app/communications'
@@ -19,8 +22,13 @@ import { Route as AppComplianceRouteImport } from './routes/app/compliance'
 import { Route as AppDashboardRouteImport } from './routes/app/dashboard'
 import { Route as AppDispatchRouteImport } from './routes/app/dispatch'
 import { Route as AppFuelRouteImport } from './routes/app/fuel'
+import { Route as AppHrRouteImport } from './routes/app/hr'
+import { Route as AppInventoryRouteImport } from './routes/app/inventory'
 import { Route as AppPodRouteImport } from './routes/app/pod'
+import { Route as AppReportsRouteImport } from './routes/app/reports'
+import { Route as AppSettingsRouteImport } from './routes/app/settings'
 import { Route as AppTrackingRouteImport } from './routes/app/tracking'
+import { Route as AppVendorsRouteImport } from './routes/app/vendors'
 import { Route as AppWorkshopRouteImport } from './routes/app/workshop'
 import { Route as DriverIndexRouteImport } from './routes/driver/index'
 import { Route as DriverExceptionRouteImport } from './routes/driver/exception'
@@ -57,6 +65,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppRouteRoute = AppRouteRouteImport.update({
   id: '/app',
   path: '/app',
@@ -65,6 +78,16 @@ const AppRouteRoute = AppRouteRouteImport.update({
 const DriverRouteRoute = DriverRouteRouteImport.update({
   id: '/driver',
   path: '/driver',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PortalRouteRoute = PortalRouteRouteImport.update({
@@ -102,14 +125,39 @@ const AppFuelRoute = AppFuelRouteImport.update({
   path: '/fuel',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppHrRoute = AppHrRouteImport.update({
+  id: '/hr',
+  path: '/hr',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppInventoryRoute = AppInventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppPodRoute = AppPodRouteImport.update({
   id: '/pod',
   path: '/pod',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppReportsRoute = AppReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppTrackingRoute = AppTrackingRouteImport.update({
   id: '/tracking',
   path: '/tracking',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppVendorsRoute = AppVendorsRouteImport.update({
+  id: '/vendors',
+  path: '/vendors',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppWorkshopRoute = AppWorkshopRouteImport.update({
@@ -269,14 +317,22 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRouteRouteWithChildren
   '/driver': typeof DriverRouteRouteWithChildren
   '/portal': typeof PortalRouteRouteWithChildren
+  '/admin': typeof AdminRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/app/audit': typeof AppAuditRoute
   '/app/communications': typeof AppCommunicationsRoute
   '/app/compliance': typeof AppComplianceRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/dispatch': typeof AppDispatchRoute
   '/app/fuel': typeof AppFuelRoute
+  '/app/hr': typeof AppHrRoute
+  '/app/inventory': typeof AppInventoryRoute
   '/app/pod': typeof AppPodRoute
+  '/app/reports': typeof AppReportsRoute
+  '/app/settings': typeof AppSettingsRoute
   '/app/tracking': typeof AppTrackingRoute
+  '/app/vendors': typeof AppVendorsRoute
   '/app/workshop': typeof AppWorkshopRoute
   '/driver/exception': typeof DriverExceptionRoute
   '/driver/fuel': typeof DriverFuelRoute
@@ -311,14 +367,22 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppRouteRouteWithChildren
+  '/admin': typeof AdminRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/app/audit': typeof AppAuditRoute
   '/app/communications': typeof AppCommunicationsRoute
   '/app/compliance': typeof AppComplianceRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/dispatch': typeof AppDispatchRoute
   '/app/fuel': typeof AppFuelRoute
+  '/app/hr': typeof AppHrRoute
+  '/app/inventory': typeof AppInventoryRoute
   '/app/pod': typeof AppPodRoute
+  '/app/reports': typeof AppReportsRoute
+  '/app/settings': typeof AppSettingsRoute
   '/app/tracking': typeof AppTrackingRoute
+  '/app/vendors': typeof AppVendorsRoute
   '/app/workshop': typeof AppWorkshopRoute
   '/driver/exception': typeof DriverExceptionRoute
   '/driver/fuel': typeof DriverFuelRoute
@@ -356,14 +420,22 @@ export interface FileRoutesById {
   '/app': typeof AppRouteRouteWithChildren
   '/driver': typeof DriverRouteRouteWithChildren
   '/portal': typeof PortalRouteRouteWithChildren
+  '/admin': typeof AdminRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/app/audit': typeof AppAuditRoute
   '/app/communications': typeof AppCommunicationsRoute
   '/app/compliance': typeof AppComplianceRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/dispatch': typeof AppDispatchRoute
   '/app/fuel': typeof AppFuelRoute
+  '/app/hr': typeof AppHrRoute
+  '/app/inventory': typeof AppInventoryRoute
   '/app/pod': typeof AppPodRoute
+  '/app/reports': typeof AppReportsRoute
+  '/app/settings': typeof AppSettingsRoute
   '/app/tracking': typeof AppTrackingRoute
+  '/app/vendors': typeof AppVendorsRoute
   '/app/workshop': typeof AppWorkshopRoute
   '/driver/exception': typeof DriverExceptionRoute
   '/driver/fuel': typeof DriverFuelRoute
@@ -402,14 +474,22 @@ export interface FileRouteTypes {
     | '/app'
     | '/driver'
     | '/portal'
+    | '/admin'
+    | '/login'
+    | '/onboarding'
     | '/app/audit'
     | '/app/communications'
     | '/app/compliance'
     | '/app/dashboard'
     | '/app/dispatch'
     | '/app/fuel'
+    | '/app/hr'
+    | '/app/inventory'
     | '/app/pod'
+    | '/app/reports'
+    | '/app/settings'
     | '/app/tracking'
+    | '/app/vendors'
     | '/app/workshop'
     | '/driver/exception'
     | '/driver/fuel'
@@ -444,14 +524,22 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/app'
+    | '/admin'
+    | '/login'
+    | '/onboarding'
     | '/app/audit'
     | '/app/communications'
     | '/app/compliance'
     | '/app/dashboard'
     | '/app/dispatch'
     | '/app/fuel'
+    | '/app/hr'
+    | '/app/inventory'
     | '/app/pod'
+    | '/app/reports'
+    | '/app/settings'
     | '/app/tracking'
+    | '/app/vendors'
     | '/app/workshop'
     | '/driver/exception'
     | '/driver/fuel'
@@ -488,14 +576,22 @@ export interface FileRouteTypes {
     | '/app'
     | '/driver'
     | '/portal'
+    | '/admin'
+    | '/login'
+    | '/onboarding'
     | '/app/audit'
     | '/app/communications'
     | '/app/compliance'
     | '/app/dashboard'
     | '/app/dispatch'
     | '/app/fuel'
+    | '/app/hr'
+    | '/app/inventory'
     | '/app/pod'
+    | '/app/reports'
+    | '/app/settings'
     | '/app/tracking'
+    | '/app/vendors'
     | '/app/workshop'
     | '/driver/exception'
     | '/driver/fuel'
@@ -533,6 +629,9 @@ export interface RootRouteChildren {
   AppRouteRoute: typeof AppRouteRouteWithChildren
   DriverRouteRoute: typeof DriverRouteRouteWithChildren
   PortalRouteRoute: typeof PortalRouteRouteWithChildren
+  AdminRoute: typeof AdminRoute
+  LoginRoute: typeof LoginRoute
+  OnboardingRoute: typeof OnboardingRoute
   TrackTokenRoute: typeof TrackTokenRoute
 }
 
@@ -543,6 +642,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app': {
@@ -557,6 +663,20 @@ declare module '@tanstack/react-router' {
       path: '/driver'
       fullPath: '/driver'
       preLoaderRoute: typeof DriverRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/portal': {
@@ -608,6 +728,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppFuelRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/hr': {
+      id: '/app/hr'
+      path: '/hr'
+      fullPath: '/app/hr'
+      preLoaderRoute: typeof AppHrRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/inventory': {
+      id: '/app/inventory'
+      path: '/inventory'
+      fullPath: '/app/inventory'
+      preLoaderRoute: typeof AppInventoryRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/app/pod': {
       id: '/app/pod'
       path: '/pod'
@@ -615,11 +749,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPodRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/reports': {
+      id: '/app/reports'
+      path: '/reports'
+      fullPath: '/app/reports'
+      preLoaderRoute: typeof AppReportsRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/settings': {
+      id: '/app/settings'
+      path: '/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/app/tracking': {
       id: '/app/tracking'
       path: '/tracking'
       fullPath: '/app/tracking'
       preLoaderRoute: typeof AppTrackingRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/vendors': {
+      id: '/app/vendors'
+      path: '/vendors'
+      fullPath: '/app/vendors'
+      preLoaderRoute: typeof AppVendorsRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/app/workshop': {
@@ -842,8 +997,13 @@ interface AppRouteRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
   AppDispatchRoute: typeof AppDispatchRoute
   AppFuelRoute: typeof AppFuelRoute
+  AppHrRoute: typeof AppHrRoute
+  AppInventoryRoute: typeof AppInventoryRoute
   AppPodRoute: typeof AppPodRoute
+  AppReportsRoute: typeof AppReportsRoute
+  AppSettingsRoute: typeof AppSettingsRoute
   AppTrackingRoute: typeof AppTrackingRoute
+  AppVendorsRoute: typeof AppVendorsRoute
   AppWorkshopRoute: typeof AppWorkshopRoute
   AppBookingsBookingIdRoute: typeof AppBookingsBookingIdRoute
   AppBookingsNewRoute: typeof AppBookingsNewRoute
@@ -868,8 +1028,13 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppDispatchRoute: AppDispatchRoute,
   AppFuelRoute: AppFuelRoute,
+  AppHrRoute: AppHrRoute,
+  AppInventoryRoute: AppInventoryRoute,
   AppPodRoute: AppPodRoute,
+  AppReportsRoute: AppReportsRoute,
+  AppSettingsRoute: AppSettingsRoute,
   AppTrackingRoute: AppTrackingRoute,
+  AppVendorsRoute: AppVendorsRoute,
   AppWorkshopRoute: AppWorkshopRoute,
   AppBookingsBookingIdRoute: AppBookingsBookingIdRoute,
   AppBookingsNewRoute: AppBookingsNewRoute,
@@ -944,6 +1109,9 @@ const rootRouteChildren: RootRouteChildren = {
   AppRouteRoute: AppRouteRouteWithChildren,
   DriverRouteRoute: DriverRouteRouteWithChildren,
   PortalRouteRoute: PortalRouteRouteWithChildren,
+  AdminRoute: AdminRoute,
+  LoginRoute: LoginRoute,
+  OnboardingRoute: OnboardingRoute,
   TrackTokenRoute: TrackTokenRoute,
 }
 export const routeTree = rootRouteImport

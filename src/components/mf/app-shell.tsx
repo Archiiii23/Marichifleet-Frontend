@@ -1,8 +1,9 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
-  Activity, BadgeIndianRupee, Bell, Boxes, ClipboardCheck, Command as CommandIcon, Fuel,
-  LayoutDashboard, LogOut, Map, MessageSquare, Package, Radio, ShieldCheck, Truck, Users, Wrench,
-  UserCircle2, Menu, X,
+  Activity, BadgeIndianRupee, BarChart3, Bell, Boxes, Building2, ClipboardCheck,
+  Command as CommandIcon, Fuel, Handshake, LayoutDashboard, LogOut, Map, MessageSquare, Package,
+  Radio, Settings, ShieldCheck, Truck, Users, UsersRound, Warehouse, Wrench,
+  UserCircle2, Menu,
 } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useDb, timeAgo } from "@/domain/hooks";
 import { PERSONAS, roleLabel, useSession, type Capability } from "@/domain/session";
 import { tickSimulation, bump } from "@/domain/store";
+import { ThemeToggle } from "@/domain/theme";
 import { cn } from "@/lib/utils";
 import { StatusBadge } from "./primitives";
 
@@ -55,18 +57,29 @@ const NAV: Array<{ group: string; items: NavItem[] }> = [
     ],
   },
   {
+    group: "Supply chain",
+    items: [
+      { to: "/app/inventory", label: "Spare Parts", icon: Warehouse, cap: "view_operations" },
+      { to: "/app/vendors", label: "Vendors", icon: Handshake, cap: "view_operations" },
+    ],
+  },
+  {
     group: "Commercial",
     items: [
       { to: "/app/clients", label: "Clients", icon: Boxes, cap: "view_operations" },
       { to: "/app/finance/invoices", label: "Invoices", icon: BadgeIndianRupee, cap: "view_finance" },
       { to: "/app/finance/receivables", label: "Receivables", icon: BadgeIndianRupee, cap: "view_finance" },
+      { to: "/app/reports", label: "Reports", icon: BarChart3, cap: "view_operations" },
     ],
   },
   {
-    group: "Platform",
+    group: "Organisation",
     items: [
+      { to: "/app/hr", label: "People & Payroll", icon: UsersRound, cap: "view_admin" },
       { to: "/app/communications", label: "Communications", icon: MessageSquare, cap: "view_operations" },
       { to: "/app/audit", label: "Audit Log", icon: ShieldCheck, cap: "view_admin" },
+      { to: "/app/settings", label: "Settings", icon: Settings, cap: "view_admin" },
+      { to: "/admin", label: "Platform Admin", icon: Building2, cap: "view_admin" },
     ],
   },
 ];
@@ -173,6 +186,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </button>
 
           <div className="ml-auto flex items-center gap-1">
+            <ThemeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
