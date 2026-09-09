@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AlertTriangle, FileSpreadsheet, MapPin, MessageSquare, Phone, Radio, ScrollText } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { clamp01, range, useSectionProgress, usePrefersReducedMotion } from "@/lib/scroll";
+import { range, useSectionProgress, usePrefersReducedMotion } from "@/lib/scroll";
 import { Counter, Eyebrow, MaskLines, Reveal } from "./type";
 
 /* ──────────────────────────────────────────────────────────── CHAOS → CONTROL */
@@ -335,4 +335,3 @@ export function LiveTracking() {
 }
 
 export { MiniMap };
-export const _clamp = clamp01;
