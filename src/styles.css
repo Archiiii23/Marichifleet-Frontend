@@ -193,3 +193,91 @@
 .mf-rise {
   animation: mf-rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
+
+/* ── Marketing experience layer ─────────────────────────────────────────── */
+
+.site-reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.site-reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+.site-line {
+  transform: translateY(105%);
+  opacity: 0;
+  transition:
+    transform 1s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.7s ease;
+  will-change: transform;
+}
+.site-line.is-in {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.site-display {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  line-height: 0.86;
+}
+
+@utility hairline {
+  border-top: 1px solid color-mix(in oklch, var(--color-border) 90%, transparent);
+}
+
+@utility vignette {
+  background:
+    radial-gradient(120% 90% at 50% 40%, transparent 40%, color-mix(in oklch, var(--background) 92%, transparent) 100%);
+}
+
+@utility noise {
+  background-image: radial-gradient(color-mix(in oklch, var(--color-foreground) 8%, transparent) 0.5px, transparent 0.5px);
+  background-size: 3px 3px;
+}
+
+@keyframes mf-stream {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes mf-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes mf-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(var(--r, 0deg));
+  }
+  50% {
+    transform: translate3d(0, -10px, 0) rotate(var(--r, 0deg));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-reveal,
+  .site-line {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
