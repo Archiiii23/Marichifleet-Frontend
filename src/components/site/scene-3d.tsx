@@ -111,7 +111,7 @@ function Truck() {
   });
 
   return (
-    <group ref={group}>
+    <group ref={group} position-x={1.35}>
       <primitive object={model} />
     </group>
   );
