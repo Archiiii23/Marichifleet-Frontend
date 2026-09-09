@@ -1,9 +1,10 @@
-import { canBooking, canInvoice, canTrip, labelize, type GuardResult } from "./machines";
+import { canBooking, canDocument, canInvoice, canTrip, labelize, type GuardResult } from "./machines";
 import { buildSeed, distanceKm } from "./seed";
 import type {
   Booking,
   BookingStatus,
   DbShape,
+  DocumentStatus,
   Driver,
   Invoice,
   Notification,
@@ -737,3 +738,32 @@ export function subscribeDb(fn: () => void) {
 
 export const getVersion = () => version;
 export const getServerVersion = () => 0;
+
+/**
+ * Compliance renewals: request a renewal for an expiring/expired document, then
+ * confirm it once the new paper arrives. Illegal jumps are refused by the
+ * document state machine.
+ */
+export function advanceDocument(docId: string, to: DocumentStatus, actor: string, newExpiryISO?: string): ActionResult {
+  const doc = getDb().docs.find((d) => d.id === docId);
+  if (!doc) return { ok: false, reason: "That document no longer exists." };
+  const guard = canDocument(doc.status, to);
+  if (!guard.ok) return { ok: false, reason: guard.reason };
+  const from = doc.status;
+  doc.status = to;
+  if (to === "renewed") {
+    doc.expiryISO = newExpiryISO ?? new Date(Date.now() + 365 * 86400000).toISOString();
+    doc.status = "valid";
+  }
+  audit(actor, `Document ${labelize(to)}`, "document", docId, from, doc.status);
+  notify({
+    event: "DOCUMENT_EXPIRING",
+    channel: "in_app",
+    recipient: "Compliance desk",
+    recipientRole: "manager",
+    body: `${doc.kind} ${doc.number} is now ${labelize(doc.status).toLowerCase()}.`,
+    link: "/app/compliance",
+    entityRef: doc.number,
+  });
+  return { ok: true };
+}
