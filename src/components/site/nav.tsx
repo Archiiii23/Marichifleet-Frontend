@@ -1,19 +1,27 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { Monitor, Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Magnetic } from "./type";
+import { Button } from "@/components/ui/button";
+import { useTheme, type Theme } from "@/domain/theme";
 
 const LINKS = [
-  { label: "Solutions", href: "#journey" },
   { label: "Platform", href: "#control" },
+  { label: "Solutions", href: "#movement" },
   { label: "Control Tower", href: "#tracking" },
-  { label: "Intelligence", href: "#intelligence" },
+];
+
+const THEMES: { value: Theme; label: string; icon: typeof Sun }[] = [
+  { value: "dark", label: "Dark", icon: Moon },
+  { value: "light", label: "Light", icon: Sun },
+  { value: "system", label: "System", icon: Monitor },
 ];
 
 export function SiteNav() {
   const [compact, setCompact] = useState(false);
   const [progress, setProgress] = useState(0);
   const [open, setOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     const onScroll = () => {
@@ -42,8 +50,7 @@ export function SiteNav() {
       >
         <a
           href="#top"
-          data-cursor="Top"
-          className="font-display text-sm font-semibold uppercase tracking-[0.34em] text-foreground"
+          className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-foreground"
         >
           Marichi<span className="text-primary">Fleet</span>
         </a>
@@ -51,14 +58,9 @@ export function SiteNav() {
         <ul className="hidden items-center gap-9 lg:flex">
           {LINKS.map((l) => (
             <li key={l.label}>
-              <Magnetic strength={0.18}>
-                <a
-                  href={l.href}
-                  className="text-[11px] uppercase tracking-[0.26em] text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  {l.label}
-                </a>
-              </Magnetic>
+              <a href={l.href} className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground">
+                {l.label}
+              </a>
             </li>
           ))}
         </ul>
@@ -70,30 +72,31 @@ export function SiteNav() {
           >
             Login
           </Link>
-          <Magnetic strength={0.2}>
-            <Link
-              to="/app/dashboard"
-              data-cursor="Enter"
-              className="inline-flex items-center rounded-full border border-foreground/25 px-4 py-2 text-[11px] uppercase tracking-[0.26em] text-foreground transition-colors hover:border-primary hover:bg-primary hover:text-primary-foreground sm:px-5"
-            >
-              Get started
-            </Link>
-          </Magnetic>
-          <button
+          <ThemePicker theme={theme} onChange={setTheme} className="hidden xl:flex" />
+          <Link
+            to="/app/dashboard"
+            className="inline-flex h-9 items-center border border-foreground/30 px-4 text-[11px] uppercase tracking-[0.14em] text-foreground transition-colors hover:border-primary hover:bg-primary hover:text-primary-foreground sm:px-5"
+          >
+            Get started
+          </Link>
+          <Button
             type="button"
+            variant="outline"
+            size="icon"
             aria-expanded={open}
             aria-label="Toggle menu"
             onClick={() => setOpen((o) => !o)}
-            className="ml-1 flex size-9 flex-col items-center justify-center gap-1.5 rounded-full border border-border lg:hidden"
+            className="ml-1 flex flex-col gap-1.5 lg:hidden"
           >
             <span className={cn("h-px w-4 bg-foreground transition-transform", open && "translate-y-[3px] rotate-45")} />
             <span className={cn("h-px w-4 bg-foreground transition-transform", open && "-translate-y-[3px] -rotate-45")} />
-          </button>
+          </Button>
         </div>
       </nav>
 
       {open && (
-        <ul className="border-t border-border bg-background/95 px-5 py-4 backdrop-blur-xl lg:hidden">
+        <div className="border-t border-border bg-background/95 px-5 py-4 backdrop-blur-xl lg:hidden">
+          <ul>
           {LINKS.map((l) => (
             <li key={l.label}>
               <a
@@ -105,7 +108,9 @@ export function SiteNav() {
               </a>
             </li>
           ))}
-        </ul>
+          </ul>
+          <ThemePicker theme={theme} onChange={setTheme} className="mt-4 flex" />
+        </div>
       )}
 
       <div className="h-px w-full bg-border/60">
@@ -116,5 +121,26 @@ export function SiteNav() {
         />
       </div>
     </header>
+  );
+}
+
+function ThemePicker({ theme, onChange, className }: { theme: Theme; onChange: (theme: Theme) => void; className?: string }) {
+  return (
+    <div className={cn("items-center border border-border bg-background/70 p-0.5", className)} aria-label="Appearance">
+      {THEMES.map(({ value, label, icon: Icon }) => (
+        <Button
+          key={value}
+          type="button"
+          variant="ghost"
+          size="icon"
+          className={cn("size-7 rounded-none", theme === value && "bg-foreground text-background hover:bg-foreground hover:text-background")}
+          onClick={() => onChange(value)}
+          aria-label={`${label} appearance`}
+          title={label}
+        >
+          <Icon className="size-3.5" aria-hidden />
+        </Button>
+      ))}
+    </div>
   );
 }

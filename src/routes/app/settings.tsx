@@ -203,7 +203,7 @@ function Settings() {
         <TabsContent value="appearance" className="mt-4">
           <Panel title="Appearance" description="Applies to the control tower, driver app and client portal on this device.">
             <div className="flex flex-wrap gap-3">
-              {(["dark", "light"] as const).map((t) => (
+              {(["dark", "light", "system"] as const).map((t) => (
                 <button
                   key={t}
                   onClick={() => setTheme(t)}
@@ -213,7 +213,7 @@ function Settings() {
                 >
                   <span className="block font-medium">{t} appearance</span>
                   <span className="block text-xs text-muted-foreground">
-                    {t === "dark" ? "Night control-tower canvas" : "Paper-bright daytime canvas"}
+                    {t === "dark" ? "Night control-tower canvas" : t === "light" ? "Paper-bright daytime canvas" : "Follow this device"}
                   </span>
                 </button>
               ))}
