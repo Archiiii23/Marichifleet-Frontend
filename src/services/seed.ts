@@ -19,9 +19,9 @@ export async function seedDemoData(tenantId: string) {
   const { data: clients, error: clientErr } = await supabase
     .from("clients")
     .insert([
-      { tenant_id: t, name: "Adarsh Steel Works", contact_name: "Rohit Kulkarni", phone: "+919820011223", email: "rohit@adarshsteel.in", city: "Pune", gstin: "27AABCA1234K1Z5", credit_limit: 1500000, payment_terms_days: 30 },
-      { tenant_id: t, name: "Sunrise Agro Foods", contact_name: "Kavita Nair", phone: "+919845566778", email: "kavita@sunriseagro.in", city: "Nashik", gstin: "27AACSS9876L1Z2", credit_limit: 900000, payment_terms_days: 21 },
-      { tenant_id: t, name: "Meridian Retail", contact_name: "Arjun Sethi", phone: "+919833344556", email: "arjun@meridianretail.in", city: "Mumbai", gstin: "27AAECM4567P1Z9", credit_limit: 2500000, payment_terms_days: 45 },
+      { tenant_id: t, name: "Adarsh Steel Works", contact_name: "Rohit Kulkarni", phone: "+919820011223", email: "rohit@adarshsteel.in", city: "Pune", gstin: "27AABCA1234K1Z5", credit_days: 30, rate_per_km: 42, segment: "manufacturing" },
+      { tenant_id: t, name: "Sunrise Agro Foods", contact_name: "Kavita Nair", phone: "+919845566778", email: "kavita@sunriseagro.in", city: "Nashik", gstin: "27AACSS9876L1Z2", credit_days: 21, rate_per_km: 38, segment: "fmcg" },
+      { tenant_id: t, name: "Meridian Retail", contact_name: "Arjun Sethi", phone: "+919833344556", email: "arjun@meridianretail.in", city: "Mumbai", gstin: "27AAECM4567P1Z9", credit_days: 45, rate_per_km: 45, segment: "retail" },
     ])
     .select();
   if (clientErr) throw new DataError(clientErr.message);
@@ -29,10 +29,10 @@ export async function seedDemoData(tenantId: string) {
   const { data: vehicles, error: vehicleErr } = await supabase
     .from("vehicles")
     .insert([
-      { tenant_id: t, reg_no: "MH12 AB 4521", make: "Tata", model: "Signa 4825.TK", vehicle_type: "trailer", capacity_tons: 25, status: "available", odometer_km: 184220, lat: 18.5204, lng: 73.8567 },
-      { tenant_id: t, reg_no: "MH14 CD 7788", make: "Ashok Leyland", model: "2820 6x4", vehicle_type: "truck", capacity_tons: 18, status: "available", odometer_km: 96140, lat: 19.076, lng: 72.8777 },
-      { tenant_id: t, reg_no: "MH15 EF 3390", make: "BharatBenz", model: "1917R", vehicle_type: "truck", capacity_tons: 12, status: "in_maintenance", odometer_km: 142380, lat: 19.9975, lng: 73.7898 },
-      { tenant_id: t, reg_no: "MH04 GH 1120", make: "Eicher", model: "Pro 3019", vehicle_type: "container", capacity_tons: 9, status: "available", odometer_km: 61220, lat: 18.5204, lng: 73.8567 },
+      { tenant_id: t, reg_no: "MH12 AB 4521", make: "Tata", type: "trailer", capacity_tons: 25, status: "available", odometer_km: 184220, lat: 18.5204, lng: 73.8567 },
+      { tenant_id: t, reg_no: "MH14 CD 7788", make: "Ashok Leyland", type: "truck", capacity_tons: 18, status: "available", odometer_km: 96140, lat: 19.076, lng: 72.8777 },
+      { tenant_id: t, reg_no: "MH15 EF 3390", make: "BharatBenz", type: "truck", capacity_tons: 12, status: "in_maintenance", odometer_km: 142380, lat: 19.9975, lng: 73.7898 },
+      { tenant_id: t, reg_no: "MH04 GH 1120", make: "Eicher", type: "container", capacity_tons: 9, status: "available", odometer_km: 61220, lat: 18.5204, lng: 73.8567 },
     ])
     .select();
   if (vehicleErr) throw new DataError(vehicleErr.message);
@@ -40,18 +40,18 @@ export async function seedDemoData(tenantId: string) {
   const { data: drivers, error: driverErr } = await supabase
     .from("drivers")
     .insert([
-      { tenant_id: t, name: "Ramesh Yadav", phone: "+919812340001", licence_no: "MH1220110004521", licence_expiry: iso(240).slice(0, 10), status: "available", rating: 4.7, experience_years: 12 },
-      { tenant_id: t, name: "Imran Shaikh", phone: "+919812340002", licence_no: "MH1420130009912", licence_expiry: iso(60).slice(0, 10), status: "available", rating: 4.4, experience_years: 8 },
-      { tenant_id: t, name: "Suresh Pawar", phone: "+919812340003", licence_no: "MH1520090003318", licence_expiry: iso(-10).slice(0, 10), status: "on_leave", rating: 4.1, experience_years: 15 },
+      { tenant_id: t, name: "Ramesh Yadav", phone: "+919812340001", licence_no: "MH1220110004521", licence_expiry: iso(240).slice(0, 10), status: "available", rating: 4.7, trips_completed: 214 },
+      { tenant_id: t, name: "Imran Shaikh", phone: "+919812340002", licence_no: "MH1420130009912", licence_expiry: iso(60).slice(0, 10), status: "available", rating: 4.4, trips_completed: 132 },
+      { tenant_id: t, name: "Suresh Pawar", phone: "+919812340003", licence_no: "MH1520090003318", licence_expiry: iso(-10).slice(0, 10), status: "on_leave", rating: 4.1, trips_completed: 301 },
     ])
     .select();
   if (driverErr) throw new DataError(driverErr.message);
 
   await supabase.from("documents").insert([
-    { tenant_id: t, owner_type: "vehicle", owner_id: vehicles![0]!.id, doc_type: "insurance", number: "INS-4521", expires_on: iso(120).slice(0, 10) },
-    { tenant_id: t, owner_type: "vehicle", owner_id: vehicles![1]!.id, doc_type: "fitness", number: "FIT-7788", expires_on: iso(18).slice(0, 10) },
-    { tenant_id: t, owner_type: "vehicle", owner_id: vehicles![2]!.id, doc_type: "permit", number: "PMT-3390", expires_on: iso(-5).slice(0, 10) },
-    { tenant_id: t, owner_type: "driver", owner_id: drivers![0]!.id, doc_type: "licence", number: "MH1220110004521", expires_on: iso(240).slice(0, 10) },
+    { tenant_id: t, owner_type: "vehicle", owner_id: vehicles![0]!.id, doc_type: "insurance", doc_number: "INS-4521", expiry_date: iso(120).slice(0, 10) },
+    { tenant_id: t, owner_type: "vehicle", owner_id: vehicles![1]!.id, doc_type: "fitness", doc_number: "FIT-7788", expiry_date: iso(18).slice(0, 10) },
+    { tenant_id: t, owner_type: "vehicle", owner_id: vehicles![2]!.id, doc_type: "permit", doc_number: "PMT-3390", expiry_date: iso(-5).slice(0, 10) },
+    { tenant_id: t, owner_type: "driver", owner_id: drivers![0]!.id, doc_type: "licence", doc_number: "MH1220110004521", expiry_date: iso(240).slice(0, 10) },
   ]);
 
   const { data: bookings } = await supabase
@@ -64,8 +64,8 @@ export async function seedDemoData(tenantId: string) {
     .select();
 
   await supabase.from("fuel_logs").insert([
-    { tenant_id: t, vehicle_id: vehicles![0]!.id, driver_id: drivers![0]!.id, litres: 180, cost: 18540, odometer_km: 184100, station: "HP Chakan", filled_at: iso(-3) },
-    { tenant_id: t, vehicle_id: vehicles![1]!.id, driver_id: drivers![1]!.id, litres: 140, cost: 14420, odometer_km: 96010, station: "IOC Nashik", filled_at: iso(-1) },
+    { tenant_id: t, vehicle_id: vehicles![0]!.id, driver_id: drivers![0]!.id, litres: 180, amount: 18540, odometer_km: 184100, station: "HP Chakan", filled_at: iso(-3) },
+    { tenant_id: t, vehicle_id: vehicles![1]!.id, driver_id: drivers![1]!.id, litres: 140, amount: 14420, odometer_km: 96010, station: "IOC Nashik", filled_at: iso(-1) },
   ]);
 
   await supabase.from("vendors").insert([
