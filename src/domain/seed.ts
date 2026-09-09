@@ -46,6 +46,13 @@ export const CITIES = [
   { city: "Kochi", lat: 9.931, lng: 76.267 },
 ];
 
+/** City lookup used by booking forms and lane pickers. */
+export const CITY_INDEX: Record<string, { lat: number; lng: number }> = Object.fromEntries(
+  CITIES.map((c) => [c.city, { lat: c.lat, lng: c.lng }]),
+);
+
+
+
 export function distanceKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
   const R = 6371;
   const dLat = ((b.lat - a.lat) * Math.PI) / 180;
