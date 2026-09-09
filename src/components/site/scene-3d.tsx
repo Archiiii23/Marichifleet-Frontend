@@ -263,40 +263,44 @@ export default function Scene3D({ reduced = false, lite = false }: { reduced?: b
       shadows={!lite}
       dpr={[1, lite ? 1.25 : 1.75]}
       gl={{ antialias: !lite, powerPreference: "high-performance" }}
-      camera={{ position: [0.2, 1.05, 6.4], fov: 34 }}
+      camera={{ position: [1.9, 1.25, 8.6], fov: 32 }}
       frameloop={reduced ? "demand" : "always"}
     >
       <color attach="background" args={["#0a0b0d"]} />
-      <fog attach="fog" args={["#0a0b0d", 12, 46]} />
+      <fog attach="fog" args={["#0a0b0d", 16, 60]} />
 
-      <ambientLight intensity={0.22} />
+      <ambientLight intensity={0.6} />
       <directionalLight
         position={[6, 12, 6]}
-        intensity={2.1}
+        intensity={3.2}
         castShadow={!lite}
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
       />
-      <spotLight position={[-8, 9, -6]} angle={0.7} penumbra={1} intensity={90} color="#e2483a" distance={40} />
-      <spotLight position={[9, 6, -10]} angle={0.8} penumbra={1} intensity={60} color="#6fa8dc" distance={44} />
+      {/* Key light from the camera side so the bodywork reads against the dark canvas. */}
+      <spotLight position={[7, 6, 11]} angle={0.8} penumbra={1} intensity={420} color="#ffffff" distance={60} />
+      <spotLight position={[-8, 9, -6]} angle={0.7} penumbra={1} intensity={220} color="#e2483a" distance={40} />
+      <spotLight position={[9, 6, -10]} angle={0.8} penumbra={1} intensity={180} color="#6fa8dc" distance={44} />
 
       <Environment resolution={128}>
-        <Lightformer intensity={2.6} position={[0, 6, 2]} scale={[12, 5, 1]} color="#ffffff" />
+        <Lightformer intensity={5} position={[0, 6, 4]} scale={[16, 6, 1]} color="#ffffff" />
         <Lightformer
-          intensity={1.5}
+          intensity={3}
           color="#8fb4d8"
           position={[-7, 2, -2]}
           rotation-y={Math.PI / 2}
           scale={[24, 2, 1]}
         />
         <Lightformer
-          intensity={1.2}
+          intensity={2.4}
           color="#e2483a"
           position={[7, 2, -4]}
           rotation-y={-Math.PI / 2}
           scale={[24, 1.5, 1]}
         />
       </Environment>
+
+
 
       <Suspense fallback={null}>
         <Truck />
