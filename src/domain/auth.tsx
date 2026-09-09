@@ -51,6 +51,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const company = (s.user.user_metadata?.["company_name"] as string | undefined) ?? "My Fleet";
       await supabase.rpc("bootstrap_tenant", { _company_name: company });
       account = await loadAccount(s.user.id);
+      if (account.profile?.tenant_id) {
+        const { seedDemoData } = await import("@/services/seed");
+        await seedDemoData(account.profile.tenant_id).catch(() => undefined);
+      }
     }
     setProfile(account.profile);
     setRoles(account.roles);
