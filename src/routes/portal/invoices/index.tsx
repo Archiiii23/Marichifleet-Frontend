@@ -45,7 +45,7 @@ function PortalInvoices() {
         emptyMessage="Invoices appear here once deliveries are completed."
         columns={[
           { key: "ref", header: "Invoice", cell: (i) => <span className="numeric font-medium">{i.ref}</span> },
-          { key: "issued", header: "Issued", cell: (i) => fmtDate(i.issuedISO), sortValue: (i) => i.issuedISO, hideOnMobile: true },
+          { key: "issued", header: "Issued", cell: (i) => (i.issuedISO ? fmtDate(i.issuedISO) : "—"), sortValue: (i) => i.issuedISO ?? "", hideOnMobile: true },
           { key: "due", header: "Due", cell: (i) => fmtDate(i.dueISO), sortValue: (i) => i.dueISO, hideOnMobile: true },
           { key: "total", header: "Total", cell: (i) => <span className="numeric">{inr(i.total)}</span>, className: "text-right" },
           { key: "bal", header: "Outstanding", cell: (i) => <span className="numeric">{inr(invoiceOutstanding(i))}</span>, className: "text-right" },

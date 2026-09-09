@@ -18,7 +18,7 @@ export const Route = createFileRoute("/track/$token")({
 function PublicTrack() {
   const { token } = Route.useParams();
   const db = useDb();
-  const trip = db.trips.find((t) => t.publicToken === token || t.ref.toLowerCase() === token.toLowerCase());
+  const trip = db.trips.find((t) => t.ref.toLowerCase() === token.toLowerCase());
 
   if (!trip) {
     return (
@@ -46,8 +46,10 @@ function PublicTrack() {
         <StatusBadge status={trip.status} />
       </header>
 
-      <Panel title="Live position" padded={false}>
-        <FleetMap trips={[trip]} vehicles={vehicle ? [vehicle] : []} selectedTripId={trip.id} height={380} />
+      <Panel title="Live position">
+        {vehicle && (
+          <FleetMap items={[{ vehicle, trip, delayed: trip.delayMins > 30 }]} selectedId={vehicle.id} height={380} />
+        )}
       </Panel>
 
       <Panel title="Status">
