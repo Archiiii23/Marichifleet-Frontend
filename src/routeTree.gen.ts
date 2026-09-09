@@ -19,8 +19,11 @@ import { Route as AppComplianceRouteImport } from './routes/app/compliance'
 import { Route as AppDashboardRouteImport } from './routes/app/dashboard'
 import { Route as AppDispatchRouteImport } from './routes/app/dispatch'
 import { Route as AppFuelRouteImport } from './routes/app/fuel'
+import { Route as AppHrRouteImport } from './routes/app/hr'
+import { Route as AppInventoryRouteImport } from './routes/app/inventory'
 import { Route as AppPodRouteImport } from './routes/app/pod'
 import { Route as AppTrackingRouteImport } from './routes/app/tracking'
+import { Route as AppVendorsRouteImport } from './routes/app/vendors'
 import { Route as AppWorkshopRouteImport } from './routes/app/workshop'
 import { Route as DriverIndexRouteImport } from './routes/driver/index'
 import { Route as DriverExceptionRouteImport } from './routes/driver/exception'
@@ -102,6 +105,16 @@ const AppFuelRoute = AppFuelRouteImport.update({
   path: '/fuel',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppHrRoute = AppHrRouteImport.update({
+  id: '/hr',
+  path: '/hr',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppInventoryRoute = AppInventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppPodRoute = AppPodRouteImport.update({
   id: '/pod',
   path: '/pod',
@@ -110,6 +123,11 @@ const AppPodRoute = AppPodRouteImport.update({
 const AppTrackingRoute = AppTrackingRouteImport.update({
   id: '/tracking',
   path: '/tracking',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppVendorsRoute = AppVendorsRouteImport.update({
+  id: '/vendors',
+  path: '/vendors',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppWorkshopRoute = AppWorkshopRouteImport.update({
@@ -275,8 +293,11 @@ export interface FileRoutesByFullPath {
   '/app/dashboard': typeof AppDashboardRoute
   '/app/dispatch': typeof AppDispatchRoute
   '/app/fuel': typeof AppFuelRoute
+  '/app/hr': typeof AppHrRoute
+  '/app/inventory': typeof AppInventoryRoute
   '/app/pod': typeof AppPodRoute
   '/app/tracking': typeof AppTrackingRoute
+  '/app/vendors': typeof AppVendorsRoute
   '/app/workshop': typeof AppWorkshopRoute
   '/driver/exception': typeof DriverExceptionRoute
   '/driver/fuel': typeof DriverFuelRoute
@@ -317,8 +338,11 @@ export interface FileRoutesByTo {
   '/app/dashboard': typeof AppDashboardRoute
   '/app/dispatch': typeof AppDispatchRoute
   '/app/fuel': typeof AppFuelRoute
+  '/app/hr': typeof AppHrRoute
+  '/app/inventory': typeof AppInventoryRoute
   '/app/pod': typeof AppPodRoute
   '/app/tracking': typeof AppTrackingRoute
+  '/app/vendors': typeof AppVendorsRoute
   '/app/workshop': typeof AppWorkshopRoute
   '/driver/exception': typeof DriverExceptionRoute
   '/driver/fuel': typeof DriverFuelRoute
@@ -362,8 +386,11 @@ export interface FileRoutesById {
   '/app/dashboard': typeof AppDashboardRoute
   '/app/dispatch': typeof AppDispatchRoute
   '/app/fuel': typeof AppFuelRoute
+  '/app/hr': typeof AppHrRoute
+  '/app/inventory': typeof AppInventoryRoute
   '/app/pod': typeof AppPodRoute
   '/app/tracking': typeof AppTrackingRoute
+  '/app/vendors': typeof AppVendorsRoute
   '/app/workshop': typeof AppWorkshopRoute
   '/driver/exception': typeof DriverExceptionRoute
   '/driver/fuel': typeof DriverFuelRoute
@@ -408,8 +435,11 @@ export interface FileRouteTypes {
     | '/app/dashboard'
     | '/app/dispatch'
     | '/app/fuel'
+    | '/app/hr'
+    | '/app/inventory'
     | '/app/pod'
     | '/app/tracking'
+    | '/app/vendors'
     | '/app/workshop'
     | '/driver/exception'
     | '/driver/fuel'
@@ -450,8 +480,11 @@ export interface FileRouteTypes {
     | '/app/dashboard'
     | '/app/dispatch'
     | '/app/fuel'
+    | '/app/hr'
+    | '/app/inventory'
     | '/app/pod'
     | '/app/tracking'
+    | '/app/vendors'
     | '/app/workshop'
     | '/driver/exception'
     | '/driver/fuel'
@@ -494,8 +527,11 @@ export interface FileRouteTypes {
     | '/app/dashboard'
     | '/app/dispatch'
     | '/app/fuel'
+    | '/app/hr'
+    | '/app/inventory'
     | '/app/pod'
     | '/app/tracking'
+    | '/app/vendors'
     | '/app/workshop'
     | '/driver/exception'
     | '/driver/fuel'
@@ -608,6 +644,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppFuelRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/hr': {
+      id: '/app/hr'
+      path: '/hr'
+      fullPath: '/app/hr'
+      preLoaderRoute: typeof AppHrRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/inventory': {
+      id: '/app/inventory'
+      path: '/inventory'
+      fullPath: '/app/inventory'
+      preLoaderRoute: typeof AppInventoryRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/app/pod': {
       id: '/app/pod'
       path: '/pod'
@@ -620,6 +670,13 @@ declare module '@tanstack/react-router' {
       path: '/tracking'
       fullPath: '/app/tracking'
       preLoaderRoute: typeof AppTrackingRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/vendors': {
+      id: '/app/vendors'
+      path: '/vendors'
+      fullPath: '/app/vendors'
+      preLoaderRoute: typeof AppVendorsRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/app/workshop': {
@@ -842,8 +899,11 @@ interface AppRouteRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
   AppDispatchRoute: typeof AppDispatchRoute
   AppFuelRoute: typeof AppFuelRoute
+  AppHrRoute: typeof AppHrRoute
+  AppInventoryRoute: typeof AppInventoryRoute
   AppPodRoute: typeof AppPodRoute
   AppTrackingRoute: typeof AppTrackingRoute
+  AppVendorsRoute: typeof AppVendorsRoute
   AppWorkshopRoute: typeof AppWorkshopRoute
   AppBookingsBookingIdRoute: typeof AppBookingsBookingIdRoute
   AppBookingsNewRoute: typeof AppBookingsNewRoute
@@ -868,8 +928,11 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppDispatchRoute: AppDispatchRoute,
   AppFuelRoute: AppFuelRoute,
+  AppHrRoute: AppHrRoute,
+  AppInventoryRoute: AppInventoryRoute,
   AppPodRoute: AppPodRoute,
   AppTrackingRoute: AppTrackingRoute,
+  AppVendorsRoute: AppVendorsRoute,
   AppWorkshopRoute: AppWorkshopRoute,
   AppBookingsBookingIdRoute: AppBookingsBookingIdRoute,
   AppBookingsNewRoute: AppBookingsNewRoute,
