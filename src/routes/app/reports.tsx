@@ -18,7 +18,7 @@ export const Route = createFileRoute("/app/reports")({
       { property: "og:description", content: "Every operational and financial trend from your live fleet data." },
     ],
   }),
-  component: Reports;
+  component: Reports,
 });
 
 function Reports() {
