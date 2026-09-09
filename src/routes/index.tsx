@@ -1,15 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { BootSequence } from "@/components/site/loader";
-import { Cursor } from "@/components/site/cursor";
 import { SmoothScroll } from "@/components/site/smooth-scroll";
 import { SiteNav } from "@/components/site/nav";
 import { HeroStage } from "@/components/site/hero-stage";
-import { ChaosToControl, ControlTower, LiveTracking } from "@/components/site/sections-story";
-import { Milestones, ProofToMoney, WhatsAppStream } from "@/components/site/sections-lifecycle";
-import { FleetIntelligence, FinalMoment, LifecycleSystems, PortScene } from "@/components/site/sections-close";
-import { TakeControl } from "@/components/site/take-control";
-import { Statement } from "@/components/site/type";
+import { BillingScene, ControlScene, DeliveryScene, FinalScene, MovementScene, ProblemScene } from "@/components/site/landing-scenes";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -35,60 +29,18 @@ export const Route = createFileRoute("/")({
 
 function Landing() {
   return (
-    <div className="force-dark">
-      <BootSequence />
+    <div className="marketing-site">
       <SmoothScroll />
-      <Cursor />
       <SiteNav />
 
       <main className="relative bg-background text-foreground">
-        {/* FREIGHT → MACHINE → MOVEMENT → ROUTE */}
         <HeroStage />
-
-        {/* CHAOS → CONTROL */}
-        <ChaosToControl />
-
-        <Statement
-          lines={["Track", "every", "mile."]}
-          note="Positions, ETA drift and exceptions refresh continuously. Stale pings are flagged, never hidden."
-        />
-
-        {/* CONTROL */}
-        <ControlTower />
-
-        {/* DATA / TRACKING */}
-        <LiveTracking />
-
-        {/* DELIVERY → PROOF */}
-        <Milestones />
-
-        <Statement
-          lines={["Prove", "every", "delivery."]}
-          note="An invoice can only exist behind a signed, OTP-verified proof of delivery."
-        />
-
-        <ProofToMoney />
-
-        {/* AUTOMATION */}
-        <WhatsAppStream />
-
-        <Statement lines={["Know", "every", "cost."]} note="Fuel, tolls, driver cost and maintenance land against the trip that caused them." />
-
-        {/* INTELLIGENCE */}
-        <FleetIntelligence />
-
-        <LifecycleSystems />
-
-        {/* INTERACTIVE */}
-        <TakeControl />
-
-        {/* SCALE */}
-        <PortScene />
-
-        <Statement lines={["Control", "the", "fleet."]} />
-
-        {/* FINAL */}
-        <FinalMoment />
+        <ProblemScene />
+        <ControlScene />
+        <MovementScene />
+        <DeliveryScene />
+        <BillingScene />
+        <FinalScene />
       </main>
     </div>
   );
