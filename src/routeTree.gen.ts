@@ -26,6 +26,7 @@ import { Route as DriverExceptionRouteImport } from './routes/driver/exception'
 import { Route as DriverFuelRouteImport } from './routes/driver/fuel'
 import { Route as DriverHomeRouteImport } from './routes/driver/home'
 import { Route as PortalDashboardRouteImport } from './routes/portal/dashboard'
+import { Route as TrackTokenRouteImport } from './routes/track/$token'
 import { Route as AppBookingsIndexRouteImport } from './routes/app/bookings/index'
 import { Route as AppBookingsBookingIdRouteImport } from './routes/app/bookings/$bookingId'
 import { Route as AppBookingsNewRouteImport } from './routes/app/bookings/new'
@@ -43,6 +44,9 @@ import { Route as DriverTripsTripIdRouteImport } from './routes/driver/trips/$tr
 import { Route as PortalBookingsIndexRouteImport } from './routes/portal/bookings/index'
 import { Route as PortalBookingsBookingIdRouteImport } from './routes/portal/bookings/$bookingId'
 import { Route as PortalBookingsNewRouteImport } from './routes/portal/bookings/new'
+import { Route as PortalInvoicesIndexRouteImport } from './routes/portal/invoices/index'
+import { Route as PortalInvoicesInvoiceIdRouteImport } from './routes/portal/invoices/$invoiceId'
+import { Route as PortalTrackingBookingIdRouteImport } from './routes/portal/tracking/$bookingId'
 import { Route as AppFinanceInvoicesIndexRouteImport } from './routes/app/finance/invoices/index'
 import { Route as AppFinanceInvoicesInvoiceIdRouteImport } from './routes/app/finance/invoices/$invoiceId'
 
@@ -131,6 +135,11 @@ const PortalDashboardRoute = PortalDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => PortalRouteRoute,
 } as any)
+const TrackTokenRoute = TrackTokenRouteImport.update({
+  id: '/track/$token',
+  path: '/track/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppBookingsIndexRoute = AppBookingsIndexRouteImport.update({
   id: '/bookings/',
   path: '/bookings/',
@@ -216,6 +225,21 @@ const PortalBookingsNewRoute = PortalBookingsNewRouteImport.update({
   path: '/bookings/new',
   getParentRoute: () => PortalRouteRoute,
 } as any)
+const PortalInvoicesIndexRoute = PortalInvoicesIndexRouteImport.update({
+  id: '/invoices/',
+  path: '/invoices/',
+  getParentRoute: () => PortalRouteRoute,
+} as any)
+const PortalInvoicesInvoiceIdRoute = PortalInvoicesInvoiceIdRouteImport.update({
+  id: '/invoices/$invoiceId',
+  path: '/invoices/$invoiceId',
+  getParentRoute: () => PortalRouteRoute,
+} as any)
+const PortalTrackingBookingIdRoute = PortalTrackingBookingIdRouteImport.update({
+  id: '/tracking/$bookingId',
+  path: '/tracking/$bookingId',
+  getParentRoute: () => PortalRouteRoute,
+} as any)
 const AppFinanceInvoicesIndexRoute = AppFinanceInvoicesIndexRouteImport.update({
   id: '/finance/invoices/',
   path: '/finance/invoices/',
@@ -246,6 +270,7 @@ export interface FileRoutesByFullPath {
   '/driver/fuel': typeof DriverFuelRoute
   '/driver/home': typeof DriverHomeRoute
   '/portal/dashboard': typeof PortalDashboardRoute
+  '/track/$token': typeof TrackTokenRoute
   '/app/bookings/$bookingId': typeof AppBookingsBookingIdRoute
   '/app/bookings/new': typeof AppBookingsNewRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
@@ -256,6 +281,8 @@ export interface FileRoutesByFullPath {
   '/driver/trips/$tripId': typeof DriverTripsTripIdRoute
   '/portal/bookings/$bookingId': typeof PortalBookingsBookingIdRoute
   '/portal/bookings/new': typeof PortalBookingsNewRoute
+  '/portal/invoices/$invoiceId': typeof PortalInvoicesInvoiceIdRoute
+  '/portal/tracking/$bookingId': typeof PortalTrackingBookingIdRoute
   '/app/bookings/': typeof AppBookingsIndexRoute
   '/app/clients/': typeof AppClientsIndexRoute
   '/app/drivers/': typeof AppDriversIndexRoute
@@ -263,6 +290,7 @@ export interface FileRoutesByFullPath {
   '/app/vehicles/': typeof AppVehiclesIndexRoute
   '/driver/trips/': typeof DriverTripsIndexRoute
   '/portal/bookings/': typeof PortalBookingsIndexRoute
+  '/portal/invoices/': typeof PortalInvoicesIndexRoute
   '/app/finance/invoices/$invoiceId': typeof AppFinanceInvoicesInvoiceIdRoute
   '/app/finance/invoices/': typeof AppFinanceInvoicesIndexRoute
 }
@@ -284,6 +312,7 @@ export interface FileRoutesByTo {
   '/driver/fuel': typeof DriverFuelRoute
   '/driver/home': typeof DriverHomeRoute
   '/portal/dashboard': typeof PortalDashboardRoute
+  '/track/$token': typeof TrackTokenRoute
   '/app/bookings/$bookingId': typeof AppBookingsBookingIdRoute
   '/app/bookings/new': typeof AppBookingsNewRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
@@ -294,6 +323,8 @@ export interface FileRoutesByTo {
   '/driver/trips/$tripId': typeof DriverTripsTripIdRoute
   '/portal/bookings/$bookingId': typeof PortalBookingsBookingIdRoute
   '/portal/bookings/new': typeof PortalBookingsNewRoute
+  '/portal/invoices/$invoiceId': typeof PortalInvoicesInvoiceIdRoute
+  '/portal/tracking/$bookingId': typeof PortalTrackingBookingIdRoute
   '/app/bookings': typeof AppBookingsIndexRoute
   '/app/clients': typeof AppClientsIndexRoute
   '/app/drivers': typeof AppDriversIndexRoute
@@ -301,6 +332,7 @@ export interface FileRoutesByTo {
   '/app/vehicles': typeof AppVehiclesIndexRoute
   '/driver/trips': typeof DriverTripsIndexRoute
   '/portal/bookings': typeof PortalBookingsIndexRoute
+  '/portal/invoices': typeof PortalInvoicesIndexRoute
   '/app/finance/invoices/$invoiceId': typeof AppFinanceInvoicesInvoiceIdRoute
   '/app/finance/invoices': typeof AppFinanceInvoicesIndexRoute
 }
@@ -323,6 +355,7 @@ export interface FileRoutesById {
   '/driver/fuel': typeof DriverFuelRoute
   '/driver/home': typeof DriverHomeRoute
   '/portal/dashboard': typeof PortalDashboardRoute
+  '/track/$token': typeof TrackTokenRoute
   '/app/bookings/$bookingId': typeof AppBookingsBookingIdRoute
   '/app/bookings/new': typeof AppBookingsNewRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
@@ -333,6 +366,8 @@ export interface FileRoutesById {
   '/driver/trips/$tripId': typeof DriverTripsTripIdRoute
   '/portal/bookings/$bookingId': typeof PortalBookingsBookingIdRoute
   '/portal/bookings/new': typeof PortalBookingsNewRoute
+  '/portal/invoices/$invoiceId': typeof PortalInvoicesInvoiceIdRoute
+  '/portal/tracking/$bookingId': typeof PortalTrackingBookingIdRoute
   '/app/bookings/': typeof AppBookingsIndexRoute
   '/app/clients/': typeof AppClientsIndexRoute
   '/app/drivers/': typeof AppDriversIndexRoute
@@ -340,6 +375,7 @@ export interface FileRoutesById {
   '/app/vehicles/': typeof AppVehiclesIndexRoute
   '/driver/trips/': typeof DriverTripsIndexRoute
   '/portal/bookings/': typeof PortalBookingsIndexRoute
+  '/portal/invoices/': typeof PortalInvoicesIndexRoute
   '/app/finance/invoices/$invoiceId': typeof AppFinanceInvoicesInvoiceIdRoute
   '/app/finance/invoices/': typeof AppFinanceInvoicesIndexRoute
 }
@@ -363,6 +399,7 @@ export interface FileRouteTypes {
     | '/driver/fuel'
     | '/driver/home'
     | '/portal/dashboard'
+    | '/track/$token'
     | '/app/bookings/$bookingId'
     | '/app/bookings/new'
     | '/app/clients/$clientId'
@@ -373,6 +410,8 @@ export interface FileRouteTypes {
     | '/driver/trips/$tripId'
     | '/portal/bookings/$bookingId'
     | '/portal/bookings/new'
+    | '/portal/invoices/$invoiceId'
+    | '/portal/tracking/$bookingId'
     | '/app/bookings/'
     | '/app/clients/'
     | '/app/drivers/'
@@ -380,6 +419,7 @@ export interface FileRouteTypes {
     | '/app/vehicles/'
     | '/driver/trips/'
     | '/portal/bookings/'
+    | '/portal/invoices/'
     | '/app/finance/invoices/$invoiceId'
     | '/app/finance/invoices/'
   fileRoutesByTo: FileRoutesByTo
@@ -401,6 +441,7 @@ export interface FileRouteTypes {
     | '/driver/fuel'
     | '/driver/home'
     | '/portal/dashboard'
+    | '/track/$token'
     | '/app/bookings/$bookingId'
     | '/app/bookings/new'
     | '/app/clients/$clientId'
@@ -411,6 +452,8 @@ export interface FileRouteTypes {
     | '/driver/trips/$tripId'
     | '/portal/bookings/$bookingId'
     | '/portal/bookings/new'
+    | '/portal/invoices/$invoiceId'
+    | '/portal/tracking/$bookingId'
     | '/app/bookings'
     | '/app/clients'
     | '/app/drivers'
@@ -418,6 +461,7 @@ export interface FileRouteTypes {
     | '/app/vehicles'
     | '/driver/trips'
     | '/portal/bookings'
+    | '/portal/invoices'
     | '/app/finance/invoices/$invoiceId'
     | '/app/finance/invoices'
   id:
@@ -439,6 +483,7 @@ export interface FileRouteTypes {
     | '/driver/fuel'
     | '/driver/home'
     | '/portal/dashboard'
+    | '/track/$token'
     | '/app/bookings/$bookingId'
     | '/app/bookings/new'
     | '/app/clients/$clientId'
@@ -449,6 +494,8 @@ export interface FileRouteTypes {
     | '/driver/trips/$tripId'
     | '/portal/bookings/$bookingId'
     | '/portal/bookings/new'
+    | '/portal/invoices/$invoiceId'
+    | '/portal/tracking/$bookingId'
     | '/app/bookings/'
     | '/app/clients/'
     | '/app/drivers/'
@@ -456,6 +503,7 @@ export interface FileRouteTypes {
     | '/app/vehicles/'
     | '/driver/trips/'
     | '/portal/bookings/'
+    | '/portal/invoices/'
     | '/app/finance/invoices/$invoiceId'
     | '/app/finance/invoices/'
   fileRoutesById: FileRoutesById
@@ -465,6 +513,7 @@ export interface RootRouteChildren {
   AppRouteRoute: typeof AppRouteRouteWithChildren
   DriverRouteRoute: typeof DriverRouteRouteWithChildren
   PortalRouteRoute: typeof PortalRouteRouteWithChildren
+  TrackTokenRoute: typeof TrackTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -588,6 +637,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalDashboardRouteImport
       parentRoute: typeof PortalRouteRoute
     }
+    '/track/$token': {
+      id: '/track/$token'
+      path: '/track/$token'
+      fullPath: '/track/$token'
+      preLoaderRoute: typeof TrackTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/bookings/': {
       id: '/app/bookings/'
       path: '/bookings'
@@ -707,6 +763,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalBookingsNewRouteImport
       parentRoute: typeof PortalRouteRoute
     }
+    '/portal/invoices/': {
+      id: '/portal/invoices/'
+      path: '/invoices'
+      fullPath: '/portal/invoices/'
+      preLoaderRoute: typeof PortalInvoicesIndexRouteImport
+      parentRoute: typeof PortalRouteRoute
+    }
+    '/portal/invoices/$invoiceId': {
+      id: '/portal/invoices/$invoiceId'
+      path: '/invoices/$invoiceId'
+      fullPath: '/portal/invoices/$invoiceId'
+      preLoaderRoute: typeof PortalInvoicesInvoiceIdRouteImport
+      parentRoute: typeof PortalRouteRoute
+    }
+    '/portal/tracking/$bookingId': {
+      id: '/portal/tracking/$bookingId'
+      path: '/tracking/$bookingId'
+      fullPath: '/portal/tracking/$bookingId'
+      preLoaderRoute: typeof PortalTrackingBookingIdRouteImport
+      parentRoute: typeof PortalRouteRoute
+    }
     '/app/finance/invoices/': {
       id: '/app/finance/invoices/'
       path: '/finance/invoices'
@@ -804,14 +881,20 @@ interface PortalRouteRouteChildren {
   PortalDashboardRoute: typeof PortalDashboardRoute
   PortalBookingsBookingIdRoute: typeof PortalBookingsBookingIdRoute
   PortalBookingsNewRoute: typeof PortalBookingsNewRoute
+  PortalInvoicesInvoiceIdRoute: typeof PortalInvoicesInvoiceIdRoute
+  PortalTrackingBookingIdRoute: typeof PortalTrackingBookingIdRoute
   PortalBookingsIndexRoute: typeof PortalBookingsIndexRoute
+  PortalInvoicesIndexRoute: typeof PortalInvoicesIndexRoute
 }
 
 const PortalRouteRouteChildren: PortalRouteRouteChildren = {
   PortalDashboardRoute: PortalDashboardRoute,
   PortalBookingsBookingIdRoute: PortalBookingsBookingIdRoute,
   PortalBookingsNewRoute: PortalBookingsNewRoute,
+  PortalInvoicesInvoiceIdRoute: PortalInvoicesInvoiceIdRoute,
+  PortalTrackingBookingIdRoute: PortalTrackingBookingIdRoute,
   PortalBookingsIndexRoute: PortalBookingsIndexRoute,
+  PortalInvoicesIndexRoute: PortalInvoicesIndexRoute,
 }
 
 const PortalRouteRouteWithChildren = PortalRouteRoute._addFileChildren(
@@ -823,6 +906,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRouteRoute: AppRouteRouteWithChildren,
   DriverRouteRoute: DriverRouteRouteWithChildren,
   PortalRouteRoute: PortalRouteRouteWithChildren,
+  TrackTokenRoute: TrackTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
