@@ -4,6 +4,7 @@ import { Metric, Panel, StatusBadge } from "@/components/mf/primitives";
 import { fmtDateTime, timeAgo, useDb } from "@/domain/hooks";
 
 export const Route = createFileRoute("/track/$token")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Track your consignment — MarichiFleet" },
