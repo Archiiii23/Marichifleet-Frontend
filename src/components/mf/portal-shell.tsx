@@ -46,6 +46,7 @@ export function PortalShell({ children }: { children: ReactNode }) {
               <span className="block font-medium">{persona.name}</span>
               <span className="block text-muted-foreground">{persona.title}</span>
             </span>
+            <ThemeToggle />
             <Button
               size="icon"
               variant="ghost"

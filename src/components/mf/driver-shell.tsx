@@ -34,6 +34,7 @@ export function DriverShell({ children }: { children: ReactNode }) {
           {online ? <Cloud className="size-3.5" /> : <CloudOff className="size-3.5" />}
           {online ? "Online" : "Offline"}
         </Button>
+        <ThemeToggle />
         <Button
           size="icon"
           variant="ghost"
