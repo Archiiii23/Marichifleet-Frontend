@@ -1,14 +1,19 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { DataTable } from "@/components/mf/data-table";
 import { KpiCard, PageHeader, StatusBadge } from "@/components/mf/primitives";
-import { fmtDate, useDb } from "@/domain/hooks";
+import { Button } from "@/components/ui/button";
+import { fmtDate, useAction, useDb } from "@/domain/hooks";
+import { useSession } from "@/domain/session";
+import { advanceDocument } from "@/domain/store";
 import type { ComplianceDoc } from "@/domain/types";
 
 export const Route = createFileRoute("/app/compliance")({
   head: () => ({
     meta: [
-      { title: "Compliance — MarichiFleet" },
-      { name: "description", content: "Permits, insurance, fitness and licences with expiry alerts." },
+      { title: "Compliance & renewals — MarichiFleet" },
+      { name: "description", content: "Permits, insurance, fitness and licences with expiry alerts and renewal tracking." },
+      { property: "og:title", content: "Compliance & renewals — MarichiFleet" },
+      { property: "og:description", content: "Never dispatch on an expired permit, licence or insurance again." },
     ],
   }),
   component: Compliance,
@@ -17,6 +22,9 @@ export const Route = createFileRoute("/app/compliance")({
 function Compliance() {
   const db = useDb();
   const navigate = useNavigate();
+  const run = useAction();
+  const { persona, can } = useSession();
+  const canRenew = can("edit_fleet") || can("view_admin");
 
   const owner = (d: ComplianceDoc) =>
     d.entityType === "vehicle"
