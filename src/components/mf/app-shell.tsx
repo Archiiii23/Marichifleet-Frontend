@@ -55,18 +55,29 @@ const NAV: Array<{ group: string; items: NavItem[] }> = [
     ],
   },
   {
+    group: "Supply chain",
+    items: [
+      { to: "/app/inventory", label: "Spare Parts", icon: Warehouse, cap: "view_operations" },
+      { to: "/app/vendors", label: "Vendors", icon: Handshake, cap: "view_operations" },
+    ],
+  },
+  {
     group: "Commercial",
     items: [
       { to: "/app/clients", label: "Clients", icon: Boxes, cap: "view_operations" },
       { to: "/app/finance/invoices", label: "Invoices", icon: BadgeIndianRupee, cap: "view_finance" },
       { to: "/app/finance/receivables", label: "Receivables", icon: BadgeIndianRupee, cap: "view_finance" },
+      { to: "/app/reports", label: "Reports", icon: BarChart3, cap: "view_operations" },
     ],
   },
   {
-    group: "Platform",
+    group: "Organisation",
     items: [
+      { to: "/app/hr", label: "People & Payroll", icon: UsersRound, cap: "view_admin" },
       { to: "/app/communications", label: "Communications", icon: MessageSquare, cap: "view_operations" },
       { to: "/app/audit", label: "Audit Log", icon: ShieldCheck, cap: "view_admin" },
+      { to: "/app/settings", label: "Settings", icon: Settings, cap: "view_admin" },
+      { to: "/admin", label: "Platform Admin", icon: Building2, cap: "view_admin" },
     ],
   },
 ];

@@ -13,6 +13,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AppRouteRouteImport } from './routes/app/route'
 import { Route as DriverRouteRouteImport } from './routes/driver/route'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as PortalRouteRouteImport } from './routes/portal/route'
 import { Route as AppAuditRouteImport } from './routes/app/audit'
 import { Route as AppCommunicationsRouteImport } from './routes/app/communications'
@@ -76,6 +78,16 @@ const AppRouteRoute = AppRouteRouteImport.update({
 const DriverRouteRoute = DriverRouteRouteImport.update({
   id: '/driver',
   path: '/driver',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PortalRouteRoute = PortalRouteRouteImport.update({
@@ -306,6 +318,8 @@ export interface FileRoutesByFullPath {
   '/driver': typeof DriverRouteRouteWithChildren
   '/portal': typeof PortalRouteRouteWithChildren
   '/admin': typeof AdminRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/app/audit': typeof AppAuditRoute
   '/app/communications': typeof AppCommunicationsRoute
   '/app/compliance': typeof AppComplianceRoute
@@ -354,6 +368,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppRouteRouteWithChildren
   '/admin': typeof AdminRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/app/audit': typeof AppAuditRoute
   '/app/communications': typeof AppCommunicationsRoute
   '/app/compliance': typeof AppComplianceRoute
@@ -405,6 +421,8 @@ export interface FileRoutesById {
   '/driver': typeof DriverRouteRouteWithChildren
   '/portal': typeof PortalRouteRouteWithChildren
   '/admin': typeof AdminRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/app/audit': typeof AppAuditRoute
   '/app/communications': typeof AppCommunicationsRoute
   '/app/compliance': typeof AppComplianceRoute
@@ -457,6 +475,8 @@ export interface FileRouteTypes {
     | '/driver'
     | '/portal'
     | '/admin'
+    | '/login'
+    | '/onboarding'
     | '/app/audit'
     | '/app/communications'
     | '/app/compliance'
@@ -505,6 +525,8 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/admin'
+    | '/login'
+    | '/onboarding'
     | '/app/audit'
     | '/app/communications'
     | '/app/compliance'
@@ -555,6 +577,8 @@ export interface FileRouteTypes {
     | '/driver'
     | '/portal'
     | '/admin'
+    | '/login'
+    | '/onboarding'
     | '/app/audit'
     | '/app/communications'
     | '/app/compliance'
@@ -606,6 +630,8 @@ export interface RootRouteChildren {
   DriverRouteRoute: typeof DriverRouteRouteWithChildren
   PortalRouteRoute: typeof PortalRouteRouteWithChildren
   AdminRoute: typeof AdminRoute
+  LoginRoute: typeof LoginRoute
+  OnboardingRoute: typeof OnboardingRoute
   TrackTokenRoute: typeof TrackTokenRoute
 }
 
@@ -637,6 +663,20 @@ declare module '@tanstack/react-router' {
       path: '/driver'
       fullPath: '/driver'
       preLoaderRoute: typeof DriverRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/portal': {
@@ -1070,6 +1110,8 @@ const rootRouteChildren: RootRouteChildren = {
   DriverRouteRoute: DriverRouteRouteWithChildren,
   PortalRouteRoute: PortalRouteRouteWithChildren,
   AdminRoute: AdminRoute,
+  LoginRoute: LoginRoute,
+  OnboardingRoute: OnboardingRoute,
   TrackTokenRoute: TrackTokenRoute,
 }
 export const routeTree = rootRouteImport
