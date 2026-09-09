@@ -28,7 +28,7 @@ function PortalInvoice() {
         <div>
           <h1 className="font-display text-2xl font-semibold">{inv.ref}</h1>
           <p className="text-sm text-muted-foreground">
-            Issued {fmtDate(inv.issuedISO)} · due {fmtDate(inv.dueISO)}
+            Issued {inv.issuedISO ? fmtDate(inv.issuedISO) : "—"} · due {fmtDate(inv.dueISO)}
           </p>
         </div>
         <StatusBadge status={isOverdue(inv) ? "overdue" : inv.status} />
@@ -53,7 +53,7 @@ function PortalInvoice() {
         </table>
         <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
           <Metric label="Subtotal" value={inr(inv.subtotal)} />
-          <Metric label="GST" value={inr(inv.tax)} />
+          <Metric label={`GST ${inv.taxPct}%`} value={inr(inv.total - inv.subtotal)} />
           <Metric label="Total" value={inr(inv.total)} />
           <Metric label="Balance due" value={inr(bal)} tone={bal > 0 ? "warning" : "success"} />
         </div>
@@ -67,8 +67,8 @@ function PortalInvoice() {
             {payments.map((p) => (
               <li key={p.id} className="flex flex-wrap items-center gap-3 rounded-md border border-border p-3">
                 <span className="numeric">{inr(p.amount)}</span>
-                <span className="text-muted-foreground">{p.method} · {p.reference}</span>
-                <span className="ml-auto text-xs text-muted-foreground">{fmtDate(p.atISO)}</span>
+                <span className="text-muted-foreground">{p.mode} · {p.reference}</span>
+                <span className="ml-auto text-xs text-muted-foreground">{fmtDate(p.receivedISO)}</span>
               </li>
             ))}
           </ul>

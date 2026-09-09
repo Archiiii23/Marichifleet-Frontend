@@ -45,8 +45,10 @@ function PortalTracking() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
-        <Panel title="Live position" padded={false}>
-          <FleetMap trips={[trip]} vehicles={vehicle ? [vehicle] : []} selectedTripId={trip.id} height={420} />
+        <Panel title="Live position">
+          {vehicle && (
+            <FleetMap items={[{ vehicle, trip, delayed: trip.delayMins > 30 }]} selectedId={vehicle.id} height={420} />
+          )}
         </Panel>
         <div className="space-y-4">
           <Panel title="Journey">
