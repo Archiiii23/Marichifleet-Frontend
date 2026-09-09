@@ -15,13 +15,18 @@ import { Route as DriverRouteRouteImport } from './routes/driver/route'
 import { Route as PortalRouteRouteImport } from './routes/portal/route'
 import { Route as AppAuditRouteImport } from './routes/app/audit'
 import { Route as AppCommunicationsRouteImport } from './routes/app/communications'
+import { Route as AppComplianceRouteImport } from './routes/app/compliance'
 import { Route as AppDashboardRouteImport } from './routes/app/dashboard'
 import { Route as AppDispatchRouteImport } from './routes/app/dispatch'
+import { Route as AppFuelRouteImport } from './routes/app/fuel'
 import { Route as AppPodRouteImport } from './routes/app/pod'
 import { Route as AppTrackingRouteImport } from './routes/app/tracking'
+import { Route as AppWorkshopRouteImport } from './routes/app/workshop'
 import { Route as AppBookingsIndexRouteImport } from './routes/app/bookings/index'
 import { Route as AppBookingsBookingIdRouteImport } from './routes/app/bookings/$bookingId'
 import { Route as AppBookingsNewRouteImport } from './routes/app/bookings/new'
+import { Route as AppClientsIndexRouteImport } from './routes/app/clients/index'
+import { Route as AppClientsClientIdRouteImport } from './routes/app/clients/$clientId'
 import { Route as AppDriversIndexRouteImport } from './routes/app/drivers/index'
 import { Route as AppDriversDriverIdRouteImport } from './routes/app/drivers/$driverId'
 import { Route as AppFinanceReceivablesRouteImport } from './routes/app/finance/receivables'
@@ -62,6 +67,11 @@ const AppCommunicationsRoute = AppCommunicationsRouteImport.update({
   path: '/communications',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppComplianceRoute = AppComplianceRouteImport.update({
+  id: '/compliance',
+  path: '/compliance',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -72,6 +82,11 @@ const AppDispatchRoute = AppDispatchRouteImport.update({
   path: '/dispatch',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppFuelRoute = AppFuelRouteImport.update({
+  id: '/fuel',
+  path: '/fuel',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppPodRoute = AppPodRouteImport.update({
   id: '/pod',
   path: '/pod',
@@ -80,6 +95,11 @@ const AppPodRoute = AppPodRouteImport.update({
 const AppTrackingRoute = AppTrackingRouteImport.update({
   id: '/tracking',
   path: '/tracking',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppWorkshopRoute = AppWorkshopRouteImport.update({
+  id: '/workshop',
+  path: '/workshop',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppBookingsIndexRoute = AppBookingsIndexRouteImport.update({
@@ -95,6 +115,16 @@ const AppBookingsBookingIdRoute = AppBookingsBookingIdRouteImport.update({
 const AppBookingsNewRoute = AppBookingsNewRouteImport.update({
   id: '/bookings/new',
   path: '/bookings/new',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppClientsIndexRoute = AppClientsIndexRouteImport.update({
+  id: '/clients/',
+  path: '/clients/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppClientsClientIdRoute = AppClientsClientIdRouteImport.update({
+  id: '/clients/$clientId',
+  path: '/clients/$clientId',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppDriversIndexRoute = AppDriversIndexRouteImport.update({
@@ -151,17 +181,22 @@ export interface FileRoutesByFullPath {
   '/portal': typeof PortalRouteRoute
   '/app/audit': typeof AppAuditRoute
   '/app/communications': typeof AppCommunicationsRoute
+  '/app/compliance': typeof AppComplianceRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/dispatch': typeof AppDispatchRoute
+  '/app/fuel': typeof AppFuelRoute
   '/app/pod': typeof AppPodRoute
   '/app/tracking': typeof AppTrackingRoute
+  '/app/workshop': typeof AppWorkshopRoute
   '/app/bookings/$bookingId': typeof AppBookingsBookingIdRoute
   '/app/bookings/new': typeof AppBookingsNewRoute
+  '/app/clients/$clientId': typeof AppClientsClientIdRoute
   '/app/drivers/$driverId': typeof AppDriversDriverIdRoute
   '/app/finance/receivables': typeof AppFinanceReceivablesRoute
   '/app/trips/$tripId': typeof AppTripsTripIdRoute
   '/app/vehicles/$vehicleId': typeof AppVehiclesVehicleIdRoute
   '/app/bookings/': typeof AppBookingsIndexRoute
+  '/app/clients/': typeof AppClientsIndexRoute
   '/app/drivers/': typeof AppDriversIndexRoute
   '/app/trips/': typeof AppTripsIndexRoute
   '/app/vehicles/': typeof AppVehiclesIndexRoute
@@ -175,17 +210,22 @@ export interface FileRoutesByTo {
   '/portal': typeof PortalRouteRoute
   '/app/audit': typeof AppAuditRoute
   '/app/communications': typeof AppCommunicationsRoute
+  '/app/compliance': typeof AppComplianceRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/dispatch': typeof AppDispatchRoute
+  '/app/fuel': typeof AppFuelRoute
   '/app/pod': typeof AppPodRoute
   '/app/tracking': typeof AppTrackingRoute
+  '/app/workshop': typeof AppWorkshopRoute
   '/app/bookings/$bookingId': typeof AppBookingsBookingIdRoute
   '/app/bookings/new': typeof AppBookingsNewRoute
+  '/app/clients/$clientId': typeof AppClientsClientIdRoute
   '/app/drivers/$driverId': typeof AppDriversDriverIdRoute
   '/app/finance/receivables': typeof AppFinanceReceivablesRoute
   '/app/trips/$tripId': typeof AppTripsTripIdRoute
   '/app/vehicles/$vehicleId': typeof AppVehiclesVehicleIdRoute
   '/app/bookings': typeof AppBookingsIndexRoute
+  '/app/clients': typeof AppClientsIndexRoute
   '/app/drivers': typeof AppDriversIndexRoute
   '/app/trips': typeof AppTripsIndexRoute
   '/app/vehicles': typeof AppVehiclesIndexRoute
@@ -200,17 +240,22 @@ export interface FileRoutesById {
   '/portal': typeof PortalRouteRoute
   '/app/audit': typeof AppAuditRoute
   '/app/communications': typeof AppCommunicationsRoute
+  '/app/compliance': typeof AppComplianceRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/dispatch': typeof AppDispatchRoute
+  '/app/fuel': typeof AppFuelRoute
   '/app/pod': typeof AppPodRoute
   '/app/tracking': typeof AppTrackingRoute
+  '/app/workshop': typeof AppWorkshopRoute
   '/app/bookings/$bookingId': typeof AppBookingsBookingIdRoute
   '/app/bookings/new': typeof AppBookingsNewRoute
+  '/app/clients/$clientId': typeof AppClientsClientIdRoute
   '/app/drivers/$driverId': typeof AppDriversDriverIdRoute
   '/app/finance/receivables': typeof AppFinanceReceivablesRoute
   '/app/trips/$tripId': typeof AppTripsTripIdRoute
   '/app/vehicles/$vehicleId': typeof AppVehiclesVehicleIdRoute
   '/app/bookings/': typeof AppBookingsIndexRoute
+  '/app/clients/': typeof AppClientsIndexRoute
   '/app/drivers/': typeof AppDriversIndexRoute
   '/app/trips/': typeof AppTripsIndexRoute
   '/app/vehicles/': typeof AppVehiclesIndexRoute
@@ -226,17 +271,22 @@ export interface FileRouteTypes {
     | '/portal'
     | '/app/audit'
     | '/app/communications'
+    | '/app/compliance'
     | '/app/dashboard'
     | '/app/dispatch'
+    | '/app/fuel'
     | '/app/pod'
     | '/app/tracking'
+    | '/app/workshop'
     | '/app/bookings/$bookingId'
     | '/app/bookings/new'
+    | '/app/clients/$clientId'
     | '/app/drivers/$driverId'
     | '/app/finance/receivables'
     | '/app/trips/$tripId'
     | '/app/vehicles/$vehicleId'
     | '/app/bookings/'
+    | '/app/clients/'
     | '/app/drivers/'
     | '/app/trips/'
     | '/app/vehicles/'
@@ -250,17 +300,22 @@ export interface FileRouteTypes {
     | '/portal'
     | '/app/audit'
     | '/app/communications'
+    | '/app/compliance'
     | '/app/dashboard'
     | '/app/dispatch'
+    | '/app/fuel'
     | '/app/pod'
     | '/app/tracking'
+    | '/app/workshop'
     | '/app/bookings/$bookingId'
     | '/app/bookings/new'
+    | '/app/clients/$clientId'
     | '/app/drivers/$driverId'
     | '/app/finance/receivables'
     | '/app/trips/$tripId'
     | '/app/vehicles/$vehicleId'
     | '/app/bookings'
+    | '/app/clients'
     | '/app/drivers'
     | '/app/trips'
     | '/app/vehicles'
@@ -274,17 +329,22 @@ export interface FileRouteTypes {
     | '/portal'
     | '/app/audit'
     | '/app/communications'
+    | '/app/compliance'
     | '/app/dashboard'
     | '/app/dispatch'
+    | '/app/fuel'
     | '/app/pod'
     | '/app/tracking'
+    | '/app/workshop'
     | '/app/bookings/$bookingId'
     | '/app/bookings/new'
+    | '/app/clients/$clientId'
     | '/app/drivers/$driverId'
     | '/app/finance/receivables'
     | '/app/trips/$tripId'
     | '/app/vehicles/$vehicleId'
     | '/app/bookings/'
+    | '/app/clients/'
     | '/app/drivers/'
     | '/app/trips/'
     | '/app/vehicles/'
@@ -343,6 +403,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCommunicationsRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/compliance': {
+      id: '/app/compliance'
+      path: '/compliance'
+      fullPath: '/app/compliance'
+      preLoaderRoute: typeof AppComplianceRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/app/dashboard': {
       id: '/app/dashboard'
       path: '/dashboard'
@@ -357,6 +424,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDispatchRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/fuel': {
+      id: '/app/fuel'
+      path: '/fuel'
+      fullPath: '/app/fuel'
+      preLoaderRoute: typeof AppFuelRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/app/pod': {
       id: '/app/pod'
       path: '/pod'
@@ -369,6 +443,13 @@ declare module '@tanstack/react-router' {
       path: '/tracking'
       fullPath: '/app/tracking'
       preLoaderRoute: typeof AppTrackingRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/workshop': {
+      id: '/app/workshop'
+      path: '/workshop'
+      fullPath: '/app/workshop'
+      preLoaderRoute: typeof AppWorkshopRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/app/bookings/': {
@@ -390,6 +471,20 @@ declare module '@tanstack/react-router' {
       path: '/bookings/new'
       fullPath: '/app/bookings/new'
       preLoaderRoute: typeof AppBookingsNewRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/clients/': {
+      id: '/app/clients/'
+      path: '/clients'
+      fullPath: '/app/clients/'
+      preLoaderRoute: typeof AppClientsIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/clients/$clientId': {
+      id: '/app/clients/$clientId'
+      path: '/clients/$clientId'
+      fullPath: '/app/clients/$clientId'
+      preLoaderRoute: typeof AppClientsClientIdRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/app/drivers/': {
@@ -461,17 +556,22 @@ declare module '@tanstack/react-router' {
 interface AppRouteRouteChildren {
   AppAuditRoute: typeof AppAuditRoute
   AppCommunicationsRoute: typeof AppCommunicationsRoute
+  AppComplianceRoute: typeof AppComplianceRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppDispatchRoute: typeof AppDispatchRoute
+  AppFuelRoute: typeof AppFuelRoute
   AppPodRoute: typeof AppPodRoute
   AppTrackingRoute: typeof AppTrackingRoute
+  AppWorkshopRoute: typeof AppWorkshopRoute
   AppBookingsBookingIdRoute: typeof AppBookingsBookingIdRoute
   AppBookingsNewRoute: typeof AppBookingsNewRoute
+  AppClientsClientIdRoute: typeof AppClientsClientIdRoute
   AppDriversDriverIdRoute: typeof AppDriversDriverIdRoute
   AppFinanceReceivablesRoute: typeof AppFinanceReceivablesRoute
   AppTripsTripIdRoute: typeof AppTripsTripIdRoute
   AppVehiclesVehicleIdRoute: typeof AppVehiclesVehicleIdRoute
   AppBookingsIndexRoute: typeof AppBookingsIndexRoute
+  AppClientsIndexRoute: typeof AppClientsIndexRoute
   AppDriversIndexRoute: typeof AppDriversIndexRoute
   AppTripsIndexRoute: typeof AppTripsIndexRoute
   AppVehiclesIndexRoute: typeof AppVehiclesIndexRoute
@@ -482,17 +582,22 @@ interface AppRouteRouteChildren {
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppAuditRoute: AppAuditRoute,
   AppCommunicationsRoute: AppCommunicationsRoute,
+  AppComplianceRoute: AppComplianceRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppDispatchRoute: AppDispatchRoute,
+  AppFuelRoute: AppFuelRoute,
   AppPodRoute: AppPodRoute,
   AppTrackingRoute: AppTrackingRoute,
+  AppWorkshopRoute: AppWorkshopRoute,
   AppBookingsBookingIdRoute: AppBookingsBookingIdRoute,
   AppBookingsNewRoute: AppBookingsNewRoute,
+  AppClientsClientIdRoute: AppClientsClientIdRoute,
   AppDriversDriverIdRoute: AppDriversDriverIdRoute,
   AppFinanceReceivablesRoute: AppFinanceReceivablesRoute,
   AppTripsTripIdRoute: AppTripsTripIdRoute,
   AppVehiclesVehicleIdRoute: AppVehiclesVehicleIdRoute,
   AppBookingsIndexRoute: AppBookingsIndexRoute,
+  AppClientsIndexRoute: AppClientsIndexRoute,
   AppDriversIndexRoute: AppDriversIndexRoute,
   AppTripsIndexRoute: AppTripsIndexRoute,
   AppVehiclesIndexRoute: AppVehiclesIndexRoute,
