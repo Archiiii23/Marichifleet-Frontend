@@ -25,7 +25,7 @@ export function HeroStage() {
   return (
     <div id="top" ref={ref} className="relative" style={{ height: reduced ? "100svh" : "240svh" }}>
       <div className="sticky top-0 h-[100svh] w-full overflow-hidden bg-background">
-        <div className="absolute inset-0">
+        <div className="hero-vehicle absolute inset-0">
           {mounted ? (
             <Suspense fallback={null}>
               <Scene3D reduced={reduced} lite={lite} />

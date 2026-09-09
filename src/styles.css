@@ -352,4 +352,8 @@
 
 @media (max-width: 767px) {
   .marketing-site .hero-grid { background-size: 44px 44px; }
+  .marketing-site .hero-vehicle {
+    transform: translateY(-15%);
+    opacity: 0.72;
+  }
 }

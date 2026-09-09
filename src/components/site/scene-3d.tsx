@@ -11,7 +11,7 @@ useGLTF.preload(MODEL);
 type Shot = { t: number; pos: readonly [number, number, number]; look: readonly [number, number, number]; fov: number };
 
 const SHOTS: Shot[] = [
-  { t: 0, pos: [7.2, 3.1, -10.8], look: [2.2, 0.8, 0], fov: 38 },
+  { t: 0, pos: [0, 2.5, -10.5], look: [2.2, 0.8, 0], fov: 36 },
   { t: 0.42, pos: [7.2, 2.5, -2.4], look: [1.1, 0.9, -1.6], fov: 37 },
   { t: 0.78, pos: [7.5, 4.8, 2], look: [1.1, 0.7, -3.8], fov: 42 },
   { t: 1, pos: [2.8, 10.8, 2.6], look: [1.1, 0, -4.4], fov: 46 },
@@ -22,7 +22,7 @@ function progress() {
 }
 
 function shotAt(t: number) {
-  let a = SHOTS[0] ?? { t: 0, pos: [7.2, 3.1, -10.8], look: [2.2, 0.8, 0], fov: 38 };
+  let a = SHOTS[0] ?? { t: 0, pos: [0, 2.5, -10.5], look: [2.2, 0.8, 0], fov: 36 };
   let b = SHOTS[SHOTS.length - 1] ?? a;
   for (let i = 0; i < SHOTS.length - 1; i++) {
     const current = SHOTS[i];
@@ -54,7 +54,7 @@ function Truck({ theme }: { theme: ResolvedTheme }) {
     const centre = new THREE.Vector3();
     box.getSize(size);
     box.getCenter(centre);
-    const scale = 3.25 / Math.max(size.x, size.y, size.z);
+    const scale = 2.9 / Math.max(size.x, size.y, size.z);
     clone.scale.setScalar(scale);
     clone.position.set(-centre.x * scale, -box.min.y * scale, -centre.z * scale);
 
@@ -153,7 +153,7 @@ export default function Scene3D({ reduced = false, lite = false }: { reduced?: b
   const { resolvedTheme } = useTheme();
   const dark = resolvedTheme === "dark";
   const background = dark ? "#0b0c0e" : "#f3f0ea";
-  return <Canvas shadows={false} dpr={[1, lite ? 1 : 1.35]} gl={{ antialias: !lite, powerPreference: "high-performance" }} camera={{ position: [7.2, 3.1, -10.8], fov: 38 }} frameloop="always">
+  return <Canvas shadows={false} dpr={1} gl={{ antialias: false, powerPreference: "high-performance" }} camera={{ position: [0, 2.5, -10.5], fov: 36 }} frameloop="always">
     <color attach="background" args={[background]} /><fog attach="fog" args={[background, 18, 54]} />
     <ambientLight intensity={dark ? 0.65 : 1.2} />
     <directionalLight position={[-6, 11, -7]} intensity={dark ? 4.2 : 3.1} />
