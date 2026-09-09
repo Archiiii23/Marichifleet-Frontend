@@ -9,12 +9,13 @@ useGLTF.preload(MODEL);
 
 /** Cinematic camera keyframes across the scroll story (front → side → rear → top). */
 const SHOTS: { t: number; pos: [number, number, number]; look: [number, number, number]; fov: number }[] = [
-  { t: 0.0, pos: [0.2, 1.05, 6.4], look: [0, 0.85, 0], fov: 34 },
-  { t: 0.26, pos: [6.2, 1.5, 2.4], look: [0, 0.9, 0], fov: 36 },
-  { t: 0.52, pos: [-4.4, 2.1, -5.6], look: [0, 0.9, 0], fov: 40 },
-  { t: 0.78, pos: [0.4, 8.6, 5.2], look: [0, 0.2, -1.2], fov: 44 },
-  { t: 1.0, pos: [0.0, 17.5, 0.9], look: [0, 0, -0.4], fov: 48 },
+  { t: 0.0, pos: [1.9, 1.25, 8.6], look: [1.35, 0.85, 0], fov: 32 },
+  { t: 0.26, pos: [8.4, 1.9, 3.6], look: [0.8, 0.9, 0], fov: 34 },
+  { t: 0.52, pos: [-6.2, 2.9, -8.2], look: [0, 0.9, -1], fov: 38 },
+  { t: 0.78, pos: [0.4, 10.4, 6.6], look: [0, 0.2, -1.2], fov: 44 },
+  { t: 1.0, pos: [0.0, 19.5, 1.1], look: [0, 0, -0.4], fov: 48 },
 ];
+
 
 function shotAt(t: number) {
   let a = SHOTS[0]!;
@@ -56,7 +57,7 @@ function Truck() {
     s.scale.setScalar(k);
     s.position.set(-centre.x * k, -box.min.y * k, -centre.z * k);
 
-    const graphite = new THREE.Color("#14161a");
+    const graphite = new THREE.Color("#2a2e34");
     s.traverse((o) => {
       const m = o as THREE.Mesh;
       if (!m.isMesh) return;
@@ -65,6 +66,9 @@ function Truck() {
       const src = m.material as THREE.MeshStandardMaterial;
       const mat = (Array.isArray(src) ? src[0]! : src).clone() as THREE.MeshStandardMaterial;
       const name = (mat.name || "").toLowerCase();
+      // The source kit ships a bright colour atlas; drop it for a single
+      // premium graphite bodywork read.
+      mat.map = null;
       if (name.includes("window") || name.includes("glass")) {
         mat.color = new THREE.Color("#0a0d12");
         mat.metalness = 0.2;
@@ -74,13 +78,15 @@ function Truck() {
         mat.emissiveIntensity = 2.2;
         mat.roughness = 0.4;
       } else {
-        mat.color = mat.color.clone().lerp(graphite, 0.62);
-        mat.metalness = 0.78;
-        mat.roughness = 0.29;
+        mat.color = graphite.clone();
+        mat.metalness = 0.82;
+        mat.roughness = 0.26;
       }
       mat.envMapIntensity = 1.35;
+      mat.needsUpdate = true;
       m.material = mat;
     });
+
     return s;
   }, [scene]);
 
