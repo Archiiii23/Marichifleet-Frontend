@@ -717,3 +717,23 @@ export function tickSimulation() {
   });
   return moved;
 }
+
+/* ------------------------------------------------------------------ */
+/* Reactivity — tiny external store so every screen stays in sync      */
+/* ------------------------------------------------------------------ */
+
+let version = 0;
+const listeners = new Set<() => void>();
+
+export function bump() {
+  version++;
+  listeners.forEach((l) => l());
+}
+
+export function subscribeDb(fn: () => void) {
+  listeners.add(fn);
+  return () => listeners.delete(fn);
+}
+
+export const getVersion = () => version;
+export const getServerVersion = () => 0;
