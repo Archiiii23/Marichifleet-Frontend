@@ -62,6 +62,40 @@ function Compliance() {
           { key: "number", header: "Number", cell: (d) => <span className="numeric">{d.number}</span>, hideOnMobile: true },
           { key: "expiry", header: "Expiry", cell: (d) => fmtDate(d.expiryISO), sortValue: (d) => d.expiryISO },
           { key: "status", header: "Status", cell: (d) => <StatusBadge status={d.status} /> },
+          {
+            key: "renewal",
+            header: "Renewal",
+            cell: (d) =>
+              !canRenew ? (
+                <span className="text-xs text-muted-foreground">—</span>
+              ) : d.status === "renewal_pending" ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 px-2 text-xs"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    run(() => advanceDocument(d.id, "renewed", persona.name), "Document renewed");
+                  }}
+                >
+                  Mark renewed
+                </Button>
+              ) : d.status === "expiring" || d.status === "expired" ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 px-2 text-xs"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    run(() => advanceDocument(d.id, "renewal_pending", persona.name), "Renewal requested");
+                  }}
+                >
+                  Start renewal
+                </Button>
+              ) : (
+                <span className="text-xs text-muted-foreground">Up to date</span>
+              ),
+          },
         ]}
       />
     </>

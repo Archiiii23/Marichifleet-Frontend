@@ -27,8 +27,6 @@ function Reports() {
   const [days, setDays] = useState("90");
   const [branch, setBranch] = useState("all");
 
-  if (!can("view_operations")) return <NoAccess what="reports and analytics" />;
-
   const since = Date.now() - Number(days) * 86400000;
 
   const data = useMemo(() => {
@@ -139,6 +137,8 @@ function Reports() {
     a.click();
     URL.revokeObjectURL(url);
   };
+
+  if (!can("view_operations")) return <NoAccess what="reports and analytics" />;
 
   const maxMonth = Math.max(1, ...data.months.map(([, v]) => v));
   const maxBucket = Math.max(1, ...data.buckets.map((b) => b.amount));
