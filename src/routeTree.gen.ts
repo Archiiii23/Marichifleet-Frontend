@@ -22,9 +22,11 @@ import { Route as AppFuelRouteImport } from './routes/app/fuel'
 import { Route as AppPodRouteImport } from './routes/app/pod'
 import { Route as AppTrackingRouteImport } from './routes/app/tracking'
 import { Route as AppWorkshopRouteImport } from './routes/app/workshop'
+import { Route as DriverIndexRouteImport } from './routes/driver/index'
 import { Route as DriverExceptionRouteImport } from './routes/driver/exception'
 import { Route as DriverFuelRouteImport } from './routes/driver/fuel'
 import { Route as DriverHomeRouteImport } from './routes/driver/home'
+import { Route as PortalIndexRouteImport } from './routes/portal/index'
 import { Route as PortalDashboardRouteImport } from './routes/portal/dashboard'
 import { Route as TrackTokenRouteImport } from './routes/track/$token'
 import { Route as AppBookingsIndexRouteImport } from './routes/app/bookings/index'
@@ -115,6 +117,11 @@ const AppWorkshopRoute = AppWorkshopRouteImport.update({
   path: '/workshop',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const DriverIndexRoute = DriverIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DriverRouteRoute,
+} as any)
 const DriverExceptionRoute = DriverExceptionRouteImport.update({
   id: '/exception',
   path: '/exception',
@@ -129,6 +136,11 @@ const DriverHomeRoute = DriverHomeRouteImport.update({
   id: '/home',
   path: '/home',
   getParentRoute: () => DriverRouteRoute,
+} as any)
+const PortalIndexRoute = PortalIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PortalRouteRoute,
 } as any)
 const PortalDashboardRoute = PortalDashboardRouteImport.update({
   id: '/dashboard',
@@ -271,6 +283,8 @@ export interface FileRoutesByFullPath {
   '/driver/home': typeof DriverHomeRoute
   '/portal/dashboard': typeof PortalDashboardRoute
   '/track/$token': typeof TrackTokenRoute
+  '/driver/': typeof DriverIndexRoute
+  '/portal/': typeof PortalIndexRoute
   '/app/bookings/$bookingId': typeof AppBookingsBookingIdRoute
   '/app/bookings/new': typeof AppBookingsNewRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
@@ -297,8 +311,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppRouteRouteWithChildren
-  '/driver': typeof DriverRouteRouteWithChildren
-  '/portal': typeof PortalRouteRouteWithChildren
   '/app/audit': typeof AppAuditRoute
   '/app/communications': typeof AppCommunicationsRoute
   '/app/compliance': typeof AppComplianceRoute
@@ -313,6 +325,8 @@ export interface FileRoutesByTo {
   '/driver/home': typeof DriverHomeRoute
   '/portal/dashboard': typeof PortalDashboardRoute
   '/track/$token': typeof TrackTokenRoute
+  '/driver': typeof DriverIndexRoute
+  '/portal': typeof PortalIndexRoute
   '/app/bookings/$bookingId': typeof AppBookingsBookingIdRoute
   '/app/bookings/new': typeof AppBookingsNewRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
@@ -356,6 +370,8 @@ export interface FileRoutesById {
   '/driver/home': typeof DriverHomeRoute
   '/portal/dashboard': typeof PortalDashboardRoute
   '/track/$token': typeof TrackTokenRoute
+  '/driver/': typeof DriverIndexRoute
+  '/portal/': typeof PortalIndexRoute
   '/app/bookings/$bookingId': typeof AppBookingsBookingIdRoute
   '/app/bookings/new': typeof AppBookingsNewRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
@@ -400,6 +416,8 @@ export interface FileRouteTypes {
     | '/driver/home'
     | '/portal/dashboard'
     | '/track/$token'
+    | '/driver/'
+    | '/portal/'
     | '/app/bookings/$bookingId'
     | '/app/bookings/new'
     | '/app/clients/$clientId'
@@ -426,8 +444,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/app'
-    | '/driver'
-    | '/portal'
     | '/app/audit'
     | '/app/communications'
     | '/app/compliance'
@@ -442,6 +458,8 @@ export interface FileRouteTypes {
     | '/driver/home'
     | '/portal/dashboard'
     | '/track/$token'
+    | '/driver'
+    | '/portal'
     | '/app/bookings/$bookingId'
     | '/app/bookings/new'
     | '/app/clients/$clientId'
@@ -484,6 +502,8 @@ export interface FileRouteTypes {
     | '/driver/home'
     | '/portal/dashboard'
     | '/track/$token'
+    | '/driver/'
+    | '/portal/'
     | '/app/bookings/$bookingId'
     | '/app/bookings/new'
     | '/app/clients/$clientId'
@@ -609,6 +629,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppWorkshopRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/driver/': {
+      id: '/driver/'
+      path: '/'
+      fullPath: '/driver/'
+      preLoaderRoute: typeof DriverIndexRouteImport
+      parentRoute: typeof DriverRouteRoute
+    }
     '/driver/exception': {
       id: '/driver/exception'
       path: '/exception'
@@ -629,6 +656,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/driver/home'
       preLoaderRoute: typeof DriverHomeRouteImport
       parentRoute: typeof DriverRouteRoute
+    }
+    '/portal/': {
+      id: '/portal/'
+      path: '/'
+      fullPath: '/portal/'
+      preLoaderRoute: typeof PortalIndexRouteImport
+      parentRoute: typeof PortalRouteRoute
     }
     '/portal/dashboard': {
       id: '/portal/dashboard'
@@ -861,6 +895,7 @@ interface DriverRouteRouteChildren {
   DriverExceptionRoute: typeof DriverExceptionRoute
   DriverFuelRoute: typeof DriverFuelRoute
   DriverHomeRoute: typeof DriverHomeRoute
+  DriverIndexRoute: typeof DriverIndexRoute
   DriverTripsTripIdRoute: typeof DriverTripsTripIdRoute
   DriverTripsIndexRoute: typeof DriverTripsIndexRoute
 }
@@ -869,6 +904,7 @@ const DriverRouteRouteChildren: DriverRouteRouteChildren = {
   DriverExceptionRoute: DriverExceptionRoute,
   DriverFuelRoute: DriverFuelRoute,
   DriverHomeRoute: DriverHomeRoute,
+  DriverIndexRoute: DriverIndexRoute,
   DriverTripsTripIdRoute: DriverTripsTripIdRoute,
   DriverTripsIndexRoute: DriverTripsIndexRoute,
 }
@@ -879,6 +915,7 @@ const DriverRouteRouteWithChildren = DriverRouteRoute._addFileChildren(
 
 interface PortalRouteRouteChildren {
   PortalDashboardRoute: typeof PortalDashboardRoute
+  PortalIndexRoute: typeof PortalIndexRoute
   PortalBookingsBookingIdRoute: typeof PortalBookingsBookingIdRoute
   PortalBookingsNewRoute: typeof PortalBookingsNewRoute
   PortalInvoicesInvoiceIdRoute: typeof PortalInvoicesInvoiceIdRoute
@@ -889,6 +926,7 @@ interface PortalRouteRouteChildren {
 
 const PortalRouteRouteChildren: PortalRouteRouteChildren = {
   PortalDashboardRoute: PortalDashboardRoute,
+  PortalIndexRoute: PortalIndexRoute,
   PortalBookingsBookingIdRoute: PortalBookingsBookingIdRoute,
   PortalBookingsNewRoute: PortalBookingsNewRoute,
   PortalInvoicesInvoiceIdRoute: PortalInvoicesInvoiceIdRoute,
