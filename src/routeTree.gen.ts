@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AppRouteRouteImport } from './routes/app/route'
 import { Route as DriverRouteRouteImport } from './routes/driver/route'
 import { Route as PortalRouteRouteImport } from './routes/portal/route'
@@ -22,6 +23,8 @@ import { Route as AppFuelRouteImport } from './routes/app/fuel'
 import { Route as AppHrRouteImport } from './routes/app/hr'
 import { Route as AppInventoryRouteImport } from './routes/app/inventory'
 import { Route as AppPodRouteImport } from './routes/app/pod'
+import { Route as AppReportsRouteImport } from './routes/app/reports'
+import { Route as AppSettingsRouteImport } from './routes/app/settings'
 import { Route as AppTrackingRouteImport } from './routes/app/tracking'
 import { Route as AppVendorsRouteImport } from './routes/app/vendors'
 import { Route as AppWorkshopRouteImport } from './routes/app/workshop'
@@ -58,6 +61,11 @@ import { Route as AppFinanceInvoicesInvoiceIdRouteImport } from './routes/app/fi
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRouteRoute = AppRouteRouteImport.update({
@@ -118,6 +126,16 @@ const AppInventoryRoute = AppInventoryRouteImport.update({
 const AppPodRoute = AppPodRouteImport.update({
   id: '/pod',
   path: '/pod',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppReportsRoute = AppReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppTrackingRoute = AppTrackingRouteImport.update({
@@ -287,6 +305,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRouteRouteWithChildren
   '/driver': typeof DriverRouteRouteWithChildren
   '/portal': typeof PortalRouteRouteWithChildren
+  '/admin': typeof AdminRoute
   '/app/audit': typeof AppAuditRoute
   '/app/communications': typeof AppCommunicationsRoute
   '/app/compliance': typeof AppComplianceRoute
@@ -296,6 +315,8 @@ export interface FileRoutesByFullPath {
   '/app/hr': typeof AppHrRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/pod': typeof AppPodRoute
+  '/app/reports': typeof AppReportsRoute
+  '/app/settings': typeof AppSettingsRoute
   '/app/tracking': typeof AppTrackingRoute
   '/app/vendors': typeof AppVendorsRoute
   '/app/workshop': typeof AppWorkshopRoute
@@ -332,6 +353,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppRouteRouteWithChildren
+  '/admin': typeof AdminRoute
   '/app/audit': typeof AppAuditRoute
   '/app/communications': typeof AppCommunicationsRoute
   '/app/compliance': typeof AppComplianceRoute
@@ -341,6 +363,8 @@ export interface FileRoutesByTo {
   '/app/hr': typeof AppHrRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/pod': typeof AppPodRoute
+  '/app/reports': typeof AppReportsRoute
+  '/app/settings': typeof AppSettingsRoute
   '/app/tracking': typeof AppTrackingRoute
   '/app/vendors': typeof AppVendorsRoute
   '/app/workshop': typeof AppWorkshopRoute
@@ -380,6 +404,7 @@ export interface FileRoutesById {
   '/app': typeof AppRouteRouteWithChildren
   '/driver': typeof DriverRouteRouteWithChildren
   '/portal': typeof PortalRouteRouteWithChildren
+  '/admin': typeof AdminRoute
   '/app/audit': typeof AppAuditRoute
   '/app/communications': typeof AppCommunicationsRoute
   '/app/compliance': typeof AppComplianceRoute
@@ -389,6 +414,8 @@ export interface FileRoutesById {
   '/app/hr': typeof AppHrRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/pod': typeof AppPodRoute
+  '/app/reports': typeof AppReportsRoute
+  '/app/settings': typeof AppSettingsRoute
   '/app/tracking': typeof AppTrackingRoute
   '/app/vendors': typeof AppVendorsRoute
   '/app/workshop': typeof AppWorkshopRoute
@@ -429,6 +456,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/driver'
     | '/portal'
+    | '/admin'
     | '/app/audit'
     | '/app/communications'
     | '/app/compliance'
@@ -438,6 +466,8 @@ export interface FileRouteTypes {
     | '/app/hr'
     | '/app/inventory'
     | '/app/pod'
+    | '/app/reports'
+    | '/app/settings'
     | '/app/tracking'
     | '/app/vendors'
     | '/app/workshop'
@@ -474,6 +504,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/app'
+    | '/admin'
     | '/app/audit'
     | '/app/communications'
     | '/app/compliance'
@@ -483,6 +514,8 @@ export interface FileRouteTypes {
     | '/app/hr'
     | '/app/inventory'
     | '/app/pod'
+    | '/app/reports'
+    | '/app/settings'
     | '/app/tracking'
     | '/app/vendors'
     | '/app/workshop'
@@ -521,6 +554,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/driver'
     | '/portal'
+    | '/admin'
     | '/app/audit'
     | '/app/communications'
     | '/app/compliance'
@@ -530,6 +564,8 @@ export interface FileRouteTypes {
     | '/app/hr'
     | '/app/inventory'
     | '/app/pod'
+    | '/app/reports'
+    | '/app/settings'
     | '/app/tracking'
     | '/app/vendors'
     | '/app/workshop'
@@ -569,6 +605,7 @@ export interface RootRouteChildren {
   AppRouteRoute: typeof AppRouteRouteWithChildren
   DriverRouteRoute: typeof DriverRouteRouteWithChildren
   PortalRouteRoute: typeof PortalRouteRouteWithChildren
+  AdminRoute: typeof AdminRoute
   TrackTokenRoute: typeof TrackTokenRoute
 }
 
@@ -579,6 +616,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app': {
@@ -663,6 +707,20 @@ declare module '@tanstack/react-router' {
       path: '/pod'
       fullPath: '/app/pod'
       preLoaderRoute: typeof AppPodRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/reports': {
+      id: '/app/reports'
+      path: '/reports'
+      fullPath: '/app/reports'
+      preLoaderRoute: typeof AppReportsRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/settings': {
+      id: '/app/settings'
+      path: '/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/app/tracking': {
@@ -902,6 +960,8 @@ interface AppRouteRouteChildren {
   AppHrRoute: typeof AppHrRoute
   AppInventoryRoute: typeof AppInventoryRoute
   AppPodRoute: typeof AppPodRoute
+  AppReportsRoute: typeof AppReportsRoute
+  AppSettingsRoute: typeof AppSettingsRoute
   AppTrackingRoute: typeof AppTrackingRoute
   AppVendorsRoute: typeof AppVendorsRoute
   AppWorkshopRoute: typeof AppWorkshopRoute
@@ -931,6 +991,8 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppHrRoute: AppHrRoute,
   AppInventoryRoute: AppInventoryRoute,
   AppPodRoute: AppPodRoute,
+  AppReportsRoute: AppReportsRoute,
+  AppSettingsRoute: AppSettingsRoute,
   AppTrackingRoute: AppTrackingRoute,
   AppVendorsRoute: AppVendorsRoute,
   AppWorkshopRoute: AppWorkshopRoute,
@@ -1007,6 +1069,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRouteRoute: AppRouteRouteWithChildren,
   DriverRouteRoute: DriverRouteRouteWithChildren,
   PortalRouteRoute: PortalRouteRouteWithChildren,
+  AdminRoute: AdminRoute,
   TrackTokenRoute: TrackTokenRoute,
 }
 export const routeTree = rootRouteImport
