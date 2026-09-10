@@ -25,7 +25,8 @@ export const Route = createFileRoute("/app/report-builder")({
   component: ReportBuilder,
 });
 
-export default function noop() {}
+
+
 
 function ReportBuilder() {
   const db = useDb();

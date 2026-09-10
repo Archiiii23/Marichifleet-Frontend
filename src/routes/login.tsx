@@ -4,7 +4,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { startDemoSession } from "@/domain/guard";
 import { PERSONAS, roleLabel, useSession } from "@/domain/session";
+
 import { ThemeToggle } from "@/domain/theme";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +24,8 @@ export const Route = createFileRoute("/login")({
   component: Login,
 });
 
+
+
 function Login() {
   const { persona, setPersona } = useSession();
   const navigate = useNavigate();
@@ -29,7 +33,9 @@ function Login() {
 
   const signIn = () => {
     const p = PERSONAS.find((x) => x.id === selected) ?? PERSONAS[2];
+    startDemoSession();
     setPersona(p.id);
+
     if (p.role === "driver") navigate({ to: "/driver/home" });
     else if (p.role === "client") navigate({ to: "/portal/dashboard" });
     else navigate({ to: "/app/dashboard" });

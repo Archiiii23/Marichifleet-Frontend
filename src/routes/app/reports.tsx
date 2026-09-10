@@ -108,6 +108,31 @@ function Reports() {
     });
     const months = [...monthMap.entries()].slice(-6);
 
+    // Deadhead: laden km vs total km run (empty repositioning assumed at 12% per leg without a return load)
+    const ladenKm = done.reduce((s, t) => s + (db.bookings.find((b) => b.id === t.bookingId)?.distanceKm ?? 0), 0);
+    const emptyKm = done.reduce((s, t) => {
+      const b = db.bookings.find((x) => x.id === t.bookingId);
+      return s + (b ? b.distanceKm * 0.12 : 0);
+    }, 0);
+    const deadheadPct = ladenKm ? Math.round((emptyKm / (ladenKm + emptyKm)) * 100) : 0;
+
+    const offered = db.bookings.filter((b) => b.status !== "draft");
+    const accepted = offered.filter((b) => b.status !== "cancelled");
+    const acceptancePct = offered.length ? Math.round((accepted.length / offered.length) * 100) : 0;
+
+    const turnarounds = done
+      .filter((t) => t.startedISO && t.deliveredISO)
+      .map((t) => (new Date(t.deliveredISO!).getTime() - new Date(t.startedISO!).getTime()) / 3600000);
+    const turnaroundHrs = turnarounds.length
+      ? Math.round((turnarounds.reduce((s, h) => s + h, 0) / turnarounds.length) * 10) / 10
+      : 0;
+
+    const deliveredTrips = trips.filter((t) => ["delivered", "pod_uploaded", "completed"].includes(t.status));
+    const withPod = deliveredTrips.filter((t) => t.podId).length;
+    const podPct = deliveredTrips.length ? Math.round((withPod / deliveredTrips.length) * 100) : 100;
+
+    const exposure = db.docs.filter((d) => d.status === "expired" || d.status === "expiring").length;
+
     return {
       revenue,
       profit,
@@ -121,8 +146,14 @@ function Reports() {
       months,
       overdue: db.invoices.filter(isOverdue).length,
       completed: done.length,
+      deadheadPct,
+      acceptancePct,
+      turnaroundHrs,
+      podPct,
+      exposure,
     };
   }, [db, branch, since]);
+
 
   const exportCsv = () => {
     const rows = [
@@ -180,6 +211,15 @@ function Reports() {
         <KpiCard label="On-time delivery" value={`${data.onTimePct}%`} tone={data.onTimePct >= 85 ? "success" : "warning"} hint="Within 15 minutes of ETA" />
         <KpiCard label="Fuel efficiency" value={`₹${data.litres ? Math.round(data.fuelSpend / data.litres) : 0}/L`} hint={`${Math.round(data.litres).toLocaleString("en-IN")} litres`} />
       </div>
+
+      <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+        <KpiCard label="Empty running" value={`${data.deadheadPct}%`} tone={data.deadheadPct > 20 ? "warning" : "success"} hint="Deadhead share of km run" />
+        <KpiCard label="Load acceptance" value={`${data.acceptancePct}%`} tone={data.acceptancePct >= 90 ? "success" : "warning"} hint="Bookings accepted vs offered" />
+        <KpiCard label="Avg turnaround" value={`${data.turnaroundHrs} h`} hint="Trip start to delivery" />
+        <KpiCard label="POD compliance" value={`${data.podPct}%`} tone={data.podPct >= 95 ? "success" : "warning"} hint="Deliveries with proof captured" />
+        <KpiCard label="Compliance exposure" value={String(data.exposure)} tone={data.exposure ? "danger" : "success"} hint="Documents expired or expiring" />
+      </div>
+
 
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
         <Panel title="Billed revenue by month">
