@@ -4,7 +4,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { startDemoSession } from "@/domain/guard";
 import { PERSONAS, roleLabel, useSession } from "@/domain/session";
+
 import { ThemeToggle } from "@/domain/theme";
 import { cn } from "@/lib/utils";
 
