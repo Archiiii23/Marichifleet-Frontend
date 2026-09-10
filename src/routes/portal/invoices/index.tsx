@@ -59,9 +59,10 @@ function PortalInvoices() {
               invoiceOutstanding(i) > 0 ? (
                 <Button
                   size="sm"
-                  onClick={(e) => {
+                  onClick={(e: React.MouseEvent) => {
                     e.stopPropagation();
                     navigate({ to: "/portal/pay/$invoiceId", params: { invoiceId: i.id } });
+
                   }}
                 >
                   Pay
