@@ -33,7 +33,7 @@ export const Route = createFileRoute("/app/geofences")({
       { property: "og:description", content: "Define zones that update trip status and raise dwell alerts automatically." },
     ],
   }),
-  component: Geofences;
+  component: Geofences,
 });
 
 function Geofences() {
