@@ -50,6 +50,25 @@ function PortalInvoices() {
           { key: "total", header: "Total", cell: (i) => <span className="numeric">{inr(i.total)}</span>, className: "text-right" },
           { key: "bal", header: "Outstanding", cell: (i) => <span className="numeric">{inr(invoiceOutstanding(i))}</span>, className: "text-right" },
           { key: "status", header: "Status", cell: (i) => <StatusBadge status={isOverdue(i) ? "overdue" : i.status} /> },
+          {
+            key: "pay",
+            header: "",
+            cell: (i) =>
+              invoiceOutstanding(i) > 0 ? (
+                <Button
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate({ to: "/portal/pay/$invoiceId", params: { invoiceId: i.id } });
+                  }}
+                >
+                  Pay
+                </Button>
+              ) : (
+                <span className="text-xs text-muted-foreground">Settled</span>
+              ),
+          },
+
         ]}
       />
     </div>
