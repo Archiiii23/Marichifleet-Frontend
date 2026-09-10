@@ -108,6 +108,31 @@ function Reports() {
     });
     const months = [...monthMap.entries()].slice(-6);
 
+    // Deadhead: laden km vs total km run (empty repositioning assumed at 12% per leg without a return load)
+    const ladenKm = done.reduce((s, t) => s + (db.bookings.find((b) => b.id === t.bookingId)?.distanceKm ?? 0), 0);
+    const emptyKm = done.reduce((s, t) => {
+      const b = db.bookings.find((x) => x.id === t.bookingId);
+      return s + (b ? b.distanceKm * 0.12 : 0);
+    }, 0);
+    const deadheadPct = ladenKm ? Math.round((emptyKm / (ladenKm + emptyKm)) * 100) : 0;
+
+    const offered = db.bookings.filter((b) => b.status !== "draft");
+    const accepted = offered.filter((b) => b.status !== "cancelled");
+    const acceptancePct = offered.length ? Math.round((accepted.length / offered.length) * 100) : 0;
+
+    const turnarounds = done
+      .filter((t) => t.startedISO && t.deliveredISO)
+      .map((t) => (new Date(t.deliveredISO!).getTime() - new Date(t.startedISO!).getTime()) / 3600000);
+    const turnaroundHrs = turnarounds.length
+      ? Math.round((turnarounds.reduce((s, h) => s + h, 0) / turnarounds.length) * 10) / 10
+      : 0;
+
+    const deliveredTrips = trips.filter((t) => ["delivered", "pod_uploaded", "completed"].includes(t.status));
+    const withPod = deliveredTrips.filter((t) => t.podId).length;
+    const podPct = deliveredTrips.length ? Math.round((withPod / deliveredTrips.length) * 100) : 100;
+
+    const exposure = db.complianceDocs.filter((d) => d.status === "expired" || d.status === "expiring").length;
+
     return {
       revenue,
       profit,
@@ -121,8 +146,14 @@ function Reports() {
       months,
       overdue: db.invoices.filter(isOverdue).length,
       completed: done.length,
+      deadheadPct,
+      acceptancePct,
+      turnaroundHrs,
+      podPct,
+      exposure,
     };
   }, [db, branch, since]);
+
 
   const exportCsv = () => {
     const rows = [
