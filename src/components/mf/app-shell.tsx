@@ -79,6 +79,7 @@ const NAV: Array<{ group: string; items: NavItem[] }> = [
       { to: "/app/finance/invoices", label: "Invoices", icon: BadgeIndianRupee, cap: "view_finance" },
       { to: "/app/finance/receivables", label: "Receivables", icon: BadgeIndianRupee, cap: "view_finance" },
       { to: "/app/expenses", label: "Expenses & Credits", icon: BadgeIndianRupee, cap: "view_finance" },
+      { to: "/app/ledger", label: "Ledger", icon: BadgeIndianRupee, cap: "view_finance" },
       { to: "/app/reports", label: "Reports", icon: BarChart3, cap: "view_operations" },
       { to: "/app/report-builder", label: "Report Builder", icon: BarChart3, cap: "view_operations" },
     ],
@@ -87,7 +88,9 @@ const NAV: Array<{ group: string; items: NavItem[] }> = [
     group: "Organisation",
     items: [
       { to: "/app/hr", label: "People & Payroll", icon: UsersRound, cap: "view_admin" },
-      { to: "/app/communications", label: "Communications", icon: MessageSquare, cap: "view_operations" },
+      { to: "/app/conversations", label: "Conversations", icon: MessageSquare, cap: "view_operations" },
+      { to: "/app/communications", label: "Message Log", icon: MessageSquare, cap: "view_operations" },
+      { to: "/app/automation", label: "Automation", icon: Activity, cap: "view_operations" },
       { to: "/app/alerts", label: "Alert Preferences", icon: Bell, cap: "view_admin" },
       { to: "/app/roles", label: "Users & Roles", icon: UsersRound, cap: "view_admin" },
       { to: "/app/audit", label: "Audit Log", icon: ShieldCheck, cap: "view_admin" },
