@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { to: "/portal/dashboard", label: "Overview" },
   { to: "/portal/bookings", label: "My bookings" },
+  { to: "/portal/exceptions", label: "Issues" },
   { to: "/portal/invoices", label: "Invoices" },
 ];
 

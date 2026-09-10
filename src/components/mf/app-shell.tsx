@@ -3,7 +3,7 @@ import {
   Activity, BadgeIndianRupee, BarChart3, Bell, Boxes, Building2, ClipboardCheck,
   Command as CommandIcon, Fuel, Handshake, LayoutDashboard, LogOut, Map, MessageSquare, Package,
   Radio, Settings, ShieldCheck, Truck, Users, UsersRound, Warehouse, Wrench,
-  UserCircle2, Menu,
+  UserCircle2, Menu, TriangleAlert,
 } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
@@ -51,6 +51,7 @@ const NAV: Array<{ group: string; items: NavItem[] }> = [
       { to: "/app/geofences", label: "Geofences", icon: Map, cap: "view_operations" },
       { to: "/app/trips", label: "Trips", icon: Activity, cap: "view_operations" },
       { to: "/app/playback", label: "Trip Playback", icon: Activity, cap: "view_operations" },
+      { to: "/app/incidents", label: "Incident Desk", icon: TriangleAlert, cap: "view_operations" },
       { to: "/app/pod", label: "Proof of Delivery", icon: ClipboardCheck, cap: "view_operations" },
     ],
   },

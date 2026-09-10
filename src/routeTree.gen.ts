@@ -53,6 +53,7 @@ import { Route as DriverInboxRouteImport } from './routes/driver/inbox'
 import { Route as DriverPayslipsRouteImport } from './routes/driver/payslips'
 import { Route as PortalIndexRouteImport } from './routes/portal/index'
 import { Route as PortalDashboardRouteImport } from './routes/portal/dashboard'
+import { Route as PortalExceptionsRouteImport } from './routes/portal/exceptions'
 import { Route as TrackTokenRouteImport } from './routes/track/$token'
 import { Route as AppBookingsIndexRouteImport } from './routes/app/bookings/index'
 import { Route as AppBookingsBookingIdRouteImport } from './routes/app/bookings/$bookingId'
@@ -298,6 +299,11 @@ const PortalDashboardRoute = PortalDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => PortalRouteRoute,
 } as any)
+const PortalExceptionsRoute = PortalExceptionsRouteImport.update({
+  id: '/exceptions',
+  path: '/exceptions',
+  getParentRoute: () => PortalRouteRoute,
+} as any)
 const TrackTokenRoute = TrackTokenRouteImport.update({
   id: '/track/$token',
   path: '/track/$token',
@@ -463,6 +469,7 @@ export interface FileRoutesByFullPath {
   '/driver/inbox': typeof DriverInboxRoute
   '/driver/payslips': typeof DriverPayslipsRoute
   '/portal/dashboard': typeof PortalDashboardRoute
+  '/portal/exceptions': typeof PortalExceptionsRoute
   '/track/$token': typeof TrackTokenRoute
   '/driver/': typeof DriverIndexRoute
   '/portal/': typeof PortalIndexRoute
@@ -531,6 +538,7 @@ export interface FileRoutesByTo {
   '/driver/inbox': typeof DriverInboxRoute
   '/driver/payslips': typeof DriverPayslipsRoute
   '/portal/dashboard': typeof PortalDashboardRoute
+  '/portal/exceptions': typeof PortalExceptionsRoute
   '/track/$token': typeof TrackTokenRoute
   '/driver': typeof DriverIndexRoute
   '/portal': typeof PortalIndexRoute
@@ -602,6 +610,7 @@ export interface FileRoutesById {
   '/driver/inbox': typeof DriverInboxRoute
   '/driver/payslips': typeof DriverPayslipsRoute
   '/portal/dashboard': typeof PortalDashboardRoute
+  '/portal/exceptions': typeof PortalExceptionsRoute
   '/track/$token': typeof TrackTokenRoute
   '/driver/': typeof DriverIndexRoute
   '/portal/': typeof PortalIndexRoute
@@ -674,6 +683,7 @@ export interface FileRouteTypes {
     | '/driver/inbox'
     | '/driver/payslips'
     | '/portal/dashboard'
+    | '/portal/exceptions'
     | '/track/$token'
     | '/driver/'
     | '/portal/'
@@ -742,6 +752,7 @@ export interface FileRouteTypes {
     | '/driver/inbox'
     | '/driver/payslips'
     | '/portal/dashboard'
+    | '/portal/exceptions'
     | '/track/$token'
     | '/driver'
     | '/portal'
@@ -812,6 +823,7 @@ export interface FileRouteTypes {
     | '/driver/inbox'
     | '/driver/payslips'
     | '/portal/dashboard'
+    | '/portal/exceptions'
     | '/track/$token'
     | '/driver/'
     | '/portal/'
@@ -1162,6 +1174,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalDashboardRouteImport
       parentRoute: typeof PortalRouteRoute
     }
+    '/portal/exceptions': {
+      id: '/portal/exceptions'
+      path: '/exceptions'
+      fullPath: '/portal/exceptions'
+      preLoaderRoute: typeof PortalExceptionsRouteImport
+      parentRoute: typeof PortalRouteRoute
+    }
     '/track/$token': {
       id: '/track/$token'
       path: '/track/$token'
@@ -1455,6 +1474,7 @@ const DriverRouteRouteWithChildren = DriverRouteRoute._addFileChildren(
 
 interface PortalRouteRouteChildren {
   PortalDashboardRoute: typeof PortalDashboardRoute
+  PortalExceptionsRoute: typeof PortalExceptionsRoute
   PortalIndexRoute: typeof PortalIndexRoute
   PortalBookingsBookingIdRoute: typeof PortalBookingsBookingIdRoute
   PortalBookingsNewRoute: typeof PortalBookingsNewRoute
@@ -1467,6 +1487,7 @@ interface PortalRouteRouteChildren {
 
 const PortalRouteRouteChildren: PortalRouteRouteChildren = {
   PortalDashboardRoute: PortalDashboardRoute,
+  PortalExceptionsRoute: PortalExceptionsRoute,
   PortalIndexRoute: PortalIndexRoute,
   PortalBookingsBookingIdRoute: PortalBookingsBookingIdRoute,
   PortalBookingsNewRoute: PortalBookingsNewRoute,
