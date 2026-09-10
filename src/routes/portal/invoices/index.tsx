@@ -1,5 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { DataTable } from "@/components/mf/data-table";
+import { Button } from "@/components/ui/button";
+
 import { KpiCard, StatusBadge } from "@/components/mf/primitives";
 import { fmtDate, inr, inrCompact, useDb } from "@/domain/hooks";
 import { useSession } from "@/domain/session";
