@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { CloudOff, Cloud, Fuel, Home, LogOut, Route as RouteIcon, TriangleAlert, Wallet } from "lucide-react";
+import { CloudOff, Cloud, Fuel, Home, Inbox, LogOut, Route as RouteIcon, TriangleAlert, Wallet } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/domain/session";
@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 const TABS = [
   { to: "/driver/home", label: "Home", icon: Home },
   { to: "/driver/trips", label: "Trips", icon: RouteIcon },
+  { to: "/driver/inbox", label: "Inbox", icon: Inbox },
   { to: "/driver/fuel", label: "Fuel", icon: Fuel },
   { to: "/driver/exception", label: "Report", icon: TriangleAlert },
   { to: "/driver/payslips", label: "Pay", icon: Wallet },

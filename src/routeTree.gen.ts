@@ -30,6 +30,7 @@ import { Route as AppExpensesRouteImport } from './routes/app/expenses'
 import { Route as AppFuelRouteImport } from './routes/app/fuel'
 import { Route as AppGeofencesRouteImport } from './routes/app/geofences'
 import { Route as AppHrRouteImport } from './routes/app/hr'
+import { Route as AppIncidentsRouteImport } from './routes/app/incidents'
 import { Route as AppInventoryRouteImport } from './routes/app/inventory'
 import { Route as AppLedgerRouteImport } from './routes/app/ledger'
 import { Route as AppPlaybackRouteImport } from './routes/app/playback'
@@ -48,9 +49,11 @@ import { Route as DriverIndexRouteImport } from './routes/driver/index'
 import { Route as DriverExceptionRouteImport } from './routes/driver/exception'
 import { Route as DriverFuelRouteImport } from './routes/driver/fuel'
 import { Route as DriverHomeRouteImport } from './routes/driver/home'
+import { Route as DriverInboxRouteImport } from './routes/driver/inbox'
 import { Route as DriverPayslipsRouteImport } from './routes/driver/payslips'
 import { Route as PortalIndexRouteImport } from './routes/portal/index'
 import { Route as PortalDashboardRouteImport } from './routes/portal/dashboard'
+import { Route as PortalExceptionsRouteImport } from './routes/portal/exceptions'
 import { Route as TrackTokenRouteImport } from './routes/track/$token'
 import { Route as AppBookingsIndexRouteImport } from './routes/app/bookings/index'
 import { Route as AppBookingsBookingIdRouteImport } from './routes/app/bookings/$bookingId'
@@ -181,6 +184,11 @@ const AppHrRoute = AppHrRouteImport.update({
   path: '/hr',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppIncidentsRoute = AppIncidentsRouteImport.update({
+  id: '/incidents',
+  path: '/incidents',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppInventoryRoute = AppInventoryRouteImport.update({
   id: '/inventory',
   path: '/inventory',
@@ -271,6 +279,11 @@ const DriverHomeRoute = DriverHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => DriverRouteRoute,
 } as any)
+const DriverInboxRoute = DriverInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => DriverRouteRoute,
+} as any)
 const DriverPayslipsRoute = DriverPayslipsRouteImport.update({
   id: '/payslips',
   path: '/payslips',
@@ -284,6 +297,11 @@ const PortalIndexRoute = PortalIndexRouteImport.update({
 const PortalDashboardRoute = PortalDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => PortalRouteRoute,
+} as any)
+const PortalExceptionsRoute = PortalExceptionsRouteImport.update({
+  id: '/exceptions',
+  path: '/exceptions',
   getParentRoute: () => PortalRouteRoute,
 } as any)
 const TrackTokenRoute = TrackTokenRouteImport.update({
@@ -430,6 +448,7 @@ export interface FileRoutesByFullPath {
   '/app/fuel': typeof AppFuelRoute
   '/app/geofences': typeof AppGeofencesRoute
   '/app/hr': typeof AppHrRoute
+  '/app/incidents': typeof AppIncidentsRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/ledger': typeof AppLedgerRoute
   '/app/playback': typeof AppPlaybackRoute
@@ -447,8 +466,10 @@ export interface FileRoutesByFullPath {
   '/driver/exception': typeof DriverExceptionRoute
   '/driver/fuel': typeof DriverFuelRoute
   '/driver/home': typeof DriverHomeRoute
+  '/driver/inbox': typeof DriverInboxRoute
   '/driver/payslips': typeof DriverPayslipsRoute
   '/portal/dashboard': typeof PortalDashboardRoute
+  '/portal/exceptions': typeof PortalExceptionsRoute
   '/track/$token': typeof TrackTokenRoute
   '/driver/': typeof DriverIndexRoute
   '/portal/': typeof PortalIndexRoute
@@ -496,6 +517,7 @@ export interface FileRoutesByTo {
   '/app/fuel': typeof AppFuelRoute
   '/app/geofences': typeof AppGeofencesRoute
   '/app/hr': typeof AppHrRoute
+  '/app/incidents': typeof AppIncidentsRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/ledger': typeof AppLedgerRoute
   '/app/playback': typeof AppPlaybackRoute
@@ -513,8 +535,10 @@ export interface FileRoutesByTo {
   '/driver/exception': typeof DriverExceptionRoute
   '/driver/fuel': typeof DriverFuelRoute
   '/driver/home': typeof DriverHomeRoute
+  '/driver/inbox': typeof DriverInboxRoute
   '/driver/payslips': typeof DriverPayslipsRoute
   '/portal/dashboard': typeof PortalDashboardRoute
+  '/portal/exceptions': typeof PortalExceptionsRoute
   '/track/$token': typeof TrackTokenRoute
   '/driver': typeof DriverIndexRoute
   '/portal': typeof PortalIndexRoute
@@ -565,6 +589,7 @@ export interface FileRoutesById {
   '/app/fuel': typeof AppFuelRoute
   '/app/geofences': typeof AppGeofencesRoute
   '/app/hr': typeof AppHrRoute
+  '/app/incidents': typeof AppIncidentsRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/ledger': typeof AppLedgerRoute
   '/app/playback': typeof AppPlaybackRoute
@@ -582,8 +607,10 @@ export interface FileRoutesById {
   '/driver/exception': typeof DriverExceptionRoute
   '/driver/fuel': typeof DriverFuelRoute
   '/driver/home': typeof DriverHomeRoute
+  '/driver/inbox': typeof DriverInboxRoute
   '/driver/payslips': typeof DriverPayslipsRoute
   '/portal/dashboard': typeof PortalDashboardRoute
+  '/portal/exceptions': typeof PortalExceptionsRoute
   '/track/$token': typeof TrackTokenRoute
   '/driver/': typeof DriverIndexRoute
   '/portal/': typeof PortalIndexRoute
@@ -635,6 +662,7 @@ export interface FileRouteTypes {
     | '/app/fuel'
     | '/app/geofences'
     | '/app/hr'
+    | '/app/incidents'
     | '/app/inventory'
     | '/app/ledger'
     | '/app/playback'
@@ -652,8 +680,10 @@ export interface FileRouteTypes {
     | '/driver/exception'
     | '/driver/fuel'
     | '/driver/home'
+    | '/driver/inbox'
     | '/driver/payslips'
     | '/portal/dashboard'
+    | '/portal/exceptions'
     | '/track/$token'
     | '/driver/'
     | '/portal/'
@@ -701,6 +731,7 @@ export interface FileRouteTypes {
     | '/app/fuel'
     | '/app/geofences'
     | '/app/hr'
+    | '/app/incidents'
     | '/app/inventory'
     | '/app/ledger'
     | '/app/playback'
@@ -718,8 +749,10 @@ export interface FileRouteTypes {
     | '/driver/exception'
     | '/driver/fuel'
     | '/driver/home'
+    | '/driver/inbox'
     | '/driver/payslips'
     | '/portal/dashboard'
+    | '/portal/exceptions'
     | '/track/$token'
     | '/driver'
     | '/portal'
@@ -769,6 +802,7 @@ export interface FileRouteTypes {
     | '/app/fuel'
     | '/app/geofences'
     | '/app/hr'
+    | '/app/incidents'
     | '/app/inventory'
     | '/app/ledger'
     | '/app/playback'
@@ -786,8 +820,10 @@ export interface FileRouteTypes {
     | '/driver/exception'
     | '/driver/fuel'
     | '/driver/home'
+    | '/driver/inbox'
     | '/driver/payslips'
     | '/portal/dashboard'
+    | '/portal/exceptions'
     | '/track/$token'
     | '/driver/'
     | '/portal/'
@@ -977,6 +1013,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppHrRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/incidents': {
+      id: '/app/incidents'
+      path: '/incidents'
+      fullPath: '/app/incidents'
+      preLoaderRoute: typeof AppIncidentsRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/app/inventory': {
       id: '/app/inventory'
       path: '/inventory'
@@ -1103,6 +1146,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DriverHomeRouteImport
       parentRoute: typeof DriverRouteRoute
     }
+    '/driver/inbox': {
+      id: '/driver/inbox'
+      path: '/inbox'
+      fullPath: '/driver/inbox'
+      preLoaderRoute: typeof DriverInboxRouteImport
+      parentRoute: typeof DriverRouteRoute
+    }
     '/driver/payslips': {
       id: '/driver/payslips'
       path: '/payslips'
@@ -1122,6 +1172,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/portal/dashboard'
       preLoaderRoute: typeof PortalDashboardRouteImport
+      parentRoute: typeof PortalRouteRoute
+    }
+    '/portal/exceptions': {
+      id: '/portal/exceptions'
+      path: '/exceptions'
+      fullPath: '/portal/exceptions'
+      preLoaderRoute: typeof PortalExceptionsRouteImport
       parentRoute: typeof PortalRouteRoute
     }
     '/track/$token': {
@@ -1309,6 +1366,7 @@ interface AppRouteRouteChildren {
   AppFuelRoute: typeof AppFuelRoute
   AppGeofencesRoute: typeof AppGeofencesRoute
   AppHrRoute: typeof AppHrRoute
+  AppIncidentsRoute: typeof AppIncidentsRoute
   AppInventoryRoute: typeof AppInventoryRoute
   AppLedgerRoute: typeof AppLedgerRoute
   AppPlaybackRoute: typeof AppPlaybackRoute
@@ -1353,6 +1411,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppFuelRoute: AppFuelRoute,
   AppGeofencesRoute: AppGeofencesRoute,
   AppHrRoute: AppHrRoute,
+  AppIncidentsRoute: AppIncidentsRoute,
   AppInventoryRoute: AppInventoryRoute,
   AppLedgerRoute: AppLedgerRoute,
   AppPlaybackRoute: AppPlaybackRoute,
@@ -1391,6 +1450,7 @@ interface DriverRouteRouteChildren {
   DriverExceptionRoute: typeof DriverExceptionRoute
   DriverFuelRoute: typeof DriverFuelRoute
   DriverHomeRoute: typeof DriverHomeRoute
+  DriverInboxRoute: typeof DriverInboxRoute
   DriverPayslipsRoute: typeof DriverPayslipsRoute
   DriverIndexRoute: typeof DriverIndexRoute
   DriverTripsTripIdRoute: typeof DriverTripsTripIdRoute
@@ -1401,6 +1461,7 @@ const DriverRouteRouteChildren: DriverRouteRouteChildren = {
   DriverExceptionRoute: DriverExceptionRoute,
   DriverFuelRoute: DriverFuelRoute,
   DriverHomeRoute: DriverHomeRoute,
+  DriverInboxRoute: DriverInboxRoute,
   DriverPayslipsRoute: DriverPayslipsRoute,
   DriverIndexRoute: DriverIndexRoute,
   DriverTripsTripIdRoute: DriverTripsTripIdRoute,
@@ -1413,6 +1474,7 @@ const DriverRouteRouteWithChildren = DriverRouteRoute._addFileChildren(
 
 interface PortalRouteRouteChildren {
   PortalDashboardRoute: typeof PortalDashboardRoute
+  PortalExceptionsRoute: typeof PortalExceptionsRoute
   PortalIndexRoute: typeof PortalIndexRoute
   PortalBookingsBookingIdRoute: typeof PortalBookingsBookingIdRoute
   PortalBookingsNewRoute: typeof PortalBookingsNewRoute
@@ -1425,6 +1487,7 @@ interface PortalRouteRouteChildren {
 
 const PortalRouteRouteChildren: PortalRouteRouteChildren = {
   PortalDashboardRoute: PortalDashboardRoute,
+  PortalExceptionsRoute: PortalExceptionsRoute,
   PortalIndexRoute: PortalIndexRoute,
   PortalBookingsBookingIdRoute: PortalBookingsBookingIdRoute,
   PortalBookingsNewRoute: PortalBookingsNewRoute,
