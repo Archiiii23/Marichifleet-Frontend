@@ -18,6 +18,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as PortalRouteRouteImport } from './routes/portal/route'
 import { Route as AppAlertsRouteImport } from './routes/app/alerts'
+import { Route as AppApprovalsRouteImport } from './routes/app/approvals'
 import { Route as AppAuditRouteImport } from './routes/app/audit'
 import { Route as AppCommunicationsRouteImport } from './routes/app/communications'
 import { Route as AppComplianceRouteImport } from './routes/app/compliance'
@@ -36,6 +37,7 @@ import { Route as AppReportsRouteImport } from './routes/app/reports'
 import { Route as AppRolesRouteImport } from './routes/app/roles'
 import { Route as AppSettingsRouteImport } from './routes/app/settings'
 import { Route as AppSubscriptionRouteImport } from './routes/app/subscription'
+import { Route as AppTowerRouteImport } from './routes/app/tower'
 import { Route as AppTrackingRouteImport } from './routes/app/tracking'
 import { Route as AppVendorsRouteImport } from './routes/app/vendors'
 import { Route as AppWorkshopRouteImport } from './routes/app/workshop'
@@ -114,6 +116,11 @@ const PortalRouteRoute = PortalRouteRouteImport.update({
 const AppAlertsRoute = AppAlertsRouteImport.update({
   id: '/alerts',
   path: '/alerts',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppApprovalsRoute = AppApprovalsRouteImport.update({
+  id: '/approvals',
+  path: '/approvals',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppAuditRoute = AppAuditRouteImport.update({
@@ -204,6 +211,11 @@ const AppSettingsRoute = AppSettingsRouteImport.update({
 const AppSubscriptionRoute = AppSubscriptionRouteImport.update({
   id: '/subscription',
   path: '/subscription',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppTowerRoute = AppTowerRouteImport.update({
+  id: '/tower',
+  path: '/tower',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppTrackingRoute = AppTrackingRouteImport.update({
@@ -388,6 +400,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/app/alerts': typeof AppAlertsRoute
+  '/app/approvals': typeof AppApprovalsRoute
   '/app/audit': typeof AppAuditRoute
   '/app/communications': typeof AppCommunicationsRoute
   '/app/compliance': typeof AppComplianceRoute
@@ -406,6 +419,7 @@ export interface FileRoutesByFullPath {
   '/app/roles': typeof AppRolesRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/subscription': typeof AppSubscriptionRoute
+  '/app/tower': typeof AppTowerRoute
   '/app/tracking': typeof AppTrackingRoute
   '/app/vendors': typeof AppVendorsRoute
   '/app/workshop': typeof AppWorkshopRoute
@@ -449,6 +463,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/app/alerts': typeof AppAlertsRoute
+  '/app/approvals': typeof AppApprovalsRoute
   '/app/audit': typeof AppAuditRoute
   '/app/communications': typeof AppCommunicationsRoute
   '/app/compliance': typeof AppComplianceRoute
@@ -467,6 +482,7 @@ export interface FileRoutesByTo {
   '/app/roles': typeof AppRolesRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/subscription': typeof AppSubscriptionRoute
+  '/app/tower': typeof AppTowerRoute
   '/app/tracking': typeof AppTrackingRoute
   '/app/vendors': typeof AppVendorsRoute
   '/app/workshop': typeof AppWorkshopRoute
@@ -513,6 +529,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/app/alerts': typeof AppAlertsRoute
+  '/app/approvals': typeof AppApprovalsRoute
   '/app/audit': typeof AppAuditRoute
   '/app/communications': typeof AppCommunicationsRoute
   '/app/compliance': typeof AppComplianceRoute
@@ -531,6 +548,7 @@ export interface FileRoutesById {
   '/app/roles': typeof AppRolesRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/subscription': typeof AppSubscriptionRoute
+  '/app/tower': typeof AppTowerRoute
   '/app/tracking': typeof AppTrackingRoute
   '/app/vendors': typeof AppVendorsRoute
   '/app/workshop': typeof AppWorkshopRoute
@@ -578,6 +596,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/onboarding'
     | '/app/alerts'
+    | '/app/approvals'
     | '/app/audit'
     | '/app/communications'
     | '/app/compliance'
@@ -596,6 +615,7 @@ export interface FileRouteTypes {
     | '/app/roles'
     | '/app/settings'
     | '/app/subscription'
+    | '/app/tower'
     | '/app/tracking'
     | '/app/vendors'
     | '/app/workshop'
@@ -639,6 +659,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/onboarding'
     | '/app/alerts'
+    | '/app/approvals'
     | '/app/audit'
     | '/app/communications'
     | '/app/compliance'
@@ -657,6 +678,7 @@ export interface FileRouteTypes {
     | '/app/roles'
     | '/app/settings'
     | '/app/subscription'
+    | '/app/tower'
     | '/app/tracking'
     | '/app/vendors'
     | '/app/workshop'
@@ -702,6 +724,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/onboarding'
     | '/app/alerts'
+    | '/app/approvals'
     | '/app/audit'
     | '/app/communications'
     | '/app/compliance'
@@ -720,6 +743,7 @@ export interface FileRouteTypes {
     | '/app/roles'
     | '/app/settings'
     | '/app/subscription'
+    | '/app/tower'
     | '/app/tracking'
     | '/app/vendors'
     | '/app/workshop'
@@ -831,6 +855,13 @@ declare module '@tanstack/react-router' {
       path: '/alerts'
       fullPath: '/app/alerts'
       preLoaderRoute: typeof AppAlertsRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/approvals': {
+      id: '/app/approvals'
+      path: '/approvals'
+      fullPath: '/app/approvals'
+      preLoaderRoute: typeof AppApprovalsRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/app/audit': {
@@ -957,6 +988,13 @@ declare module '@tanstack/react-router' {
       path: '/subscription'
       fullPath: '/app/subscription'
       preLoaderRoute: typeof AppSubscriptionRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/tower': {
+      id: '/app/tower'
+      path: '/tower'
+      fullPath: '/app/tower'
+      preLoaderRoute: typeof AppTowerRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/app/tracking': {
@@ -1202,6 +1240,7 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteRouteChildren {
   AppAlertsRoute: typeof AppAlertsRoute
+  AppApprovalsRoute: typeof AppApprovalsRoute
   AppAuditRoute: typeof AppAuditRoute
   AppCommunicationsRoute: typeof AppCommunicationsRoute
   AppComplianceRoute: typeof AppComplianceRoute
@@ -1220,6 +1259,7 @@ interface AppRouteRouteChildren {
   AppRolesRoute: typeof AppRolesRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppSubscriptionRoute: typeof AppSubscriptionRoute
+  AppTowerRoute: typeof AppTowerRoute
   AppTrackingRoute: typeof AppTrackingRoute
   AppVendorsRoute: typeof AppVendorsRoute
   AppWorkshopRoute: typeof AppWorkshopRoute
@@ -1241,6 +1281,7 @@ interface AppRouteRouteChildren {
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppAlertsRoute: AppAlertsRoute,
+  AppApprovalsRoute: AppApprovalsRoute,
   AppAuditRoute: AppAuditRoute,
   AppCommunicationsRoute: AppCommunicationsRoute,
   AppComplianceRoute: AppComplianceRoute,
@@ -1259,6 +1300,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppRolesRoute: AppRolesRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppSubscriptionRoute: AppSubscriptionRoute,
+  AppTowerRoute: AppTowerRoute,
   AppTrackingRoute: AppTrackingRoute,
   AppVendorsRoute: AppVendorsRoute,
   AppWorkshopRoute: AppWorkshopRoute,
