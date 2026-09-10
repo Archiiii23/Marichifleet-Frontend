@@ -30,6 +30,7 @@ import { Route as AppExpensesRouteImport } from './routes/app/expenses'
 import { Route as AppFuelRouteImport } from './routes/app/fuel'
 import { Route as AppGeofencesRouteImport } from './routes/app/geofences'
 import { Route as AppHrRouteImport } from './routes/app/hr'
+import { Route as AppIncidentsRouteImport } from './routes/app/incidents'
 import { Route as AppInventoryRouteImport } from './routes/app/inventory'
 import { Route as AppLedgerRouteImport } from './routes/app/ledger'
 import { Route as AppPlaybackRouteImport } from './routes/app/playback'
@@ -179,6 +180,11 @@ const AppGeofencesRoute = AppGeofencesRouteImport.update({
 const AppHrRoute = AppHrRouteImport.update({
   id: '/hr',
   path: '/hr',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppIncidentsRoute = AppIncidentsRouteImport.update({
+  id: '/incidents',
+  path: '/incidents',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppInventoryRoute = AppInventoryRouteImport.update({
@@ -430,6 +436,7 @@ export interface FileRoutesByFullPath {
   '/app/fuel': typeof AppFuelRoute
   '/app/geofences': typeof AppGeofencesRoute
   '/app/hr': typeof AppHrRoute
+  '/app/incidents': typeof AppIncidentsRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/ledger': typeof AppLedgerRoute
   '/app/playback': typeof AppPlaybackRoute
@@ -496,6 +503,7 @@ export interface FileRoutesByTo {
   '/app/fuel': typeof AppFuelRoute
   '/app/geofences': typeof AppGeofencesRoute
   '/app/hr': typeof AppHrRoute
+  '/app/incidents': typeof AppIncidentsRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/ledger': typeof AppLedgerRoute
   '/app/playback': typeof AppPlaybackRoute
@@ -565,6 +573,7 @@ export interface FileRoutesById {
   '/app/fuel': typeof AppFuelRoute
   '/app/geofences': typeof AppGeofencesRoute
   '/app/hr': typeof AppHrRoute
+  '/app/incidents': typeof AppIncidentsRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/ledger': typeof AppLedgerRoute
   '/app/playback': typeof AppPlaybackRoute
@@ -635,6 +644,7 @@ export interface FileRouteTypes {
     | '/app/fuel'
     | '/app/geofences'
     | '/app/hr'
+    | '/app/incidents'
     | '/app/inventory'
     | '/app/ledger'
     | '/app/playback'
@@ -701,6 +711,7 @@ export interface FileRouteTypes {
     | '/app/fuel'
     | '/app/geofences'
     | '/app/hr'
+    | '/app/incidents'
     | '/app/inventory'
     | '/app/ledger'
     | '/app/playback'
@@ -769,6 +780,7 @@ export interface FileRouteTypes {
     | '/app/fuel'
     | '/app/geofences'
     | '/app/hr'
+    | '/app/incidents'
     | '/app/inventory'
     | '/app/ledger'
     | '/app/playback'
@@ -975,6 +987,13 @@ declare module '@tanstack/react-router' {
       path: '/hr'
       fullPath: '/app/hr'
       preLoaderRoute: typeof AppHrRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/incidents': {
+      id: '/app/incidents'
+      path: '/incidents'
+      fullPath: '/app/incidents'
+      preLoaderRoute: typeof AppIncidentsRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/app/inventory': {
@@ -1309,6 +1328,7 @@ interface AppRouteRouteChildren {
   AppFuelRoute: typeof AppFuelRoute
   AppGeofencesRoute: typeof AppGeofencesRoute
   AppHrRoute: typeof AppHrRoute
+  AppIncidentsRoute: typeof AppIncidentsRoute
   AppInventoryRoute: typeof AppInventoryRoute
   AppLedgerRoute: typeof AppLedgerRoute
   AppPlaybackRoute: typeof AppPlaybackRoute
@@ -1353,6 +1373,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppFuelRoute: AppFuelRoute,
   AppGeofencesRoute: AppGeofencesRoute,
   AppHrRoute: AppHrRoute,
+  AppIncidentsRoute: AppIncidentsRoute,
   AppInventoryRoute: AppInventoryRoute,
   AppLedgerRoute: AppLedgerRoute,
   AppPlaybackRoute: AppPlaybackRoute,

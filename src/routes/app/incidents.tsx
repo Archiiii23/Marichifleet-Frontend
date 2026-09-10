@@ -153,7 +153,7 @@ function CaseFile({ c, onResolve }: { c: IncidentCase; onResolve: () => void }) 
         <Panel title="Recommended action" description={`${c.recommendation.level} · ${level.label}`}>
           <p className="text-sm font-medium">{c.recommendation.label}</p>
           <p className="mt-1 text-sm text-muted-foreground">{c.recommendation.detail}</p>
-          <p className="mt-3 border-l-2 border-border pl-3 text-xs text-muted-foreground">{level.description}</p>
+          <p className="mt-3 border-l-2 border-border pl-3 text-xs text-muted-foreground">{level.blurb}</p>
           {c.recommendation.level === "L2" ? (
             <Button size="sm" variant="outline" className="mt-3" asChild>
               <Link to="/app/approvals">Review in Approvals</Link>
