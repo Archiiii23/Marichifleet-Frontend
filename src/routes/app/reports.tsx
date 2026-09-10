@@ -212,6 +212,15 @@ function Reports() {
         <KpiCard label="Fuel efficiency" value={`₹${data.litres ? Math.round(data.fuelSpend / data.litres) : 0}/L`} hint={`${Math.round(data.litres).toLocaleString("en-IN")} litres`} />
       </div>
 
+      <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+        <KpiCard label="Empty running" value={`${data.deadheadPct}%`} tone={data.deadheadPct > 20 ? "warning" : "success"} hint="Deadhead share of km run" />
+        <KpiCard label="Load acceptance" value={`${data.acceptancePct}%`} tone={data.acceptancePct >= 90 ? "success" : "warning"} hint="Bookings accepted vs offered" />
+        <KpiCard label="Avg turnaround" value={`${data.turnaroundHrs} h`} hint="Trip start to delivery" />
+        <KpiCard label="POD compliance" value={`${data.podPct}%`} tone={data.podPct >= 95 ? "success" : "warning"} hint="Deliveries with proof captured" />
+        <KpiCard label="Compliance exposure" value={String(data.exposure)} tone={data.exposure ? "danger" : "success"} hint="Documents expired or expiring" />
+      </div>
+
+
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
         <Panel title="Billed revenue by month">
           <div className="flex h-48 items-end gap-3">
