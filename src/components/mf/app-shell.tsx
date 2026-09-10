@@ -260,9 +260,15 @@ export function AppShell({ children }: { children: ReactNode }) {
                   </DropdownMenuItem>
                 ))}
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate({ to: "/" })}>
-                  <LogOut className="size-4" aria-hidden /> Exit to website
+                <DropdownMenuItem
+                  onClick={() => {
+                    endDemoSession();
+                    navigate({ to: "/" });
+                  }}
+                >
+                  <LogOut className="size-4" aria-hidden /> Sign out
                 </DropdownMenuItem>
+
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
