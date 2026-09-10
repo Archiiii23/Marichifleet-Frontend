@@ -18,9 +18,12 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as PortalRouteRouteImport } from './routes/portal/route'
 import { Route as AppAlertsRouteImport } from './routes/app/alerts'
+import { Route as AppApprovalsRouteImport } from './routes/app/approvals'
 import { Route as AppAuditRouteImport } from './routes/app/audit'
+import { Route as AppAutomationRouteImport } from './routes/app/automation'
 import { Route as AppCommunicationsRouteImport } from './routes/app/communications'
 import { Route as AppComplianceRouteImport } from './routes/app/compliance'
+import { Route as AppConversationsRouteImport } from './routes/app/conversations'
 import { Route as AppDashboardRouteImport } from './routes/app/dashboard'
 import { Route as AppDispatchRouteImport } from './routes/app/dispatch'
 import { Route as AppExpensesRouteImport } from './routes/app/expenses'
@@ -28,6 +31,7 @@ import { Route as AppFuelRouteImport } from './routes/app/fuel'
 import { Route as AppGeofencesRouteImport } from './routes/app/geofences'
 import { Route as AppHrRouteImport } from './routes/app/hr'
 import { Route as AppInventoryRouteImport } from './routes/app/inventory'
+import { Route as AppLedgerRouteImport } from './routes/app/ledger'
 import { Route as AppPlaybackRouteImport } from './routes/app/playback'
 import { Route as AppPodRouteImport } from './routes/app/pod'
 import { Route as AppPurchaseOrdersRouteImport } from './routes/app/purchase-orders'
@@ -36,6 +40,7 @@ import { Route as AppReportsRouteImport } from './routes/app/reports'
 import { Route as AppRolesRouteImport } from './routes/app/roles'
 import { Route as AppSettingsRouteImport } from './routes/app/settings'
 import { Route as AppSubscriptionRouteImport } from './routes/app/subscription'
+import { Route as AppTowerRouteImport } from './routes/app/tower'
 import { Route as AppTrackingRouteImport } from './routes/app/tracking'
 import { Route as AppVendorsRouteImport } from './routes/app/vendors'
 import { Route as AppWorkshopRouteImport } from './routes/app/workshop'
@@ -116,9 +121,19 @@ const AppAlertsRoute = AppAlertsRouteImport.update({
   path: '/alerts',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppApprovalsRoute = AppApprovalsRouteImport.update({
+  id: '/approvals',
+  path: '/approvals',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppAuditRoute = AppAuditRouteImport.update({
   id: '/audit',
   path: '/audit',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppAutomationRoute = AppAutomationRouteImport.update({
+  id: '/automation',
+  path: '/automation',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppCommunicationsRoute = AppCommunicationsRouteImport.update({
@@ -129,6 +144,11 @@ const AppCommunicationsRoute = AppCommunicationsRouteImport.update({
 const AppComplianceRoute = AppComplianceRouteImport.update({
   id: '/compliance',
   path: '/compliance',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppConversationsRoute = AppConversationsRouteImport.update({
+  id: '/conversations',
+  path: '/conversations',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
@@ -164,6 +184,11 @@ const AppHrRoute = AppHrRouteImport.update({
 const AppInventoryRoute = AppInventoryRouteImport.update({
   id: '/inventory',
   path: '/inventory',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppLedgerRoute = AppLedgerRouteImport.update({
+  id: '/ledger',
+  path: '/ledger',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppPlaybackRoute = AppPlaybackRouteImport.update({
@@ -204,6 +229,11 @@ const AppSettingsRoute = AppSettingsRouteImport.update({
 const AppSubscriptionRoute = AppSubscriptionRouteImport.update({
   id: '/subscription',
   path: '/subscription',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppTowerRoute = AppTowerRouteImport.update({
+  id: '/tower',
+  path: '/tower',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppTrackingRoute = AppTrackingRouteImport.update({
@@ -388,9 +418,12 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/app/alerts': typeof AppAlertsRoute
+  '/app/approvals': typeof AppApprovalsRoute
   '/app/audit': typeof AppAuditRoute
+  '/app/automation': typeof AppAutomationRoute
   '/app/communications': typeof AppCommunicationsRoute
   '/app/compliance': typeof AppComplianceRoute
+  '/app/conversations': typeof AppConversationsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/dispatch': typeof AppDispatchRoute
   '/app/expenses': typeof AppExpensesRoute
@@ -398,6 +431,7 @@ export interface FileRoutesByFullPath {
   '/app/geofences': typeof AppGeofencesRoute
   '/app/hr': typeof AppHrRoute
   '/app/inventory': typeof AppInventoryRoute
+  '/app/ledger': typeof AppLedgerRoute
   '/app/playback': typeof AppPlaybackRoute
   '/app/pod': typeof AppPodRoute
   '/app/purchase-orders': typeof AppPurchaseOrdersRoute
@@ -406,6 +440,7 @@ export interface FileRoutesByFullPath {
   '/app/roles': typeof AppRolesRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/subscription': typeof AppSubscriptionRoute
+  '/app/tower': typeof AppTowerRoute
   '/app/tracking': typeof AppTrackingRoute
   '/app/vendors': typeof AppVendorsRoute
   '/app/workshop': typeof AppWorkshopRoute
@@ -449,9 +484,12 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/app/alerts': typeof AppAlertsRoute
+  '/app/approvals': typeof AppApprovalsRoute
   '/app/audit': typeof AppAuditRoute
+  '/app/automation': typeof AppAutomationRoute
   '/app/communications': typeof AppCommunicationsRoute
   '/app/compliance': typeof AppComplianceRoute
+  '/app/conversations': typeof AppConversationsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/dispatch': typeof AppDispatchRoute
   '/app/expenses': typeof AppExpensesRoute
@@ -459,6 +497,7 @@ export interface FileRoutesByTo {
   '/app/geofences': typeof AppGeofencesRoute
   '/app/hr': typeof AppHrRoute
   '/app/inventory': typeof AppInventoryRoute
+  '/app/ledger': typeof AppLedgerRoute
   '/app/playback': typeof AppPlaybackRoute
   '/app/pod': typeof AppPodRoute
   '/app/purchase-orders': typeof AppPurchaseOrdersRoute
@@ -467,6 +506,7 @@ export interface FileRoutesByTo {
   '/app/roles': typeof AppRolesRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/subscription': typeof AppSubscriptionRoute
+  '/app/tower': typeof AppTowerRoute
   '/app/tracking': typeof AppTrackingRoute
   '/app/vendors': typeof AppVendorsRoute
   '/app/workshop': typeof AppWorkshopRoute
@@ -513,9 +553,12 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/app/alerts': typeof AppAlertsRoute
+  '/app/approvals': typeof AppApprovalsRoute
   '/app/audit': typeof AppAuditRoute
+  '/app/automation': typeof AppAutomationRoute
   '/app/communications': typeof AppCommunicationsRoute
   '/app/compliance': typeof AppComplianceRoute
+  '/app/conversations': typeof AppConversationsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/dispatch': typeof AppDispatchRoute
   '/app/expenses': typeof AppExpensesRoute
@@ -523,6 +566,7 @@ export interface FileRoutesById {
   '/app/geofences': typeof AppGeofencesRoute
   '/app/hr': typeof AppHrRoute
   '/app/inventory': typeof AppInventoryRoute
+  '/app/ledger': typeof AppLedgerRoute
   '/app/playback': typeof AppPlaybackRoute
   '/app/pod': typeof AppPodRoute
   '/app/purchase-orders': typeof AppPurchaseOrdersRoute
@@ -531,6 +575,7 @@ export interface FileRoutesById {
   '/app/roles': typeof AppRolesRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/subscription': typeof AppSubscriptionRoute
+  '/app/tower': typeof AppTowerRoute
   '/app/tracking': typeof AppTrackingRoute
   '/app/vendors': typeof AppVendorsRoute
   '/app/workshop': typeof AppWorkshopRoute
@@ -578,9 +623,12 @@ export interface FileRouteTypes {
     | '/login'
     | '/onboarding'
     | '/app/alerts'
+    | '/app/approvals'
     | '/app/audit'
+    | '/app/automation'
     | '/app/communications'
     | '/app/compliance'
+    | '/app/conversations'
     | '/app/dashboard'
     | '/app/dispatch'
     | '/app/expenses'
@@ -588,6 +636,7 @@ export interface FileRouteTypes {
     | '/app/geofences'
     | '/app/hr'
     | '/app/inventory'
+    | '/app/ledger'
     | '/app/playback'
     | '/app/pod'
     | '/app/purchase-orders'
@@ -596,6 +645,7 @@ export interface FileRouteTypes {
     | '/app/roles'
     | '/app/settings'
     | '/app/subscription'
+    | '/app/tower'
     | '/app/tracking'
     | '/app/vendors'
     | '/app/workshop'
@@ -639,9 +689,12 @@ export interface FileRouteTypes {
     | '/login'
     | '/onboarding'
     | '/app/alerts'
+    | '/app/approvals'
     | '/app/audit'
+    | '/app/automation'
     | '/app/communications'
     | '/app/compliance'
+    | '/app/conversations'
     | '/app/dashboard'
     | '/app/dispatch'
     | '/app/expenses'
@@ -649,6 +702,7 @@ export interface FileRouteTypes {
     | '/app/geofences'
     | '/app/hr'
     | '/app/inventory'
+    | '/app/ledger'
     | '/app/playback'
     | '/app/pod'
     | '/app/purchase-orders'
@@ -657,6 +711,7 @@ export interface FileRouteTypes {
     | '/app/roles'
     | '/app/settings'
     | '/app/subscription'
+    | '/app/tower'
     | '/app/tracking'
     | '/app/vendors'
     | '/app/workshop'
@@ -702,9 +757,12 @@ export interface FileRouteTypes {
     | '/login'
     | '/onboarding'
     | '/app/alerts'
+    | '/app/approvals'
     | '/app/audit'
+    | '/app/automation'
     | '/app/communications'
     | '/app/compliance'
+    | '/app/conversations'
     | '/app/dashboard'
     | '/app/dispatch'
     | '/app/expenses'
@@ -712,6 +770,7 @@ export interface FileRouteTypes {
     | '/app/geofences'
     | '/app/hr'
     | '/app/inventory'
+    | '/app/ledger'
     | '/app/playback'
     | '/app/pod'
     | '/app/purchase-orders'
@@ -720,6 +779,7 @@ export interface FileRouteTypes {
     | '/app/roles'
     | '/app/settings'
     | '/app/subscription'
+    | '/app/tower'
     | '/app/tracking'
     | '/app/vendors'
     | '/app/workshop'
@@ -833,11 +893,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAlertsRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/approvals': {
+      id: '/app/approvals'
+      path: '/approvals'
+      fullPath: '/app/approvals'
+      preLoaderRoute: typeof AppApprovalsRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/app/audit': {
       id: '/app/audit'
       path: '/audit'
       fullPath: '/app/audit'
       preLoaderRoute: typeof AppAuditRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/automation': {
+      id: '/app/automation'
+      path: '/automation'
+      fullPath: '/app/automation'
+      preLoaderRoute: typeof AppAutomationRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/app/communications': {
@@ -852,6 +926,13 @@ declare module '@tanstack/react-router' {
       path: '/compliance'
       fullPath: '/app/compliance'
       preLoaderRoute: typeof AppComplianceRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/conversations': {
+      id: '/app/conversations'
+      path: '/conversations'
+      fullPath: '/app/conversations'
+      preLoaderRoute: typeof AppConversationsRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/app/dashboard': {
@@ -901,6 +982,13 @@ declare module '@tanstack/react-router' {
       path: '/inventory'
       fullPath: '/app/inventory'
       preLoaderRoute: typeof AppInventoryRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/ledger': {
+      id: '/app/ledger'
+      path: '/ledger'
+      fullPath: '/app/ledger'
+      preLoaderRoute: typeof AppLedgerRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/app/playback': {
@@ -957,6 +1045,13 @@ declare module '@tanstack/react-router' {
       path: '/subscription'
       fullPath: '/app/subscription'
       preLoaderRoute: typeof AppSubscriptionRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/tower': {
+      id: '/app/tower'
+      path: '/tower'
+      fullPath: '/app/tower'
+      preLoaderRoute: typeof AppTowerRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/app/tracking': {
@@ -1202,9 +1297,12 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteRouteChildren {
   AppAlertsRoute: typeof AppAlertsRoute
+  AppApprovalsRoute: typeof AppApprovalsRoute
   AppAuditRoute: typeof AppAuditRoute
+  AppAutomationRoute: typeof AppAutomationRoute
   AppCommunicationsRoute: typeof AppCommunicationsRoute
   AppComplianceRoute: typeof AppComplianceRoute
+  AppConversationsRoute: typeof AppConversationsRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppDispatchRoute: typeof AppDispatchRoute
   AppExpensesRoute: typeof AppExpensesRoute
@@ -1212,6 +1310,7 @@ interface AppRouteRouteChildren {
   AppGeofencesRoute: typeof AppGeofencesRoute
   AppHrRoute: typeof AppHrRoute
   AppInventoryRoute: typeof AppInventoryRoute
+  AppLedgerRoute: typeof AppLedgerRoute
   AppPlaybackRoute: typeof AppPlaybackRoute
   AppPodRoute: typeof AppPodRoute
   AppPurchaseOrdersRoute: typeof AppPurchaseOrdersRoute
@@ -1220,6 +1319,7 @@ interface AppRouteRouteChildren {
   AppRolesRoute: typeof AppRolesRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppSubscriptionRoute: typeof AppSubscriptionRoute
+  AppTowerRoute: typeof AppTowerRoute
   AppTrackingRoute: typeof AppTrackingRoute
   AppVendorsRoute: typeof AppVendorsRoute
   AppWorkshopRoute: typeof AppWorkshopRoute
@@ -1241,9 +1341,12 @@ interface AppRouteRouteChildren {
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppAlertsRoute: AppAlertsRoute,
+  AppApprovalsRoute: AppApprovalsRoute,
   AppAuditRoute: AppAuditRoute,
+  AppAutomationRoute: AppAutomationRoute,
   AppCommunicationsRoute: AppCommunicationsRoute,
   AppComplianceRoute: AppComplianceRoute,
+  AppConversationsRoute: AppConversationsRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppDispatchRoute: AppDispatchRoute,
   AppExpensesRoute: AppExpensesRoute,
@@ -1251,6 +1354,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppGeofencesRoute: AppGeofencesRoute,
   AppHrRoute: AppHrRoute,
   AppInventoryRoute: AppInventoryRoute,
+  AppLedgerRoute: AppLedgerRoute,
   AppPlaybackRoute: AppPlaybackRoute,
   AppPodRoute: AppPodRoute,
   AppPurchaseOrdersRoute: AppPurchaseOrdersRoute,
@@ -1259,6 +1363,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppRolesRoute: AppRolesRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppSubscriptionRoute: AppSubscriptionRoute,
+  AppTowerRoute: AppTowerRoute,
   AppTrackingRoute: AppTrackingRoute,
   AppVendorsRoute: AppVendorsRoute,
   AppWorkshopRoute: AppWorkshopRoute,
