@@ -49,6 +49,7 @@ import { Route as DriverIndexRouteImport } from './routes/driver/index'
 import { Route as DriverExceptionRouteImport } from './routes/driver/exception'
 import { Route as DriverFuelRouteImport } from './routes/driver/fuel'
 import { Route as DriverHomeRouteImport } from './routes/driver/home'
+import { Route as DriverInboxRouteImport } from './routes/driver/inbox'
 import { Route as DriverPayslipsRouteImport } from './routes/driver/payslips'
 import { Route as PortalIndexRouteImport } from './routes/portal/index'
 import { Route as PortalDashboardRouteImport } from './routes/portal/dashboard'
@@ -277,6 +278,11 @@ const DriverHomeRoute = DriverHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => DriverRouteRoute,
 } as any)
+const DriverInboxRoute = DriverInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => DriverRouteRoute,
+} as any)
 const DriverPayslipsRoute = DriverPayslipsRouteImport.update({
   id: '/payslips',
   path: '/payslips',
@@ -454,6 +460,7 @@ export interface FileRoutesByFullPath {
   '/driver/exception': typeof DriverExceptionRoute
   '/driver/fuel': typeof DriverFuelRoute
   '/driver/home': typeof DriverHomeRoute
+  '/driver/inbox': typeof DriverInboxRoute
   '/driver/payslips': typeof DriverPayslipsRoute
   '/portal/dashboard': typeof PortalDashboardRoute
   '/track/$token': typeof TrackTokenRoute
@@ -521,6 +528,7 @@ export interface FileRoutesByTo {
   '/driver/exception': typeof DriverExceptionRoute
   '/driver/fuel': typeof DriverFuelRoute
   '/driver/home': typeof DriverHomeRoute
+  '/driver/inbox': typeof DriverInboxRoute
   '/driver/payslips': typeof DriverPayslipsRoute
   '/portal/dashboard': typeof PortalDashboardRoute
   '/track/$token': typeof TrackTokenRoute
@@ -591,6 +599,7 @@ export interface FileRoutesById {
   '/driver/exception': typeof DriverExceptionRoute
   '/driver/fuel': typeof DriverFuelRoute
   '/driver/home': typeof DriverHomeRoute
+  '/driver/inbox': typeof DriverInboxRoute
   '/driver/payslips': typeof DriverPayslipsRoute
   '/portal/dashboard': typeof PortalDashboardRoute
   '/track/$token': typeof TrackTokenRoute
@@ -662,6 +671,7 @@ export interface FileRouteTypes {
     | '/driver/exception'
     | '/driver/fuel'
     | '/driver/home'
+    | '/driver/inbox'
     | '/driver/payslips'
     | '/portal/dashboard'
     | '/track/$token'
@@ -729,6 +739,7 @@ export interface FileRouteTypes {
     | '/driver/exception'
     | '/driver/fuel'
     | '/driver/home'
+    | '/driver/inbox'
     | '/driver/payslips'
     | '/portal/dashboard'
     | '/track/$token'
@@ -798,6 +809,7 @@ export interface FileRouteTypes {
     | '/driver/exception'
     | '/driver/fuel'
     | '/driver/home'
+    | '/driver/inbox'
     | '/driver/payslips'
     | '/portal/dashboard'
     | '/track/$token'
@@ -1122,6 +1134,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DriverHomeRouteImport
       parentRoute: typeof DriverRouteRoute
     }
+    '/driver/inbox': {
+      id: '/driver/inbox'
+      path: '/inbox'
+      fullPath: '/driver/inbox'
+      preLoaderRoute: typeof DriverInboxRouteImport
+      parentRoute: typeof DriverRouteRoute
+    }
     '/driver/payslips': {
       id: '/driver/payslips'
       path: '/payslips'
@@ -1412,6 +1431,7 @@ interface DriverRouteRouteChildren {
   DriverExceptionRoute: typeof DriverExceptionRoute
   DriverFuelRoute: typeof DriverFuelRoute
   DriverHomeRoute: typeof DriverHomeRoute
+  DriverInboxRoute: typeof DriverInboxRoute
   DriverPayslipsRoute: typeof DriverPayslipsRoute
   DriverIndexRoute: typeof DriverIndexRoute
   DriverTripsTripIdRoute: typeof DriverTripsTripIdRoute
@@ -1422,6 +1442,7 @@ const DriverRouteRouteChildren: DriverRouteRouteChildren = {
   DriverExceptionRoute: DriverExceptionRoute,
   DriverFuelRoute: DriverFuelRoute,
   DriverHomeRoute: DriverHomeRoute,
+  DriverInboxRoute: DriverInboxRoute,
   DriverPayslipsRoute: DriverPayslipsRoute,
   DriverIndexRoute: DriverIndexRoute,
   DriverTripsTripIdRoute: DriverTripsTripIdRoute,
