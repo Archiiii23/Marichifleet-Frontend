@@ -91,8 +91,7 @@ export function deriveExceptions(db: DbShape, now = Date.now()): Exception[] {
     }
   }
 
-  for (const d of db.docs) {
-    if (d.status !== "expired") continue;
+  for (const d of db.docs.filter((x) => x.status === "expired").slice(0, 6)) {
     const name =
       d.entityType === "vehicle"
         ? db.vehicles.find((v) => v.id === d.entityId)?.regNo
