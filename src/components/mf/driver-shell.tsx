@@ -25,8 +25,11 @@ export function DriverShell({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-20 flex h-14 items-center gap-2 border-b border-border bg-background/95 px-4 backdrop-blur">
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold">{persona.name}</p>
-          <p className="text-[11px] text-muted-foreground">Driver app · MarichiFleet</p>
+          <p className="text-[11px] text-muted-foreground">
+            {online ? "All work synced" : "Offline — entries queue until signal returns"}
+          </p>
         </div>
+
         <Button
           size="sm"
           variant={online ? "outline" : "destructive"}

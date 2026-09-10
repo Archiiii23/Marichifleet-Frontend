@@ -17,7 +17,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { endDemoSession } from "@/domain/guard";
 import { useDb, timeAgo } from "@/domain/hooks";
+
 import { PERSONAS, roleLabel, useSession, type Capability } from "@/domain/session";
 import { tickSimulation, bump } from "@/domain/store";
 import { ThemeToggle } from "@/domain/theme";
