@@ -24,7 +24,7 @@ function DriverInbox() {
 
   const tasks = [
     ...trips
-      .filter((t) => t.status === "assigned")
+      .filter((t) => t.status === "driver_assigned")
       .map((t) => ({ id: `acc_${t.id}`, label: `Accept ${t.ref}`, detail: "Dispatch is holding the load for you", to: `/driver/trips/${t.id}` })),
     ...trips
       .filter((t) => t.status === "exception")
