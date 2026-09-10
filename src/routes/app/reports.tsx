@@ -131,7 +131,7 @@ function Reports() {
     const withPod = deliveredTrips.filter((t) => t.podId).length;
     const podPct = deliveredTrips.length ? Math.round((withPod / deliveredTrips.length) * 100) : 100;
 
-    const exposure = db.complianceDocs.filter((d) => d.status === "expired" || d.status === "expiring").length;
+    const exposure = db.docs.filter((d) => d.status === "expired" || d.status === "expiring").length;
 
     return {
       revenue,
