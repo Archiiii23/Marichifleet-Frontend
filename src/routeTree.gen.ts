@@ -25,11 +25,14 @@ import { Route as AppDashboardRouteImport } from './routes/app/dashboard'
 import { Route as AppDispatchRouteImport } from './routes/app/dispatch'
 import { Route as AppExpensesRouteImport } from './routes/app/expenses'
 import { Route as AppFuelRouteImport } from './routes/app/fuel'
+import { Route as AppGeofencesRouteImport } from './routes/app/geofences'
 import { Route as AppHrRouteImport } from './routes/app/hr'
 import { Route as AppInventoryRouteImport } from './routes/app/inventory'
+import { Route as AppPlaybackRouteImport } from './routes/app/playback'
 import { Route as AppPodRouteImport } from './routes/app/pod'
 import { Route as AppPurchaseOrdersRouteImport } from './routes/app/purchase-orders'
 import { Route as AppReportsRouteImport } from './routes/app/reports'
+import { Route as AppRolesRouteImport } from './routes/app/roles'
 import { Route as AppSettingsRouteImport } from './routes/app/settings'
 import { Route as AppSubscriptionRouteImport } from './routes/app/subscription'
 import { Route as AppTrackingRouteImport } from './routes/app/tracking'
@@ -145,6 +148,11 @@ const AppFuelRoute = AppFuelRouteImport.update({
   path: '/fuel',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppGeofencesRoute = AppGeofencesRouteImport.update({
+  id: '/geofences',
+  path: '/geofences',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppHrRoute = AppHrRouteImport.update({
   id: '/hr',
   path: '/hr',
@@ -153,6 +161,11 @@ const AppHrRoute = AppHrRouteImport.update({
 const AppInventoryRoute = AppInventoryRouteImport.update({
   id: '/inventory',
   path: '/inventory',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppPlaybackRoute = AppPlaybackRouteImport.update({
+  id: '/playback',
+  path: '/playback',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppPodRoute = AppPodRouteImport.update({
@@ -168,6 +181,11 @@ const AppPurchaseOrdersRoute = AppPurchaseOrdersRouteImport.update({
 const AppReportsRoute = AppReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppRolesRoute = AppRolesRouteImport.update({
+  id: '/roles',
+  path: '/roles',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
@@ -359,11 +377,14 @@ export interface FileRoutesByFullPath {
   '/app/dispatch': typeof AppDispatchRoute
   '/app/expenses': typeof AppExpensesRoute
   '/app/fuel': typeof AppFuelRoute
+  '/app/geofences': typeof AppGeofencesRoute
   '/app/hr': typeof AppHrRoute
   '/app/inventory': typeof AppInventoryRoute
+  '/app/playback': typeof AppPlaybackRoute
   '/app/pod': typeof AppPodRoute
   '/app/purchase-orders': typeof AppPurchaseOrdersRoute
   '/app/reports': typeof AppReportsRoute
+  '/app/roles': typeof AppRolesRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/subscription': typeof AppSubscriptionRoute
   '/app/tracking': typeof AppTrackingRoute
@@ -414,11 +435,14 @@ export interface FileRoutesByTo {
   '/app/dispatch': typeof AppDispatchRoute
   '/app/expenses': typeof AppExpensesRoute
   '/app/fuel': typeof AppFuelRoute
+  '/app/geofences': typeof AppGeofencesRoute
   '/app/hr': typeof AppHrRoute
   '/app/inventory': typeof AppInventoryRoute
+  '/app/playback': typeof AppPlaybackRoute
   '/app/pod': typeof AppPodRoute
   '/app/purchase-orders': typeof AppPurchaseOrdersRoute
   '/app/reports': typeof AppReportsRoute
+  '/app/roles': typeof AppRolesRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/subscription': typeof AppSubscriptionRoute
   '/app/tracking': typeof AppTrackingRoute
@@ -472,11 +496,14 @@ export interface FileRoutesById {
   '/app/dispatch': typeof AppDispatchRoute
   '/app/expenses': typeof AppExpensesRoute
   '/app/fuel': typeof AppFuelRoute
+  '/app/geofences': typeof AppGeofencesRoute
   '/app/hr': typeof AppHrRoute
   '/app/inventory': typeof AppInventoryRoute
+  '/app/playback': typeof AppPlaybackRoute
   '/app/pod': typeof AppPodRoute
   '/app/purchase-orders': typeof AppPurchaseOrdersRoute
   '/app/reports': typeof AppReportsRoute
+  '/app/roles': typeof AppRolesRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/subscription': typeof AppSubscriptionRoute
   '/app/tracking': typeof AppTrackingRoute
@@ -531,11 +558,14 @@ export interface FileRouteTypes {
     | '/app/dispatch'
     | '/app/expenses'
     | '/app/fuel'
+    | '/app/geofences'
     | '/app/hr'
     | '/app/inventory'
+    | '/app/playback'
     | '/app/pod'
     | '/app/purchase-orders'
     | '/app/reports'
+    | '/app/roles'
     | '/app/settings'
     | '/app/subscription'
     | '/app/tracking'
@@ -586,11 +616,14 @@ export interface FileRouteTypes {
     | '/app/dispatch'
     | '/app/expenses'
     | '/app/fuel'
+    | '/app/geofences'
     | '/app/hr'
     | '/app/inventory'
+    | '/app/playback'
     | '/app/pod'
     | '/app/purchase-orders'
     | '/app/reports'
+    | '/app/roles'
     | '/app/settings'
     | '/app/subscription'
     | '/app/tracking'
@@ -643,11 +676,14 @@ export interface FileRouteTypes {
     | '/app/dispatch'
     | '/app/expenses'
     | '/app/fuel'
+    | '/app/geofences'
     | '/app/hr'
     | '/app/inventory'
+    | '/app/playback'
     | '/app/pod'
     | '/app/purchase-orders'
     | '/app/reports'
+    | '/app/roles'
     | '/app/settings'
     | '/app/subscription'
     | '/app/tracking'
@@ -810,6 +846,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppFuelRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/geofences': {
+      id: '/app/geofences'
+      path: '/geofences'
+      fullPath: '/app/geofences'
+      preLoaderRoute: typeof AppGeofencesRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/app/hr': {
       id: '/app/hr'
       path: '/hr'
@@ -822,6 +865,13 @@ declare module '@tanstack/react-router' {
       path: '/inventory'
       fullPath: '/app/inventory'
       preLoaderRoute: typeof AppInventoryRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/playback': {
+      id: '/app/playback'
+      path: '/playback'
+      fullPath: '/app/playback'
+      preLoaderRoute: typeof AppPlaybackRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/app/pod': {
@@ -843,6 +893,13 @@ declare module '@tanstack/react-router' {
       path: '/reports'
       fullPath: '/app/reports'
       preLoaderRoute: typeof AppReportsRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/roles': {
+      id: '/app/roles'
+      path: '/roles'
+      fullPath: '/app/roles'
+      preLoaderRoute: typeof AppRolesRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/app/settings': {
@@ -1095,11 +1152,14 @@ interface AppRouteRouteChildren {
   AppDispatchRoute: typeof AppDispatchRoute
   AppExpensesRoute: typeof AppExpensesRoute
   AppFuelRoute: typeof AppFuelRoute
+  AppGeofencesRoute: typeof AppGeofencesRoute
   AppHrRoute: typeof AppHrRoute
   AppInventoryRoute: typeof AppInventoryRoute
+  AppPlaybackRoute: typeof AppPlaybackRoute
   AppPodRoute: typeof AppPodRoute
   AppPurchaseOrdersRoute: typeof AppPurchaseOrdersRoute
   AppReportsRoute: typeof AppReportsRoute
+  AppRolesRoute: typeof AppRolesRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppSubscriptionRoute: typeof AppSubscriptionRoute
   AppTrackingRoute: typeof AppTrackingRoute
@@ -1130,11 +1190,14 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppDispatchRoute: AppDispatchRoute,
   AppExpensesRoute: AppExpensesRoute,
   AppFuelRoute: AppFuelRoute,
+  AppGeofencesRoute: AppGeofencesRoute,
   AppHrRoute: AppHrRoute,
   AppInventoryRoute: AppInventoryRoute,
+  AppPlaybackRoute: AppPlaybackRoute,
   AppPodRoute: AppPodRoute,
   AppPurchaseOrdersRoute: AppPurchaseOrdersRoute,
   AppReportsRoute: AppReportsRoute,
+  AppRolesRoute: AppRolesRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppSubscriptionRoute: AppSubscriptionRoute,
   AppTrackingRoute: AppTrackingRoute,
