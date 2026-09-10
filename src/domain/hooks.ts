@@ -36,7 +36,7 @@ const CURRENCY: Record<string, { symbol: string; locale: string; lakhs: boolean 
 
 /** Tenant currency, so the same screens work for India, Zambia and the Gulf. */
 export function currency() {
-  return CURRENCY[getDb().tenant.currency] ?? CURRENCY.INR;
+  return CURRENCY[getDb().tenant.currency] ?? CURRENCY["INR"]!;
 }
 
 export const money = (n: number) => {
