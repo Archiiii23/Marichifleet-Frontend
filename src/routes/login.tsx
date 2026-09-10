@@ -29,7 +29,9 @@ function Login() {
 
   const signIn = () => {
     const p = PERSONAS.find((x) => x.id === selected) ?? PERSONAS[2];
+    startDemoSession();
     setPersona(p.id);
+
     if (p.role === "driver") navigate({ to: "/driver/home" });
     else if (p.role === "client") navigate({ to: "/portal/dashboard" });
     else navigate({ to: "/app/dashboard" });
