@@ -26,14 +26,40 @@ export function useAction() {
   }, []);
 }
 
-export const inr = (n: number) =>
-  `₹${Math.round(n).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
-
-export const inrCompact = (n: number) => {
-  if (Math.abs(n) >= 1e7) return `₹${(n / 1e7).toFixed(2)} Cr`;
-  if (Math.abs(n) >= 1e5) return `₹${(n / 1e5).toFixed(2)} L`;
-  return inr(n);
+const CURRENCY: Record<string, { symbol: string; locale: string; lakhs: boolean }> = {
+  INR: { symbol: "₹", locale: "en-IN", lakhs: true },
+  ZMW: { symbol: "K", locale: "en-ZM", lakhs: false },
+  AED: { symbol: "AED ", locale: "en-AE", lakhs: false },
+  SAR: { symbol: "SAR ", locale: "en-SA", lakhs: false },
+  USD: { symbol: "$", locale: "en-US", lakhs: false },
 };
+
+/** Tenant currency, so the same screens work for India, Zambia and the Gulf. */
+export function currency() {
+  return CURRENCY[getDb().tenant.currency] ?? CURRENCY.INR;
+}
+
+export const money = (n: number) => {
+  const c = currency();
+  return `${c.symbol}${Math.round(n).toLocaleString(c.locale, { maximumFractionDigits: 0 })}`;
+};
+
+export const moneyCompact = (n: number) => {
+  const c = currency();
+  if (c.lakhs) {
+    if (Math.abs(n) >= 1e7) return `${c.symbol}${(n / 1e7).toFixed(2)} Cr`;
+    if (Math.abs(n) >= 1e5) return `${c.symbol}${(n / 1e5).toFixed(2)} L`;
+  } else {
+    if (Math.abs(n) >= 1e6) return `${c.symbol}${(n / 1e6).toFixed(2)}M`;
+    if (Math.abs(n) >= 1e3) return `${c.symbol}${(n / 1e3).toFixed(1)}k`;
+  }
+  return money(n);
+};
+
+/** Legacy aliases — existing screens keep working, now currency-aware. */
+export const inr = money;
+export const inrCompact = moneyCompact;
+
 
 export function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
