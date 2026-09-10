@@ -36,7 +36,11 @@ interface NavItem {
 const NAV: Array<{ group: string; items: NavItem[] }> = [
   {
     group: "Overview",
-    items: [{ to: "/app/dashboard", label: "Control Tower", icon: LayoutDashboard, cap: "view_operations" }],
+    items: [
+      { to: "/app/tower", label: "Control Tower", icon: Radio, cap: "view_operations" },
+      { to: "/app/dashboard", label: "Daily Briefing", icon: LayoutDashboard, cap: "view_operations" },
+      { to: "/app/approvals", label: "Approvals", icon: ClipboardCheck, cap: "view_operations" },
+    ],
   },
   {
     group: "Operations",

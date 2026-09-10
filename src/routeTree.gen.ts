@@ -20,8 +20,10 @@ import { Route as PortalRouteRouteImport } from './routes/portal/route'
 import { Route as AppAlertsRouteImport } from './routes/app/alerts'
 import { Route as AppApprovalsRouteImport } from './routes/app/approvals'
 import { Route as AppAuditRouteImport } from './routes/app/audit'
+import { Route as AppAutomationRouteImport } from './routes/app/automation'
 import { Route as AppCommunicationsRouteImport } from './routes/app/communications'
 import { Route as AppComplianceRouteImport } from './routes/app/compliance'
+import { Route as AppConversationsRouteImport } from './routes/app/conversations'
 import { Route as AppDashboardRouteImport } from './routes/app/dashboard'
 import { Route as AppDispatchRouteImport } from './routes/app/dispatch'
 import { Route as AppExpensesRouteImport } from './routes/app/expenses'
@@ -29,6 +31,7 @@ import { Route as AppFuelRouteImport } from './routes/app/fuel'
 import { Route as AppGeofencesRouteImport } from './routes/app/geofences'
 import { Route as AppHrRouteImport } from './routes/app/hr'
 import { Route as AppInventoryRouteImport } from './routes/app/inventory'
+import { Route as AppLedgerRouteImport } from './routes/app/ledger'
 import { Route as AppPlaybackRouteImport } from './routes/app/playback'
 import { Route as AppPodRouteImport } from './routes/app/pod'
 import { Route as AppPurchaseOrdersRouteImport } from './routes/app/purchase-orders'
@@ -128,6 +131,11 @@ const AppAuditRoute = AppAuditRouteImport.update({
   path: '/audit',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppAutomationRoute = AppAutomationRouteImport.update({
+  id: '/automation',
+  path: '/automation',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppCommunicationsRoute = AppCommunicationsRouteImport.update({
   id: '/communications',
   path: '/communications',
@@ -136,6 +144,11 @@ const AppCommunicationsRoute = AppCommunicationsRouteImport.update({
 const AppComplianceRoute = AppComplianceRouteImport.update({
   id: '/compliance',
   path: '/compliance',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppConversationsRoute = AppConversationsRouteImport.update({
+  id: '/conversations',
+  path: '/conversations',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
@@ -171,6 +184,11 @@ const AppHrRoute = AppHrRouteImport.update({
 const AppInventoryRoute = AppInventoryRouteImport.update({
   id: '/inventory',
   path: '/inventory',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppLedgerRoute = AppLedgerRouteImport.update({
+  id: '/ledger',
+  path: '/ledger',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppPlaybackRoute = AppPlaybackRouteImport.update({
@@ -402,8 +420,10 @@ export interface FileRoutesByFullPath {
   '/app/alerts': typeof AppAlertsRoute
   '/app/approvals': typeof AppApprovalsRoute
   '/app/audit': typeof AppAuditRoute
+  '/app/automation': typeof AppAutomationRoute
   '/app/communications': typeof AppCommunicationsRoute
   '/app/compliance': typeof AppComplianceRoute
+  '/app/conversations': typeof AppConversationsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/dispatch': typeof AppDispatchRoute
   '/app/expenses': typeof AppExpensesRoute
@@ -411,6 +431,7 @@ export interface FileRoutesByFullPath {
   '/app/geofences': typeof AppGeofencesRoute
   '/app/hr': typeof AppHrRoute
   '/app/inventory': typeof AppInventoryRoute
+  '/app/ledger': typeof AppLedgerRoute
   '/app/playback': typeof AppPlaybackRoute
   '/app/pod': typeof AppPodRoute
   '/app/purchase-orders': typeof AppPurchaseOrdersRoute
@@ -465,8 +486,10 @@ export interface FileRoutesByTo {
   '/app/alerts': typeof AppAlertsRoute
   '/app/approvals': typeof AppApprovalsRoute
   '/app/audit': typeof AppAuditRoute
+  '/app/automation': typeof AppAutomationRoute
   '/app/communications': typeof AppCommunicationsRoute
   '/app/compliance': typeof AppComplianceRoute
+  '/app/conversations': typeof AppConversationsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/dispatch': typeof AppDispatchRoute
   '/app/expenses': typeof AppExpensesRoute
@@ -474,6 +497,7 @@ export interface FileRoutesByTo {
   '/app/geofences': typeof AppGeofencesRoute
   '/app/hr': typeof AppHrRoute
   '/app/inventory': typeof AppInventoryRoute
+  '/app/ledger': typeof AppLedgerRoute
   '/app/playback': typeof AppPlaybackRoute
   '/app/pod': typeof AppPodRoute
   '/app/purchase-orders': typeof AppPurchaseOrdersRoute
@@ -531,8 +555,10 @@ export interface FileRoutesById {
   '/app/alerts': typeof AppAlertsRoute
   '/app/approvals': typeof AppApprovalsRoute
   '/app/audit': typeof AppAuditRoute
+  '/app/automation': typeof AppAutomationRoute
   '/app/communications': typeof AppCommunicationsRoute
   '/app/compliance': typeof AppComplianceRoute
+  '/app/conversations': typeof AppConversationsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/dispatch': typeof AppDispatchRoute
   '/app/expenses': typeof AppExpensesRoute
@@ -540,6 +566,7 @@ export interface FileRoutesById {
   '/app/geofences': typeof AppGeofencesRoute
   '/app/hr': typeof AppHrRoute
   '/app/inventory': typeof AppInventoryRoute
+  '/app/ledger': typeof AppLedgerRoute
   '/app/playback': typeof AppPlaybackRoute
   '/app/pod': typeof AppPodRoute
   '/app/purchase-orders': typeof AppPurchaseOrdersRoute
@@ -598,8 +625,10 @@ export interface FileRouteTypes {
     | '/app/alerts'
     | '/app/approvals'
     | '/app/audit'
+    | '/app/automation'
     | '/app/communications'
     | '/app/compliance'
+    | '/app/conversations'
     | '/app/dashboard'
     | '/app/dispatch'
     | '/app/expenses'
@@ -607,6 +636,7 @@ export interface FileRouteTypes {
     | '/app/geofences'
     | '/app/hr'
     | '/app/inventory'
+    | '/app/ledger'
     | '/app/playback'
     | '/app/pod'
     | '/app/purchase-orders'
@@ -661,8 +691,10 @@ export interface FileRouteTypes {
     | '/app/alerts'
     | '/app/approvals'
     | '/app/audit'
+    | '/app/automation'
     | '/app/communications'
     | '/app/compliance'
+    | '/app/conversations'
     | '/app/dashboard'
     | '/app/dispatch'
     | '/app/expenses'
@@ -670,6 +702,7 @@ export interface FileRouteTypes {
     | '/app/geofences'
     | '/app/hr'
     | '/app/inventory'
+    | '/app/ledger'
     | '/app/playback'
     | '/app/pod'
     | '/app/purchase-orders'
@@ -726,8 +759,10 @@ export interface FileRouteTypes {
     | '/app/alerts'
     | '/app/approvals'
     | '/app/audit'
+    | '/app/automation'
     | '/app/communications'
     | '/app/compliance'
+    | '/app/conversations'
     | '/app/dashboard'
     | '/app/dispatch'
     | '/app/expenses'
@@ -735,6 +770,7 @@ export interface FileRouteTypes {
     | '/app/geofences'
     | '/app/hr'
     | '/app/inventory'
+    | '/app/ledger'
     | '/app/playback'
     | '/app/pod'
     | '/app/purchase-orders'
@@ -871,6 +907,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAuditRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/automation': {
+      id: '/app/automation'
+      path: '/automation'
+      fullPath: '/app/automation'
+      preLoaderRoute: typeof AppAutomationRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/app/communications': {
       id: '/app/communications'
       path: '/communications'
@@ -883,6 +926,13 @@ declare module '@tanstack/react-router' {
       path: '/compliance'
       fullPath: '/app/compliance'
       preLoaderRoute: typeof AppComplianceRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/conversations': {
+      id: '/app/conversations'
+      path: '/conversations'
+      fullPath: '/app/conversations'
+      preLoaderRoute: typeof AppConversationsRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/app/dashboard': {
@@ -932,6 +982,13 @@ declare module '@tanstack/react-router' {
       path: '/inventory'
       fullPath: '/app/inventory'
       preLoaderRoute: typeof AppInventoryRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/ledger': {
+      id: '/app/ledger'
+      path: '/ledger'
+      fullPath: '/app/ledger'
+      preLoaderRoute: typeof AppLedgerRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/app/playback': {
@@ -1242,8 +1299,10 @@ interface AppRouteRouteChildren {
   AppAlertsRoute: typeof AppAlertsRoute
   AppApprovalsRoute: typeof AppApprovalsRoute
   AppAuditRoute: typeof AppAuditRoute
+  AppAutomationRoute: typeof AppAutomationRoute
   AppCommunicationsRoute: typeof AppCommunicationsRoute
   AppComplianceRoute: typeof AppComplianceRoute
+  AppConversationsRoute: typeof AppConversationsRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppDispatchRoute: typeof AppDispatchRoute
   AppExpensesRoute: typeof AppExpensesRoute
@@ -1251,6 +1310,7 @@ interface AppRouteRouteChildren {
   AppGeofencesRoute: typeof AppGeofencesRoute
   AppHrRoute: typeof AppHrRoute
   AppInventoryRoute: typeof AppInventoryRoute
+  AppLedgerRoute: typeof AppLedgerRoute
   AppPlaybackRoute: typeof AppPlaybackRoute
   AppPodRoute: typeof AppPodRoute
   AppPurchaseOrdersRoute: typeof AppPurchaseOrdersRoute
@@ -1283,8 +1343,10 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppAlertsRoute: AppAlertsRoute,
   AppApprovalsRoute: AppApprovalsRoute,
   AppAuditRoute: AppAuditRoute,
+  AppAutomationRoute: AppAutomationRoute,
   AppCommunicationsRoute: AppCommunicationsRoute,
   AppComplianceRoute: AppComplianceRoute,
+  AppConversationsRoute: AppConversationsRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppDispatchRoute: AppDispatchRoute,
   AppExpensesRoute: AppExpensesRoute,
@@ -1292,6 +1354,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppGeofencesRoute: AppGeofencesRoute,
   AppHrRoute: AppHrRoute,
   AppInventoryRoute: AppInventoryRoute,
+  AppLedgerRoute: AppLedgerRoute,
   AppPlaybackRoute: AppPlaybackRoute,
   AppPodRoute: AppPodRoute,
   AppPurchaseOrdersRoute: AppPurchaseOrdersRoute,
