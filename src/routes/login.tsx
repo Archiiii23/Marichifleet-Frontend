@@ -24,7 +24,6 @@ export const Route = createFileRoute("/login")({
   component: Login,
 });
 
-import { startDemoSession } from "@/domain/guard";
 
 
 function Login() {
