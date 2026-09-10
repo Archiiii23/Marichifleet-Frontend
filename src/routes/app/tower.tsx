@@ -98,14 +98,10 @@ function Tower() {
         <div className="space-y-4">
           <Panel title="Live fleet" description="Map does not re-render when the queue updates">
             <FleetMap
-              vehicles={moving.map((v) => ({
-                id: v.id,
-                regNo: v.regNo,
-                lat: v.lat,
-                lng: v.lng,
-                status: v.status,
-                speedKph: v.speedKph,
-              }))}
+              items={moving.map((v) => {
+                const trip = db.trips.find((t) => t.id === v.currentTripId);
+                return { vehicle: v, trip, delayed: (trip?.delayMins ?? 0) > 25 };
+              })}
               height={280}
             />
           </Panel>

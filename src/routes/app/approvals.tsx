@@ -55,7 +55,7 @@ function Approvals() {
 
       <div className="grid gap-4 md:grid-cols-3">
         <KpiCard label="Pending" value={String(pending.length)} hint="Expiring approvals escalate automatically" icon={Clock} />
-        <KpiCard label="Money at stake" value={money(exposure, db.tenant.currency)} hint="Sum of proposed cost deltas" tone="warning" />
+        <KpiCard label="Money at stake" value={money(exposure)} hint="Sum of proposed cost deltas" tone="warning" />
         <KpiCard label="Decided today" value={String(Object.keys(decided).length)} hint="Idempotent — double taps are safe" icon={CheckCircle2} />
       </div>
 
@@ -74,7 +74,7 @@ function Approvals() {
               key={a.id}
               title={a.summary}
               description={`${a.command} · requested by ${a.requestedBy}`}
-              actions={<span className="numeric text-sm font-semibold">{money(a.costDeltaMinor / 100, db.tenant.currency)}</span>}
+              actions={<span className="numeric text-sm font-semibold">{money(a.costDeltaMinor / 100)}</span>}
             >
               <ul className="space-y-1.5 text-sm">
                 {a.diff.map((d) => (
