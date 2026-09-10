@@ -12,7 +12,7 @@ export const Route = createFileRoute("/driver/payslips")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  component: DriverPayslips;
+  component: DriverPayslips,
 });
 
 function DriverPayslips() {
