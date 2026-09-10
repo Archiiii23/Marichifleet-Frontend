@@ -42,7 +42,9 @@ const NAV: Array<{ group: string; items: NavItem[] }> = [
       { to: "/app/bookings", label: "Bookings", icon: Package, cap: "view_operations" },
       { to: "/app/dispatch", label: "Dispatch Board", icon: Radio, cap: "view_operations" },
       { to: "/app/tracking", label: "Live Fleet", icon: Map, cap: "view_operations" },
+      { to: "/app/geofences", label: "Geofences", icon: Map, cap: "view_operations" },
       { to: "/app/trips", label: "Trips", icon: Activity, cap: "view_operations" },
+      { to: "/app/playback", label: "Trip Playback", icon: Activity, cap: "view_operations" },
       { to: "/app/pod", label: "Proof of Delivery", icon: ClipboardCheck, cap: "view_operations" },
     ],
   },
@@ -60,6 +62,7 @@ const NAV: Array<{ group: string; items: NavItem[] }> = [
     group: "Supply chain",
     items: [
       { to: "/app/inventory", label: "Spare Parts", icon: Warehouse, cap: "view_operations" },
+      { to: "/app/purchase-orders", label: "Purchase Orders", icon: Package, cap: "view_operations" },
       { to: "/app/vendors", label: "Vendors", icon: Handshake, cap: "view_operations" },
     ],
   },
@@ -69,7 +72,9 @@ const NAV: Array<{ group: string; items: NavItem[] }> = [
       { to: "/app/clients", label: "Clients", icon: Boxes, cap: "view_operations" },
       { to: "/app/finance/invoices", label: "Invoices", icon: BadgeIndianRupee, cap: "view_finance" },
       { to: "/app/finance/receivables", label: "Receivables", icon: BadgeIndianRupee, cap: "view_finance" },
+      { to: "/app/expenses", label: "Expenses & Credits", icon: BadgeIndianRupee, cap: "view_finance" },
       { to: "/app/reports", label: "Reports", icon: BarChart3, cap: "view_operations" },
+      { to: "/app/report-builder", label: "Report Builder", icon: BarChart3, cap: "view_operations" },
     ],
   },
   {
@@ -77,12 +82,16 @@ const NAV: Array<{ group: string; items: NavItem[] }> = [
     items: [
       { to: "/app/hr", label: "People & Payroll", icon: UsersRound, cap: "view_admin" },
       { to: "/app/communications", label: "Communications", icon: MessageSquare, cap: "view_operations" },
+      { to: "/app/alerts", label: "Alert Preferences", icon: Bell, cap: "view_admin" },
+      { to: "/app/roles", label: "Users & Roles", icon: UsersRound, cap: "view_admin" },
       { to: "/app/audit", label: "Audit Log", icon: ShieldCheck, cap: "view_admin" },
+      { to: "/app/subscription", label: "Subscription", icon: Building2, cap: "view_admin" },
       { to: "/app/settings", label: "Settings", icon: Settings, cap: "view_admin" },
       { to: "/admin", label: "Platform Admin", icon: Building2, cap: "view_admin" },
     ],
   },
 ];
+
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { persona, setPersona, can } = useSession();

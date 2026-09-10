@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { CloudOff, Cloud, Fuel, Home, LogOut, Route as RouteIcon, TriangleAlert } from "lucide-react";
+import { CloudOff, Cloud, Fuel, Home, LogOut, Route as RouteIcon, TriangleAlert, Wallet } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/domain/session";
@@ -11,7 +11,9 @@ const TABS = [
   { to: "/driver/trips", label: "Trips", icon: RouteIcon },
   { to: "/driver/fuel", label: "Fuel", icon: Fuel },
   { to: "/driver/exception", label: "Report", icon: TriangleAlert },
+  { to: "/driver/payslips", label: "Pay", icon: Wallet },
 ];
+
 
 export function DriverShell({ children }: { children: ReactNode }) {
   const { persona, online, setOnline, setPersona } = useSession();
