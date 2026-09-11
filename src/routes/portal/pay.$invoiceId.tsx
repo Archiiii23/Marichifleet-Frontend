@@ -34,6 +34,8 @@ function PayInvoice() {
   const [amount, setAmount] = useState(outstanding);
   const [mode, setMode] = useState<(typeof MODES)[number]>("UPI");
   const [reference, setReference] = useState("");
+  const [processing, setProcessing] = useState(false);
+  const [receiptId, setReceiptId] = useState("");
 
   if (!invoice) {
     return <EmptyState title="Invoice not found" message="This invoice may have been cancelled. Check your invoice list." />;
@@ -63,9 +65,20 @@ function PayInvoice() {
         </dl>
       </Panel>
 
-      <Panel title="Make a payment" description="Payments are confirmed against your invoice immediately.">
-        {outstanding <= 0 ? (
-          <p className="text-sm text-success">This invoice is fully settled. Thank you.</p>
+      <Panel title={receiptId ? "Payment confirmed" : "Make a payment"} description={receiptId ? "Your receipt is available in the invoice activity." : "Payments are confirmed against your invoice immediately."}>
+        {receiptId ? (
+          <div className="space-y-4" role="status" aria-live="polite">
+            <div className="rounded-md border border-success/30 bg-success/10 p-4">
+              <p className="font-medium text-success">Payment received</p>
+              <p className="mt-1 text-sm text-muted-foreground">Receipt {receiptId} · {money(amount)} via {mode}</p>
+            </div>
+            <Button className="w-full" onClick={() => navigate({ to: "/portal/invoices/$invoiceId", params: { invoiceId: invoice.id } })}>View invoice and receipt</Button>
+          </div>
+        ) : outstanding <= 0 ? (
+          <div className="space-y-3">
+            <p className="text-sm text-success">This invoice is fully settled. Thank you.</p>
+            <Button variant="outline" onClick={() => navigate({ to: "/portal/invoices/$invoiceId", params: { invoiceId: invoice.id } })}>View receipt</Button>
+          </div>
         ) : (
           <div className="space-y-3">
             <label className="block text-sm">
@@ -87,15 +100,18 @@ function PayInvoice() {
             </label>
             <div className="flex gap-2">
               <Button
+                disabled={processing || amount <= 0 || amount > outstanding}
                 onClick={() => {
+                  setProcessing(true);
                   const res = run(
                     () => recordPayment(invoice.id, amount, mode, reference || "Portal payment", persona.name),
                     "Payment received — thank you.",
                   );
-                  if (res.ok) navigate({ to: "/portal/invoices" });
+                  setProcessing(false);
+                  if (res.ok) setReceiptId(`RCT-${res.id?.slice(-6).toUpperCase() ?? Date.now().toString().slice(-6)}`);
                 }}
               >
-                Pay {money(amount)}
+                {processing ? "Confirming…" : `Pay ${money(amount)}`}
               </Button>
               <Button variant="outline" onClick={() => navigate({ to: "/portal/invoices" })}>
                 Back to invoices

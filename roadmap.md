@@ -1,8 +1,8 @@
 # MarichiFleet frontend completion
 
-- [ ] Deepen billing and profitability views
-- [ ] Deepen workshop, parts and vendor workflows
-- [ ] Complete operational analytics and KPI catalogue
-- [ ] Complete remaining driver and client portal states
-- [ ] Normalize route metadata and verify navigation
-- [ ] Validate responsive rendering and critical journeys
+- [x] Deepen billing and profitability views
+- [x] Deepen workshop, parts and vendor workflows
+- [x] Complete operational analytics and KPI catalogue
+- [x] Complete remaining driver and client portal states
+- [x] Normalize route metadata and verify navigation
+- [x] Validate responsive rendering and critical journeys

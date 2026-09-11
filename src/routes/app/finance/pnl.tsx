@@ -26,7 +26,7 @@ function ProfitAndLoss() {
   const [dimension, setDimension] = useState<"client" | "route" | "vehicle">("client");
   const rows = useMemo(() => {
     const map = new Map<string, { label: string; trips: number; revenue: number; directCost: number }>();
-    for (const trip of db.trips) {
+    for (const trip of db.trips.filter((item) => item.status === "delivered" || item.status === "completed")) {
       const booking = db.bookings.find((b) => b.id === trip.bookingId);
       const vehicle = db.vehicles.find((v) => v.id === trip.vehicleId);
       const client = db.clients.find((c) => c.id === booking?.clientId);

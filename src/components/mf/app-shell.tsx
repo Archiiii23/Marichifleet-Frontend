@@ -77,7 +77,7 @@ const NAV: Array<{ group: string; items: NavItem[] }> = [
     group: "Commercial",
     items: [
       { to: "/app/clients", label: "Clients", icon: Boxes, cap: "view_operations" },
-      { to: "/app/finance/invoices", label: "Invoices", icon: BadgeIndianRupee, cap: "view_finance" },
+      { to: "/app/finance/invoices/", label: "Invoices", icon: BadgeIndianRupee, cap: "view_finance" },
       { to: "/app/finance/receivables", label: "Receivables", icon: BadgeIndianRupee, cap: "view_finance" },
       { to: "/app/expenses", label: "Expenses & Credits", icon: BadgeIndianRupee, cap: "view_finance" },
       { to: "/app/ledger", label: "Ledger", icon: BadgeIndianRupee, cap: "view_finance" },
