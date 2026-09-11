@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Star } from "lucide-react";
 import { useState } from "react";
 import { EmptyState, KpiCard, PageHeader, Panel } from "@/components/mf/primitives";
@@ -94,6 +94,9 @@ function Vendors() {
                     <dd className={v.payable > 0 ? "numeric text-warning" : "numeric"}>{inr(v.payable)}</dd>
                   </div>
                 </dl>
+                <Button asChild size="sm" variant="outline" className="mt-3 w-full">
+                  <Link to="/app/vendors/$vendorId" params={{ vendorId: v.id }}>Open vendor</Link>
+                </Button>
               </article>
             ))}
           </div>
