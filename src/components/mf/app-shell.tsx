@@ -3,7 +3,7 @@ import {
   Activity, BadgeIndianRupee, BarChart3, Bell, Boxes, Building2, ClipboardCheck,
   Command as CommandIcon, Fuel, Handshake, LayoutDashboard, LogOut, Map, MessageSquare, Package,
   Radio, Settings, ShieldCheck, Truck, Users, UsersRound, Warehouse, Wrench,
-  UserCircle2, Menu, TriangleAlert,
+  UserCircle2, Menu, TriangleAlert, TrendingUp,
 } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
