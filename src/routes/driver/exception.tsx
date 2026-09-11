@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { Camera } from "lucide-react";
 import { Panel, StatusBadge } from "@/components/mf/primitives";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -31,6 +32,7 @@ function DriverException() {
   const [tripId, setTripId] = useState(live[0]?.id ?? "");
   const [type, setType] = useState(TYPES[0]);
   const [note, setNote] = useState("");
+  const [evidence, setEvidence] = useState<string[]>([]);
 
   return (
     <div className="space-y-4">
@@ -46,8 +48,9 @@ function DriverException() {
               <Label className="text-xs">Trip</Label>
               <div className="space-y-1.5">
                 {live.map((t) => (
-                  <button
+                  <Button
                     key={t.id}
+                    variant="outline"
                     onClick={() => setTripId(t.id)}
                     className={cn(
                       "flex w-full items-center justify-between rounded-md border p-2.5 text-left text-sm",
@@ -56,7 +59,7 @@ function DriverException() {
                   >
                     <span className="numeric">{t.ref}</span>
                     <StatusBadge status={t.status} />
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -64,8 +67,10 @@ function DriverException() {
               <Label className="text-xs">Type</Label>
               <div className="flex flex-wrap gap-1.5">
                 {TYPES.map((x) => (
-                  <button
+                  <Button
                     key={x}
+                    size="sm"
+                    variant="outline"
                     onClick={() => setType(x)}
                     className={cn(
                       "rounded-full border px-3 py-1 text-xs",
@@ -73,9 +78,16 @@ function DriverException() {
                     )}
                   >
                     {x}
-                  </button>
+                  </Button>
                 ))}
               </div>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs">Photo evidence</Label>
+              <label className="flex min-h-20 cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed border-border-strong text-sm text-muted-foreground">
+                <Camera className="size-4" /> {evidence.length ? `${evidence.length} photo${evidence.length > 1 ? "s" : ""} attached` : "Take or attach photos"}
+                <input type="file" accept="image/*" capture="environment" multiple className="sr-only" onChange={(event) => setEvidence(Array.from(event.target.files ?? []).map((file) => file.name))} />
+              </label>
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs">What happened?</Label>
@@ -84,7 +96,8 @@ function DriverException() {
             <Button
               className="w-full"
               onClick={() => {
-                const res = run(() => reportException(tripId, type, note, persona.name), "Dispatch has been alerted");
+                const detail = evidence.length ? `${note} · ${evidence.length} photo evidence item(s) attached` : note;
+                const res = run(() => reportException(tripId, type, detail, persona.name), "Dispatch has been alerted");
                 if (res.ok) navigate({ to: "/driver/trips/$tripId", params: { tripId } });
               }}
             >

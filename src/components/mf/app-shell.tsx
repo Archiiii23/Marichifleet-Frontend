@@ -3,7 +3,7 @@ import {
   Activity, BadgeIndianRupee, BarChart3, Bell, Boxes, Building2, ClipboardCheck,
   Command as CommandIcon, Fuel, Handshake, LayoutDashboard, LogOut, Map, MessageSquare, Package,
   Radio, Settings, ShieldCheck, Truck, Users, UsersRound, Warehouse, Wrench,
-  UserCircle2, Menu, TriangleAlert,
+  UserCircle2, Menu, TriangleAlert, TrendingUp,
 } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
@@ -77,10 +77,11 @@ const NAV: Array<{ group: string; items: NavItem[] }> = [
     group: "Commercial",
     items: [
       { to: "/app/clients", label: "Clients", icon: Boxes, cap: "view_operations" },
-      { to: "/app/finance/invoices", label: "Invoices", icon: BadgeIndianRupee, cap: "view_finance" },
+      { to: "/app/finance/invoices/", label: "Invoices", icon: BadgeIndianRupee, cap: "view_finance" },
       { to: "/app/finance/receivables", label: "Receivables", icon: BadgeIndianRupee, cap: "view_finance" },
       { to: "/app/expenses", label: "Expenses & Credits", icon: BadgeIndianRupee, cap: "view_finance" },
       { to: "/app/ledger", label: "Ledger", icon: BadgeIndianRupee, cap: "view_finance" },
+      { to: "/app/finance/pnl", label: "Profit & Loss", icon: TrendingUp, cap: "view_finance" },
       { to: "/app/reports", label: "Reports", icon: BarChart3, cap: "view_operations" },
       { to: "/app/report-builder", label: "Report Builder", icon: BarChart3, cap: "view_operations" },
     ],

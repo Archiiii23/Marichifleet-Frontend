@@ -8,6 +8,10 @@ export const Route = createFileRoute("/app/clients/$clientId")({
     meta: [
       { title: "Client detail — MarichiFleet" },
       { name: "description", content: "Booking history, rate card and receivables for one customer." },
+      { property: "og:title", content: "Client account — MarichiFleet" },
+      { property: "og:description", content: "Client bookings, commercial terms, billing history and credit exposure." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: ClientDetail,
@@ -31,6 +35,8 @@ function ClientDetail() {
   const invoices = db.invoices.filter((i) => i.clientId === c.id);
   const rates = db.rateCards.filter((r) => r.clientId === c.id);
   const outstanding = invoices.reduce((s, i) => s + invoiceOutstanding(i), 0);
+  const overdue = invoices.filter((i) => i.status !== "paid" && new Date(i.dueISO).getTime() < Date.now());
+  const oldestDue = overdue.sort((a, b) => a.dueISO.localeCompare(b.dueISO))[0];
 
   return (
     <>
@@ -79,6 +85,14 @@ function ClientDetail() {
               <Metric label="Credit days" value={String(c.creditDays)} />
               <Metric label="Outstanding" value={inr(outstanding)} tone={outstanding > 0 ? "warning" : "success"} />
               <Metric label="Lifetime billed" value={inr(invoices.reduce((s, i) => s + i.total, 0))} />
+            </div>
+          </Panel>
+          <Panel title="Credit control" description="Live exposure against the agreed payment window.">
+            <div className="grid grid-cols-2 gap-4">
+              <Metric label="Open invoices" value={String(invoices.filter((i) => invoiceOutstanding(i) > 0).length)} />
+              <Metric label="Overdue invoices" value={String(overdue.length)} tone={overdue.length ? "danger" : "success"} />
+              <Metric label="Exposure" value={inr(outstanding)} tone={outstanding ? "warning" : "success"} />
+              <Metric label="Oldest due" value={oldestDue ? fmtDate(oldestDue.dueISO) : "Current"} />
             </div>
           </Panel>
           <Panel title="Rate card">

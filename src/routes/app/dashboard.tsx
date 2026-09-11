@@ -126,7 +126,7 @@ function Dashboard() {
 
       {can("view_finance") && (
         <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <KpiCard label="Billed revenue" value={inrCompact(revenue)} hint="All invoices raised" icon={BadgeIndianRupee} to="/app/finance/invoices" />
+          <KpiCard label="Billed revenue" value={inrCompact(revenue)} hint="All invoices raised" icon={BadgeIndianRupee} to="/app/finance/invoices/" />
           <KpiCard label="Receivables" value={inrCompact(receivables)} hint="Outstanding across clients" tone="info" icon={BadgeIndianRupee} to="/app/finance/receivables" />
           <KpiCard label="Overdue invoices" value={String(overdue.length)} hint={inrCompact(overdue.reduce((s, i) => s + invoiceOutstanding(i), 0))} tone={overdue.length ? "danger" : "success"} icon={AlertTriangle} to="/app/finance/receivables" />
           <KpiCard label="Trip contribution" value={inrCompact(profit)} hint={`${completed.length} completed trips after fuel, tolls and driver cost`} tone="success" icon={TrendingUp} to="/app/trips" />

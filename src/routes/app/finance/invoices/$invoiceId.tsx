@@ -33,7 +33,7 @@ function InvoiceDetail() {
   if (!inv) {
     return (
       <>
-        <PageHeader title="Invoice not found" breadcrumb={[{ label: "Invoices", to: "/app/finance/invoices" }]} />
+        <PageHeader title="Invoice not found" breadcrumb={[{ label: "Invoices", to: "/app/finance/invoices/" }]} />
         <p className="text-sm text-muted-foreground">This invoice no longer exists.</p>
       </>
     );
@@ -48,7 +48,7 @@ function InvoiceDetail() {
     <>
       <PageHeader
         title={inv.ref}
-        breadcrumb={[{ label: "Invoices", to: "/app/finance/invoices" }, { label: inv.ref }]}
+        breadcrumb={[{ label: "Invoices", to: "/app/finance/invoices/" }, { label: inv.ref }]}
         subtitle={`${client.name} · ${client.gstin}`}
         actions={
           <>

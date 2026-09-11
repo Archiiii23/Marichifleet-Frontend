@@ -62,11 +62,14 @@ import { Route as AppClientsIndexRouteImport } from './routes/app/clients/index'
 import { Route as AppClientsClientIdRouteImport } from './routes/app/clients/$clientId'
 import { Route as AppDriversIndexRouteImport } from './routes/app/drivers/index'
 import { Route as AppDriversDriverIdRouteImport } from './routes/app/drivers/$driverId'
+import { Route as AppFinanceInvoicesRouteImport } from './routes/app/finance/invoices'
+import { Route as AppFinancePnlRouteImport } from './routes/app/finance/pnl'
 import { Route as AppFinanceReceivablesRouteImport } from './routes/app/finance/receivables'
 import { Route as AppTripsIndexRouteImport } from './routes/app/trips/index'
 import { Route as AppTripsTripIdRouteImport } from './routes/app/trips/$tripId'
 import { Route as AppVehiclesIndexRouteImport } from './routes/app/vehicles/index'
 import { Route as AppVehiclesVehicleIdRouteImport } from './routes/app/vehicles/$vehicleId'
+import { Route as AppVendorsVendorIdRouteImport } from './routes/app/vendors/$vendorId'
 import { Route as DriverTripsIndexRouteImport } from './routes/driver/trips/index'
 import { Route as DriverTripsTripIdRouteImport } from './routes/driver/trips/$tripId'
 import { Route as PortalBookingsIndexRouteImport } from './routes/portal/bookings/index'
@@ -344,6 +347,16 @@ const AppDriversDriverIdRoute = AppDriversDriverIdRouteImport.update({
   path: '/drivers/$driverId',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppFinanceInvoicesRoute = AppFinanceInvoicesRouteImport.update({
+  id: '/finance/invoices',
+  path: '/finance/invoices',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppFinancePnlRoute = AppFinancePnlRouteImport.update({
+  id: '/finance/pnl',
+  path: '/finance/pnl',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppFinanceReceivablesRoute = AppFinanceReceivablesRouteImport.update({
   id: '/finance/receivables',
   path: '/finance/receivables',
@@ -368,6 +381,11 @@ const AppVehiclesVehicleIdRoute = AppVehiclesVehicleIdRouteImport.update({
   id: '/vehicles/$vehicleId',
   path: '/vehicles/$vehicleId',
   getParentRoute: () => AppRouteRoute,
+} as any)
+const AppVendorsVendorIdRoute = AppVendorsVendorIdRouteImport.update({
+  id: '/$vendorId',
+  path: '/$vendorId',
+  getParentRoute: () => AppVendorsRoute,
 } as any)
 const DriverTripsIndexRoute = DriverTripsIndexRouteImport.update({
   id: '/trips/',
@@ -415,15 +433,15 @@ const PortalTrackingBookingIdRoute = PortalTrackingBookingIdRouteImport.update({
   getParentRoute: () => PortalRouteRoute,
 } as any)
 const AppFinanceInvoicesIndexRoute = AppFinanceInvoicesIndexRouteImport.update({
-  id: '/finance/invoices/',
-  path: '/finance/invoices/',
-  getParentRoute: () => AppRouteRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppFinanceInvoicesRoute,
 } as any)
 const AppFinanceInvoicesInvoiceIdRoute =
   AppFinanceInvoicesInvoiceIdRouteImport.update({
-    id: '/finance/invoices/$invoiceId',
-    path: '/finance/invoices/$invoiceId',
-    getParentRoute: () => AppRouteRoute,
+    id: '/$invoiceId',
+    path: '/$invoiceId',
+    getParentRoute: () => AppFinanceInvoicesRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -461,7 +479,7 @@ export interface FileRoutesByFullPath {
   '/app/subscription': typeof AppSubscriptionRoute
   '/app/tower': typeof AppTowerRoute
   '/app/tracking': typeof AppTrackingRoute
-  '/app/vendors': typeof AppVendorsRoute
+  '/app/vendors': typeof AppVendorsRouteWithChildren
   '/app/workshop': typeof AppWorkshopRoute
   '/driver/exception': typeof DriverExceptionRoute
   '/driver/fuel': typeof DriverFuelRoute
@@ -477,9 +495,12 @@ export interface FileRoutesByFullPath {
   '/app/bookings/new': typeof AppBookingsNewRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
   '/app/drivers/$driverId': typeof AppDriversDriverIdRoute
+  '/app/finance/invoices': typeof AppFinanceInvoicesRouteWithChildren
+  '/app/finance/pnl': typeof AppFinancePnlRoute
   '/app/finance/receivables': typeof AppFinanceReceivablesRoute
   '/app/trips/$tripId': typeof AppTripsTripIdRoute
   '/app/vehicles/$vehicleId': typeof AppVehiclesVehicleIdRoute
+  '/app/vendors/$vendorId': typeof AppVendorsVendorIdRoute
   '/driver/trips/$tripId': typeof DriverTripsTripIdRoute
   '/portal/bookings/$bookingId': typeof PortalBookingsBookingIdRoute
   '/portal/bookings/new': typeof PortalBookingsNewRoute
@@ -530,7 +551,7 @@ export interface FileRoutesByTo {
   '/app/subscription': typeof AppSubscriptionRoute
   '/app/tower': typeof AppTowerRoute
   '/app/tracking': typeof AppTrackingRoute
-  '/app/vendors': typeof AppVendorsRoute
+  '/app/vendors': typeof AppVendorsRouteWithChildren
   '/app/workshop': typeof AppWorkshopRoute
   '/driver/exception': typeof DriverExceptionRoute
   '/driver/fuel': typeof DriverFuelRoute
@@ -546,9 +567,11 @@ export interface FileRoutesByTo {
   '/app/bookings/new': typeof AppBookingsNewRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
   '/app/drivers/$driverId': typeof AppDriversDriverIdRoute
+  '/app/finance/pnl': typeof AppFinancePnlRoute
   '/app/finance/receivables': typeof AppFinanceReceivablesRoute
   '/app/trips/$tripId': typeof AppTripsTripIdRoute
   '/app/vehicles/$vehicleId': typeof AppVehiclesVehicleIdRoute
+  '/app/vendors/$vendorId': typeof AppVendorsVendorIdRoute
   '/driver/trips/$tripId': typeof DriverTripsTripIdRoute
   '/portal/bookings/$bookingId': typeof PortalBookingsBookingIdRoute
   '/portal/bookings/new': typeof PortalBookingsNewRoute
@@ -602,7 +625,7 @@ export interface FileRoutesById {
   '/app/subscription': typeof AppSubscriptionRoute
   '/app/tower': typeof AppTowerRoute
   '/app/tracking': typeof AppTrackingRoute
-  '/app/vendors': typeof AppVendorsRoute
+  '/app/vendors': typeof AppVendorsRouteWithChildren
   '/app/workshop': typeof AppWorkshopRoute
   '/driver/exception': typeof DriverExceptionRoute
   '/driver/fuel': typeof DriverFuelRoute
@@ -618,9 +641,12 @@ export interface FileRoutesById {
   '/app/bookings/new': typeof AppBookingsNewRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
   '/app/drivers/$driverId': typeof AppDriversDriverIdRoute
+  '/app/finance/invoices': typeof AppFinanceInvoicesRouteWithChildren
+  '/app/finance/pnl': typeof AppFinancePnlRoute
   '/app/finance/receivables': typeof AppFinanceReceivablesRoute
   '/app/trips/$tripId': typeof AppTripsTripIdRoute
   '/app/vehicles/$vehicleId': typeof AppVehiclesVehicleIdRoute
+  '/app/vendors/$vendorId': typeof AppVendorsVendorIdRoute
   '/driver/trips/$tripId': typeof DriverTripsTripIdRoute
   '/portal/bookings/$bookingId': typeof PortalBookingsBookingIdRoute
   '/portal/bookings/new': typeof PortalBookingsNewRoute
@@ -691,9 +717,12 @@ export interface FileRouteTypes {
     | '/app/bookings/new'
     | '/app/clients/$clientId'
     | '/app/drivers/$driverId'
+    | '/app/finance/invoices'
+    | '/app/finance/pnl'
     | '/app/finance/receivables'
     | '/app/trips/$tripId'
     | '/app/vehicles/$vehicleId'
+    | '/app/vendors/$vendorId'
     | '/driver/trips/$tripId'
     | '/portal/bookings/$bookingId'
     | '/portal/bookings/new'
@@ -760,9 +789,11 @@ export interface FileRouteTypes {
     | '/app/bookings/new'
     | '/app/clients/$clientId'
     | '/app/drivers/$driverId'
+    | '/app/finance/pnl'
     | '/app/finance/receivables'
     | '/app/trips/$tripId'
     | '/app/vehicles/$vehicleId'
+    | '/app/vendors/$vendorId'
     | '/driver/trips/$tripId'
     | '/portal/bookings/$bookingId'
     | '/portal/bookings/new'
@@ -831,9 +862,12 @@ export interface FileRouteTypes {
     | '/app/bookings/new'
     | '/app/clients/$clientId'
     | '/app/drivers/$driverId'
+    | '/app/finance/invoices'
+    | '/app/finance/pnl'
     | '/app/finance/receivables'
     | '/app/trips/$tripId'
     | '/app/vehicles/$vehicleId'
+    | '/app/vendors/$vendorId'
     | '/driver/trips/$tripId'
     | '/portal/bookings/$bookingId'
     | '/portal/bookings/new'
@@ -1237,6 +1271,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDriversDriverIdRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/finance/invoices': {
+      id: '/app/finance/invoices'
+      path: '/finance/invoices'
+      fullPath: '/app/finance/invoices'
+      preLoaderRoute: typeof AppFinanceInvoicesRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/finance/pnl': {
+      id: '/app/finance/pnl'
+      path: '/finance/pnl'
+      fullPath: '/app/finance/pnl'
+      preLoaderRoute: typeof AppFinancePnlRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/app/finance/receivables': {
       id: '/app/finance/receivables'
       path: '/finance/receivables'
@@ -1271,6 +1319,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/vehicles/$vehicleId'
       preLoaderRoute: typeof AppVehiclesVehicleIdRouteImport
       parentRoute: typeof AppRouteRoute
+    }
+    '/app/vendors/$vendorId': {
+      id: '/app/vendors/$vendorId'
+      path: '/$vendorId'
+      fullPath: '/app/vendors/$vendorId'
+      preLoaderRoute: typeof AppVendorsVendorIdRouteImport
+      parentRoute: typeof AppVendorsRoute
     }
     '/driver/trips/': {
       id: '/driver/trips/'
@@ -1337,20 +1392,45 @@ declare module '@tanstack/react-router' {
     }
     '/app/finance/invoices/': {
       id: '/app/finance/invoices/'
-      path: '/finance/invoices'
+      path: '/'
       fullPath: '/app/finance/invoices/'
       preLoaderRoute: typeof AppFinanceInvoicesIndexRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppFinanceInvoicesRoute
     }
     '/app/finance/invoices/$invoiceId': {
       id: '/app/finance/invoices/$invoiceId'
-      path: '/finance/invoices/$invoiceId'
+      path: '/$invoiceId'
       fullPath: '/app/finance/invoices/$invoiceId'
       preLoaderRoute: typeof AppFinanceInvoicesInvoiceIdRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppFinanceInvoicesRoute
     }
   }
 }
+
+interface AppVendorsRouteChildren {
+  AppVendorsVendorIdRoute: typeof AppVendorsVendorIdRoute
+}
+
+const AppVendorsRouteChildren: AppVendorsRouteChildren = {
+  AppVendorsVendorIdRoute: AppVendorsVendorIdRoute,
+}
+
+const AppVendorsRouteWithChildren = AppVendorsRoute._addFileChildren(
+  AppVendorsRouteChildren,
+)
+
+interface AppFinanceInvoicesRouteChildren {
+  AppFinanceInvoicesInvoiceIdRoute: typeof AppFinanceInvoicesInvoiceIdRoute
+  AppFinanceInvoicesIndexRoute: typeof AppFinanceInvoicesIndexRoute
+}
+
+const AppFinanceInvoicesRouteChildren: AppFinanceInvoicesRouteChildren = {
+  AppFinanceInvoicesInvoiceIdRoute: AppFinanceInvoicesInvoiceIdRoute,
+  AppFinanceInvoicesIndexRoute: AppFinanceInvoicesIndexRoute,
+}
+
+const AppFinanceInvoicesRouteWithChildren =
+  AppFinanceInvoicesRoute._addFileChildren(AppFinanceInvoicesRouteChildren)
 
 interface AppRouteRouteChildren {
   AppAlertsRoute: typeof AppAlertsRoute
@@ -1379,12 +1459,14 @@ interface AppRouteRouteChildren {
   AppSubscriptionRoute: typeof AppSubscriptionRoute
   AppTowerRoute: typeof AppTowerRoute
   AppTrackingRoute: typeof AppTrackingRoute
-  AppVendorsRoute: typeof AppVendorsRoute
+  AppVendorsRoute: typeof AppVendorsRouteWithChildren
   AppWorkshopRoute: typeof AppWorkshopRoute
   AppBookingsBookingIdRoute: typeof AppBookingsBookingIdRoute
   AppBookingsNewRoute: typeof AppBookingsNewRoute
   AppClientsClientIdRoute: typeof AppClientsClientIdRoute
   AppDriversDriverIdRoute: typeof AppDriversDriverIdRoute
+  AppFinanceInvoicesRoute: typeof AppFinanceInvoicesRouteWithChildren
+  AppFinancePnlRoute: typeof AppFinancePnlRoute
   AppFinanceReceivablesRoute: typeof AppFinanceReceivablesRoute
   AppTripsTripIdRoute: typeof AppTripsTripIdRoute
   AppVehiclesVehicleIdRoute: typeof AppVehiclesVehicleIdRoute
@@ -1393,8 +1475,6 @@ interface AppRouteRouteChildren {
   AppDriversIndexRoute: typeof AppDriversIndexRoute
   AppTripsIndexRoute: typeof AppTripsIndexRoute
   AppVehiclesIndexRoute: typeof AppVehiclesIndexRoute
-  AppFinanceInvoicesInvoiceIdRoute: typeof AppFinanceInvoicesInvoiceIdRoute
-  AppFinanceInvoicesIndexRoute: typeof AppFinanceInvoicesIndexRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
@@ -1424,12 +1504,14 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppSubscriptionRoute: AppSubscriptionRoute,
   AppTowerRoute: AppTowerRoute,
   AppTrackingRoute: AppTrackingRoute,
-  AppVendorsRoute: AppVendorsRoute,
+  AppVendorsRoute: AppVendorsRouteWithChildren,
   AppWorkshopRoute: AppWorkshopRoute,
   AppBookingsBookingIdRoute: AppBookingsBookingIdRoute,
   AppBookingsNewRoute: AppBookingsNewRoute,
   AppClientsClientIdRoute: AppClientsClientIdRoute,
   AppDriversDriverIdRoute: AppDriversDriverIdRoute,
+  AppFinanceInvoicesRoute: AppFinanceInvoicesRouteWithChildren,
+  AppFinancePnlRoute: AppFinancePnlRoute,
   AppFinanceReceivablesRoute: AppFinanceReceivablesRoute,
   AppTripsTripIdRoute: AppTripsTripIdRoute,
   AppVehiclesVehicleIdRoute: AppVehiclesVehicleIdRoute,
@@ -1438,8 +1520,6 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppDriversIndexRoute: AppDriversIndexRoute,
   AppTripsIndexRoute: AppTripsIndexRoute,
   AppVehiclesIndexRoute: AppVehiclesIndexRoute,
-  AppFinanceInvoicesInvoiceIdRoute: AppFinanceInvoicesInvoiceIdRoute,
-  AppFinanceInvoicesIndexRoute: AppFinanceInvoicesIndexRoute,
 }
 
 const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(

@@ -1,4 +1,4 @@
-import { canBooking, canDocument, canInvoice, canTrip, labelize, type GuardResult } from "./machines";
+import { canBooking, canDocument, canInvoice, canJobCard, canTrip, labelize, type GuardResult } from "./machines";
 import { buildSeed, distanceKm } from "./seed";
 import type {
   Booking,
@@ -7,6 +7,7 @@ import type {
   DocumentStatus,
   Driver,
   Invoice,
+  JobCardStatus,
   Notification,
   NotificationEvent,
   Place,
@@ -451,6 +452,36 @@ export function resumeTrip(tripId: string, actor: string): ActionResult {
   t.exception = undefined;
   audit(actor, "Exception cleared, trip resumed", "trip", t.id);
   return { ok: true };
+}
+
+export function advanceJobCard(
+  jobCardId: string,
+  to: JobCardStatus,
+  actor: string,
+  costs?: { partsCost: number; labourCost: number },
+): ActionResult {
+  const d = getDb();
+  const job = byId(d.jobCards, jobCardId);
+  if (!job) return { ok: false, reason: "Job card not found." };
+  const guard = canJobCard(job.status, to);
+  if (!guard.ok) return guard;
+  if (costs) {
+    if (costs.partsCost < 0 || costs.labourCost < 0) return { ok: false, reason: "Costs cannot be negative." };
+    job.partsCost = costs.partsCost;
+    job.labourCost = costs.labourCost;
+  }
+  if (to === "in_progress" && job.partsCost + job.labourCost <= 0) {
+    return { ok: false, reason: "Add a parts or labour estimate before starting work." };
+  }
+  const from = job.status;
+  job.status = to;
+  if (to === "released") {
+    job.closedISO = now();
+    const vehicle = byId(d.vehicles, job.vehicleId);
+    if (vehicle && vehicle.status === "maintenance") vehicle.status = "available";
+  }
+  audit(actor, `Job card → ${labelize(to)}`, "job_card", job.id, labelize(from), labelize(to));
+  return { ok: true, id: job.id };
 }
 
 export function markDelivered(tripId: string, actor: string): ActionResult {

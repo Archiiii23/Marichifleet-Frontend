@@ -5,6 +5,7 @@
  * the console.
  */
 import type { DbShape } from "@/domain/types";
+import { getPrd } from "@/domain/prd";
 import type { AutomationLevel } from "./roles";
 
 export interface Exception {
@@ -313,6 +314,31 @@ export function deriveLedger(db: DbShape): LedgerEntry[] {
       id: `le_${f.id}`, atISO: f.atISO,
       narration: `Fuel · ${f.station} · ${f.litres} L`, account: "Fuel expense",
       debitMinor: f.cost * 100, creditMinor: 0, source: f.station,
+    });
+  }
+  for (const expense of getPrd().expenses) {
+    rows.push({
+      id: `le_${expense.id}_expense`, atISO: expense.atISO,
+      narration: `${expense.category} · ${expense.note}`, account: `${expense.category} expense`,
+      debitMinor: expense.amount * 100, creditMinor: 0, source: expense.id, sourceLink: "/app/expenses",
+    });
+    rows.push({
+      id: `le_${expense.id}_payable`, atISO: expense.atISO,
+      narration: `${expense.status === "paid" ? "Paid" : "Payable"} · ${expense.note}`,
+      account: expense.status === "paid" ? "Bank" : "Accounts payable",
+      debitMinor: 0, creditMinor: expense.amount * 100, source: expense.id, sourceLink: "/app/expenses",
+    });
+  }
+  for (const credit of getPrd().creditNotes) {
+    rows.push({
+      id: `le_${credit.id}_contra`, atISO: credit.atISO,
+      narration: `Credit note ${credit.ref} · ${credit.reason}`, account: "Sales returns",
+      debitMinor: credit.amount * 100, creditMinor: 0, source: credit.ref, sourceLink: "/app/expenses",
+    });
+    rows.push({
+      id: `le_${credit.id}_ar`, atISO: credit.atISO,
+      narration: `Credit applied · ${credit.ref}`, account: "Accounts receivable",
+      debitMinor: 0, creditMinor: credit.amount * 100, source: credit.ref, sourceLink: "/app/expenses",
     });
   }
   return rows.sort((a, b) => b.atISO.localeCompare(a.atISO));

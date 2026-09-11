@@ -137,6 +137,16 @@ export interface CreditNote {
   atISO: string;
 }
 
+export interface InvoiceDispute {
+  id: string;
+  invoiceId: string;
+  clientId: string;
+  reason: string;
+  detail: string;
+  status: "open" | "under_review" | "resolved";
+  raisedISO: string;
+}
+
 /* ------------------------------------------------------------- roles & people */
 
 export const PERMISSIONS = [
@@ -189,6 +199,7 @@ export interface PrdShape {
   purchaseOrders: PurchaseOrder[];
   expenses: Expense[];
   creditNotes: CreditNote[];
+  invoiceDisputes: InvoiceDispute[];
   roles: CustomRole[];
   payslips: Payslip[];
 }
@@ -332,7 +343,17 @@ function build(): PrdShape {
     atISO: daysAgo(7),
   }));
 
-  return { subscription, alertPrefs, geofences, purchaseOrders, expenses, creditNotes, roles, payslips };
+  const invoiceDisputes: InvoiceDispute[] = db.invoices.slice(1, 2).map((inv, i) => ({
+    id: `dsp_${i + 1}`,
+    invoiceId: inv.id,
+    clientId: inv.clientId,
+    reason: "Detention charge",
+    detail: "Waiting time was caused by a gate closure outside our control.",
+    status: "under_review",
+    raisedISO: daysAgo(3),
+  }));
+
+  return { subscription, alertPrefs, geofences, purchaseOrders, expenses, creditNotes, invoiceDisputes, roles, payslips };
 }
 
 export function getPrd(): PrdShape {
@@ -545,6 +566,18 @@ export function issueCreditNote(invoiceId: string, amount: number, reason: strin
   if (inv.paid >= inv.total) inv.status = "paid";
   else if (inv.paid > 0) inv.status = "partially_paid";
   audit(actor, `Credit note ${ref} against ${inv.ref}`, "credit_note", ref);
+  return ok;
+}
+
+export function raiseInvoiceDispute(invoiceId: string, reason: string, detail: string, actor: string): GuardResult {
+  const inv = getDb().invoices.find((i) => i.id === invoiceId);
+  if (!inv) return no("That invoice no longer exists.");
+  if (!reason.trim() || !detail.trim()) return no("Choose a reason and explain what should be reviewed.");
+  const existing = getPrd().invoiceDisputes.find((d) => d.invoiceId === invoiceId && d.status !== "resolved");
+  if (existing) return no("This invoice already has an open review.");
+  getPrd().invoiceDisputes.unshift({ id: nid("dsp"), invoiceId, clientId: inv.clientId, reason, detail, status: "open", raisedISO: now() });
+  audit(actor, `Invoice dispute opened — ${reason}`, "invoice", invoiceId);
+  notify({ event: "PAYMENT_REMINDER", channel: "in_app", recipient: "Finance desk", recipientRole: "accountant", body: `${inv.ref} has been disputed: ${reason}.`, link: `/app/finance/invoices/${inv.id}`, entityRef: inv.ref });
   return ok;
 }
 
