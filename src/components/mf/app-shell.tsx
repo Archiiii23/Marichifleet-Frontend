@@ -81,6 +81,7 @@ const NAV: Array<{ group: string; items: NavItem[] }> = [
       { to: "/app/finance/receivables", label: "Receivables", icon: BadgeIndianRupee, cap: "view_finance" },
       { to: "/app/expenses", label: "Expenses & Credits", icon: BadgeIndianRupee, cap: "view_finance" },
       { to: "/app/ledger", label: "Ledger", icon: BadgeIndianRupee, cap: "view_finance" },
+      { to: "/app/finance/pnl", label: "Profit & Loss", icon: TrendingUp, cap: "view_finance" },
       { to: "/app/reports", label: "Reports", icon: BarChart3, cap: "view_operations" },
       { to: "/app/report-builder", label: "Report Builder", icon: BarChart3, cap: "view_operations" },
     ],
