@@ -67,6 +67,7 @@ import { Route as AppTripsIndexRouteImport } from './routes/app/trips/index'
 import { Route as AppTripsTripIdRouteImport } from './routes/app/trips/$tripId'
 import { Route as AppVehiclesIndexRouteImport } from './routes/app/vehicles/index'
 import { Route as AppVehiclesVehicleIdRouteImport } from './routes/app/vehicles/$vehicleId'
+import { Route as AppVendorsVendorIdRouteImport } from './routes/app/vendors/$vendorId'
 import { Route as DriverTripsIndexRouteImport } from './routes/driver/trips/index'
 import { Route as DriverTripsTripIdRouteImport } from './routes/driver/trips/$tripId'
 import { Route as PortalBookingsIndexRouteImport } from './routes/portal/bookings/index'
@@ -369,6 +370,11 @@ const AppVehiclesVehicleIdRoute = AppVehiclesVehicleIdRouteImport.update({
   path: '/vehicles/$vehicleId',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppVendorsVendorIdRoute = AppVendorsVendorIdRouteImport.update({
+  id: '/$vendorId',
+  path: '/$vendorId',
+  getParentRoute: () => AppVendorsRoute,
+} as any)
 const DriverTripsIndexRoute = DriverTripsIndexRouteImport.update({
   id: '/trips/',
   path: '/trips/',
@@ -461,7 +467,7 @@ export interface FileRoutesByFullPath {
   '/app/subscription': typeof AppSubscriptionRoute
   '/app/tower': typeof AppTowerRoute
   '/app/tracking': typeof AppTrackingRoute
-  '/app/vendors': typeof AppVendorsRoute
+  '/app/vendors': typeof AppVendorsRouteWithChildren
   '/app/workshop': typeof AppWorkshopRoute
   '/driver/exception': typeof DriverExceptionRoute
   '/driver/fuel': typeof DriverFuelRoute
@@ -480,6 +486,7 @@ export interface FileRoutesByFullPath {
   '/app/finance/receivables': typeof AppFinanceReceivablesRoute
   '/app/trips/$tripId': typeof AppTripsTripIdRoute
   '/app/vehicles/$vehicleId': typeof AppVehiclesVehicleIdRoute
+  '/app/vendors/$vendorId': typeof AppVendorsVendorIdRoute
   '/driver/trips/$tripId': typeof DriverTripsTripIdRoute
   '/portal/bookings/$bookingId': typeof PortalBookingsBookingIdRoute
   '/portal/bookings/new': typeof PortalBookingsNewRoute
@@ -530,7 +537,7 @@ export interface FileRoutesByTo {
   '/app/subscription': typeof AppSubscriptionRoute
   '/app/tower': typeof AppTowerRoute
   '/app/tracking': typeof AppTrackingRoute
-  '/app/vendors': typeof AppVendorsRoute
+  '/app/vendors': typeof AppVendorsRouteWithChildren
   '/app/workshop': typeof AppWorkshopRoute
   '/driver/exception': typeof DriverExceptionRoute
   '/driver/fuel': typeof DriverFuelRoute
@@ -549,6 +556,7 @@ export interface FileRoutesByTo {
   '/app/finance/receivables': typeof AppFinanceReceivablesRoute
   '/app/trips/$tripId': typeof AppTripsTripIdRoute
   '/app/vehicles/$vehicleId': typeof AppVehiclesVehicleIdRoute
+  '/app/vendors/$vendorId': typeof AppVendorsVendorIdRoute
   '/driver/trips/$tripId': typeof DriverTripsTripIdRoute
   '/portal/bookings/$bookingId': typeof PortalBookingsBookingIdRoute
   '/portal/bookings/new': typeof PortalBookingsNewRoute
@@ -602,7 +610,7 @@ export interface FileRoutesById {
   '/app/subscription': typeof AppSubscriptionRoute
   '/app/tower': typeof AppTowerRoute
   '/app/tracking': typeof AppTrackingRoute
-  '/app/vendors': typeof AppVendorsRoute
+  '/app/vendors': typeof AppVendorsRouteWithChildren
   '/app/workshop': typeof AppWorkshopRoute
   '/driver/exception': typeof DriverExceptionRoute
   '/driver/fuel': typeof DriverFuelRoute
@@ -621,6 +629,7 @@ export interface FileRoutesById {
   '/app/finance/receivables': typeof AppFinanceReceivablesRoute
   '/app/trips/$tripId': typeof AppTripsTripIdRoute
   '/app/vehicles/$vehicleId': typeof AppVehiclesVehicleIdRoute
+  '/app/vendors/$vendorId': typeof AppVendorsVendorIdRoute
   '/driver/trips/$tripId': typeof DriverTripsTripIdRoute
   '/portal/bookings/$bookingId': typeof PortalBookingsBookingIdRoute
   '/portal/bookings/new': typeof PortalBookingsNewRoute
@@ -694,6 +703,7 @@ export interface FileRouteTypes {
     | '/app/finance/receivables'
     | '/app/trips/$tripId'
     | '/app/vehicles/$vehicleId'
+    | '/app/vendors/$vendorId'
     | '/driver/trips/$tripId'
     | '/portal/bookings/$bookingId'
     | '/portal/bookings/new'
@@ -763,6 +773,7 @@ export interface FileRouteTypes {
     | '/app/finance/receivables'
     | '/app/trips/$tripId'
     | '/app/vehicles/$vehicleId'
+    | '/app/vendors/$vendorId'
     | '/driver/trips/$tripId'
     | '/portal/bookings/$bookingId'
     | '/portal/bookings/new'
@@ -834,6 +845,7 @@ export interface FileRouteTypes {
     | '/app/finance/receivables'
     | '/app/trips/$tripId'
     | '/app/vehicles/$vehicleId'
+    | '/app/vendors/$vendorId'
     | '/driver/trips/$tripId'
     | '/portal/bookings/$bookingId'
     | '/portal/bookings/new'
@@ -1272,6 +1284,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppVehiclesVehicleIdRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/vendors/$vendorId': {
+      id: '/app/vendors/$vendorId'
+      path: '/$vendorId'
+      fullPath: '/app/vendors/$vendorId'
+      preLoaderRoute: typeof AppVendorsVendorIdRouteImport
+      parentRoute: typeof AppVendorsRoute
+    }
     '/driver/trips/': {
       id: '/driver/trips/'
       path: '/trips'
@@ -1352,6 +1371,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AppVendorsRouteChildren {
+  AppVendorsVendorIdRoute: typeof AppVendorsVendorIdRoute
+}
+
+const AppVendorsRouteChildren: AppVendorsRouteChildren = {
+  AppVendorsVendorIdRoute: AppVendorsVendorIdRoute,
+}
+
+const AppVendorsRouteWithChildren = AppVendorsRoute._addFileChildren(
+  AppVendorsRouteChildren,
+)
+
 interface AppRouteRouteChildren {
   AppAlertsRoute: typeof AppAlertsRoute
   AppApprovalsRoute: typeof AppApprovalsRoute
@@ -1379,7 +1410,7 @@ interface AppRouteRouteChildren {
   AppSubscriptionRoute: typeof AppSubscriptionRoute
   AppTowerRoute: typeof AppTowerRoute
   AppTrackingRoute: typeof AppTrackingRoute
-  AppVendorsRoute: typeof AppVendorsRoute
+  AppVendorsRoute: typeof AppVendorsRouteWithChildren
   AppWorkshopRoute: typeof AppWorkshopRoute
   AppBookingsBookingIdRoute: typeof AppBookingsBookingIdRoute
   AppBookingsNewRoute: typeof AppBookingsNewRoute
@@ -1424,7 +1455,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppSubscriptionRoute: AppSubscriptionRoute,
   AppTowerRoute: AppTowerRoute,
   AppTrackingRoute: AppTrackingRoute,
-  AppVendorsRoute: AppVendorsRoute,
+  AppVendorsRoute: AppVendorsRouteWithChildren,
   AppWorkshopRoute: AppWorkshopRoute,
   AppBookingsBookingIdRoute: AppBookingsBookingIdRoute,
   AppBookingsNewRoute: AppBookingsNewRoute,
