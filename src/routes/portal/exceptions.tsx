@@ -62,6 +62,10 @@ function PortalExceptions() {
                   <span className="text-muted-foreground">What happens next: </span>
                   {c.recommendation.detail}
                 </p>
+                <ol className="border-l border-border pl-4 text-xs text-muted-foreground">
+                  {c.timeline.map((event) => <li key={`${event.atISO}-${event.label}`} className="relative py-1 before:absolute before:-left-[19px] before:top-2 before:size-1.5 before:rounded-full before:bg-primary"><span className="text-foreground">{event.label}</span> · {fmtDateTime(event.atISO)}</li>)}
+                  <li className="relative py-1 before:absolute before:-left-[19px] before:top-2 before:size-1.5 before:rounded-full before:bg-warning">Response in progress · SLA target {c.slaTargetMins} min</li>
+                </ol>
                 <div className="flex flex-wrap gap-2 pt-1">
                   <Button size="sm" variant="outline" asChild>
                     <Link to="/portal/bookings">View shipment</Link>

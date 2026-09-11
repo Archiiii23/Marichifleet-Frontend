@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { FleetMap } from "@/components/mf/fleet-map";
 import { Metric, Panel, StatusBadge } from "@/components/mf/primitives";
 import { fmtDateTime, timeAgo, useDb } from "@/domain/hooks";
@@ -8,6 +9,10 @@ export const Route = createFileRoute("/portal/tracking/$bookingId")({
     meta: [
       { title: "Live tracking — MarichiFleet" },
       { name: "description", content: "Follow your consignment on the map with live ETA and checkpoints." },
+      { property: "og:title", content: "Live shipment tracking — MarichiFleet" },
+      { property: "og:description", content: "Follow shipment movement, ETA and completed checkpoints." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: PortalTracking,
@@ -18,6 +23,7 @@ function PortalTracking() {
   const db = useDb();
   const b = db.bookings.find((x) => x.id === bookingId);
   const trip = db.trips.find((t) => t.id === b?.tripId);
+  const [playback, setPlayback] = useState(100);
 
   if (!b) return <p className="text-sm text-muted-foreground">Shipment not found.</p>;
   if (!trip) {
@@ -46,9 +52,12 @@ function PortalTracking() {
 
       <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
         <Panel title="Live position">
-          {vehicle && (
-            <FleetMap items={[{ vehicle, trip, delayed: trip.delayMins > 30 }]} selectedId={vehicle.id} height={420} />
-          )}
+          {vehicle && (() => {
+            const index = Math.min(trip.route.length - 1, Math.round((playback / 100) * (trip.route.length - 1)));
+            const point = trip.route[index] ?? { lat: vehicle.lat, lng: vehicle.lng };
+            const playbackVehicle = { ...vehicle, lat: point.lat, lng: point.lng };
+            return <><FleetMap items={[{ vehicle: playbackVehicle, trip, delayed: trip.delayMins > 30 }]} selectedId={vehicle.id} height={420} /><div className="mt-3"><div className="flex justify-between text-xs text-muted-foreground"><span>Trip start</span><span>{playback === 100 ? "Live" : `${playback}% of route`}</span></div><input className="mt-2 w-full accent-primary" type="range" min={0} max={100} value={playback} onChange={(event) => setPlayback(Number(event.target.value))} aria-label="Trip route playback" /></div></>;
+          })()}
         </Panel>
         <div className="space-y-4">
           <Panel title="Journey">

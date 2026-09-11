@@ -62,6 +62,7 @@ import { Route as AppClientsIndexRouteImport } from './routes/app/clients/index'
 import { Route as AppClientsClientIdRouteImport } from './routes/app/clients/$clientId'
 import { Route as AppDriversIndexRouteImport } from './routes/app/drivers/index'
 import { Route as AppDriversDriverIdRouteImport } from './routes/app/drivers/$driverId'
+import { Route as AppFinancePnlRouteImport } from './routes/app/finance/pnl'
 import { Route as AppFinanceReceivablesRouteImport } from './routes/app/finance/receivables'
 import { Route as AppTripsIndexRouteImport } from './routes/app/trips/index'
 import { Route as AppTripsTripIdRouteImport } from './routes/app/trips/$tripId'
@@ -345,6 +346,11 @@ const AppDriversDriverIdRoute = AppDriversDriverIdRouteImport.update({
   path: '/drivers/$driverId',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppFinancePnlRoute = AppFinancePnlRouteImport.update({
+  id: '/finance/pnl',
+  path: '/finance/pnl',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppFinanceReceivablesRoute = AppFinanceReceivablesRouteImport.update({
   id: '/finance/receivables',
   path: '/finance/receivables',
@@ -483,6 +489,7 @@ export interface FileRoutesByFullPath {
   '/app/bookings/new': typeof AppBookingsNewRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
   '/app/drivers/$driverId': typeof AppDriversDriverIdRoute
+  '/app/finance/pnl': typeof AppFinancePnlRoute
   '/app/finance/receivables': typeof AppFinanceReceivablesRoute
   '/app/trips/$tripId': typeof AppTripsTripIdRoute
   '/app/vehicles/$vehicleId': typeof AppVehiclesVehicleIdRoute
@@ -553,6 +560,7 @@ export interface FileRoutesByTo {
   '/app/bookings/new': typeof AppBookingsNewRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
   '/app/drivers/$driverId': typeof AppDriversDriverIdRoute
+  '/app/finance/pnl': typeof AppFinancePnlRoute
   '/app/finance/receivables': typeof AppFinanceReceivablesRoute
   '/app/trips/$tripId': typeof AppTripsTripIdRoute
   '/app/vehicles/$vehicleId': typeof AppVehiclesVehicleIdRoute
@@ -626,6 +634,7 @@ export interface FileRoutesById {
   '/app/bookings/new': typeof AppBookingsNewRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
   '/app/drivers/$driverId': typeof AppDriversDriverIdRoute
+  '/app/finance/pnl': typeof AppFinancePnlRoute
   '/app/finance/receivables': typeof AppFinanceReceivablesRoute
   '/app/trips/$tripId': typeof AppTripsTripIdRoute
   '/app/vehicles/$vehicleId': typeof AppVehiclesVehicleIdRoute
@@ -700,6 +709,7 @@ export interface FileRouteTypes {
     | '/app/bookings/new'
     | '/app/clients/$clientId'
     | '/app/drivers/$driverId'
+    | '/app/finance/pnl'
     | '/app/finance/receivables'
     | '/app/trips/$tripId'
     | '/app/vehicles/$vehicleId'
@@ -770,6 +780,7 @@ export interface FileRouteTypes {
     | '/app/bookings/new'
     | '/app/clients/$clientId'
     | '/app/drivers/$driverId'
+    | '/app/finance/pnl'
     | '/app/finance/receivables'
     | '/app/trips/$tripId'
     | '/app/vehicles/$vehicleId'
@@ -842,6 +853,7 @@ export interface FileRouteTypes {
     | '/app/bookings/new'
     | '/app/clients/$clientId'
     | '/app/drivers/$driverId'
+    | '/app/finance/pnl'
     | '/app/finance/receivables'
     | '/app/trips/$tripId'
     | '/app/vehicles/$vehicleId'
@@ -1249,6 +1261,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDriversDriverIdRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/finance/pnl': {
+      id: '/app/finance/pnl'
+      path: '/finance/pnl'
+      fullPath: '/app/finance/pnl'
+      preLoaderRoute: typeof AppFinancePnlRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/app/finance/receivables': {
       id: '/app/finance/receivables'
       path: '/finance/receivables'
@@ -1416,6 +1435,7 @@ interface AppRouteRouteChildren {
   AppBookingsNewRoute: typeof AppBookingsNewRoute
   AppClientsClientIdRoute: typeof AppClientsClientIdRoute
   AppDriversDriverIdRoute: typeof AppDriversDriverIdRoute
+  AppFinancePnlRoute: typeof AppFinancePnlRoute
   AppFinanceReceivablesRoute: typeof AppFinanceReceivablesRoute
   AppTripsTripIdRoute: typeof AppTripsTripIdRoute
   AppVehiclesVehicleIdRoute: typeof AppVehiclesVehicleIdRoute
@@ -1461,6 +1481,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppBookingsNewRoute: AppBookingsNewRoute,
   AppClientsClientIdRoute: AppClientsClientIdRoute,
   AppDriversDriverIdRoute: AppDriversDriverIdRoute,
+  AppFinancePnlRoute: AppFinancePnlRoute,
   AppFinanceReceivablesRoute: AppFinanceReceivablesRoute,
   AppTripsTripIdRoute: AppTripsTripIdRoute,
   AppVehiclesVehicleIdRoute: AppVehiclesVehicleIdRoute,
