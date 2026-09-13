@@ -1,13 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Truck } from "lucide-react";
+import { Sparkles, Truck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/domain/auth";
+import { startDemoSession } from "@/domain/guard";
 import { homeRouteFor } from "@/domain/rbac";
 import { ThemeToggle } from "@/domain/theme";
 
@@ -70,13 +70,26 @@ function AuthPage() {
   };
 
   const google = async () => {
-    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
-    if (result.error) {
-      toast.error("Google sign-in failed", { description: String(result.error) });
-      return;
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin + "/auth",
+      },
+    });
+    if (error) {
+      toast.error("Google sign-in failed", { description: error.message });
     }
-    if (result.redirected) return;
-    navigate({ to: homeRouteFor(roles) });
+  };
+
+  const demoLogin = (personaId = "u_owner") => {
+    startDemoSession();
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("marichifleet.persona", personaId);
+    }
+    toast.success("Demo Mode Activated", {
+      description: "Signed in as Director with full system access.",
+    });
+    navigate({ to: "/app/dashboard" });
   };
 
   return (
@@ -143,7 +156,42 @@ function AuthPage() {
           </form>
         )}
 
-        <Button variant="outline" className="mt-3" onClick={google} type="button">
+        <div className="relative my-4">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-border" />
+          </div>
+          <div className="relative flex justify-center text-[10px] font-semibold uppercase tracking-wider">
+            <span className="bg-background px-2 text-muted-foreground">Demo / Instant Access</span>
+          </div>
+        </div>
+
+        <Button
+          variant="secondary"
+          className="w-full gap-2 border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary font-medium"
+          onClick={() => demoLogin("u_owner")}
+          type="button"
+        >
+          <Sparkles className="size-4" />
+          Demo Login (Bypass Auth)
+        </Button>
+
+        <div className="mt-2 flex items-center justify-between px-0.5 text-xs text-muted-foreground">
+          <span>Explore with full seeded data</span>
+          <Link to="/login" className="text-primary hover:underline font-medium">
+            Switch Demo Role →
+          </Link>
+        </div>
+
+        <div className="relative my-4">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-border" />
+          </div>
+          <div className="relative flex justify-center text-[10px] font-semibold uppercase tracking-wider">
+            <span className="bg-background px-2 text-muted-foreground">Or</span>
+          </div>
+        </div>
+
+        <Button variant="outline" className="w-full" onClick={google} type="button">
           Continue with Google
         </Button>
 

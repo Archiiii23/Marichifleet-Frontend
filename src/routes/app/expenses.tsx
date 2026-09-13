@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { EmptyState, KpiCard, PageHeader, Panel, StatusBadge } from "@/components/mf/primitives";
+import { EmptyState, KpiCard, NoAccess, PageHeader, Panel, StatusBadge } from "@/components/mf/primitives";
+import { Amount, toMoney } from "@/components/mf/amount";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { getExtras } from "@/domain/extras";
-import { fmtDate, money, moneyCompact, useAction, useDb } from "@/domain/hooks";
+import { fmtDate, useAction, useDb } from "@/domain/hooks";
 import { advanceExpense, getPrd, issueCreditNote, recordExpense, type Expense } from "@/domain/prd";
 import { useSession } from "@/domain/session";
 
@@ -16,9 +17,9 @@ const CATEGORIES: Expense["category"][] = ["Fuel", "Toll", "Repairs", "Parts", "
 export const Route = createFileRoute("/app/expenses")({
   head: () => ({
     meta: [
-      { title: "Expenses & credit notes — MarichiFleet" },
+      { title: "Expenses & Credit Notes — MarichiFleet" },
       { name: "description", content: "Operating expense ledger, vendor payables and credit notes raised against client invoices." },
-      { property: "og:title", content: "Expenses & credit notes — MarichiFleet" },
+      { property: "og:title", content: "Expenses & Credit Notes — MarichiFleet" },
       { property: "og:description", content: "Track what the fleet spends and what has been credited back to clients." },
     ],
   }),
@@ -30,7 +31,7 @@ function Expenses() {
   const prd = getPrd();
   const extras = getExtras();
   const run = useAction();
-  const { persona } = useSession();
+  const { persona, can, approvalLimits } = useSession();
 
   const [category, setCategory] = useState<Expense["category"]>("Repairs");
   const [amount, setAmount] = useState(0);
@@ -40,6 +41,10 @@ function Expenses() {
   const [invoiceId, setInvoiceId] = useState(db.invoices[0]?.id ?? "");
   const [cnAmount, setCnAmount] = useState(0);
   const [reason, setReason] = useState("");
+
+  if (!can("expenses:read") && !can("view_finance")) {
+    return <NoAccess what="expenses and credit notes" />;
+  }
 
   const totals = useMemo(() => {
     const total = prd.expenses.reduce((s, e) => s + e.amount, 0);
@@ -52,22 +57,59 @@ function Expenses() {
   const vendorName = (id?: string) => extras.vendors.find((v) => v.id === id)?.name ?? "—";
   const invoiceRef = (id: string) => db.invoices.find((i) => i.id === id)?.ref ?? id;
 
+  // Max expense approval limit in rupees
+  const maxApprovalRupees = approvalLimits ? approvalLimits.expense / 100 : Infinity;
+
   return (
     <>
       <PageHeader
-        title="Expenses & credit notes"
-        subtitle="The cost side of the ledger: operating expenses, vendor payables, and credits issued against disputed invoices."
+        title="Expenses & Credit Notes"
+        subtitle="Operating costs, maintenance settlements, fuel disbursements, and credits against disputed invoices."
       />
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <KpiCard label="Expenses booked" value={moneyCompact(totals.total)} hint="All categories" />
-        <KpiCard label="Awaiting payment" value={moneyCompact(totals.unpaid)} tone={totals.unpaid > 0 ? "warning" : "success"} hint="Recorded and approved" />
-        <KpiCard label="Credit notes" value={moneyCompact(totals.credited)} hint={`${prd.creditNotes.length} issued`} />
-        <KpiCard label="Net position" value={moneyCompact(totals.profit)} tone={totals.profit >= 0 ? "success" : "danger"} hint="Invoiced revenue less credits and expenses" />
+        <div className="rounded-lg border border-border bg-card p-4">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Expenses Booked</span>
+          <div className="mt-2 text-2xl font-bold tracking-tight">
+            <Amount value={toMoney(totals.total)} />
+          </div>
+          <p className="mt-1 text-[11px] text-muted-foreground">All cost categories</p>
+        </div>
+
+        <div className="rounded-lg border border-border bg-card p-4">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Awaiting Payment</span>
+          <div className="mt-2 text-2xl font-bold tracking-tight text-warning">
+            <Amount value={toMoney(totals.unpaid)} />
+          </div>
+          <p className="mt-1 text-[11px] text-muted-foreground">Approved payables in queue</p>
+        </div>
+
+        <div className="rounded-lg border border-border bg-card p-4">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Credit Notes</span>
+          <div className="mt-2 text-2xl font-bold tracking-tight">
+            <Amount value={toMoney(totals.credited)} />
+          </div>
+          <p className="mt-1 text-[11px] text-muted-foreground">{prd.creditNotes.length} credit notes issued</p>
+        </div>
+
+        <div className="rounded-lg border border-border bg-card p-4">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Net Operating Margin</span>
+          <div className={`mt-2 text-2xl font-bold tracking-tight ${totals.profit >= 0 ? "text-emerald-500" : "text-destructive"}`}>
+            <Amount value={toMoney(totals.profit)} />
+          </div>
+          <p className="mt-1 text-[11px] text-muted-foreground">Billed revenue less credits & costs</p>
+        </div>
       </div>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
-        <Panel title="Record an expense">
+        <Panel
+          title="Record Operating Expense"
+          description={
+            approvalLimits?.expense
+              ? `Your role approval limit: ₹${(approvalLimits.expense / 100).toLocaleString("en-IN")}`
+              : "Direct cost entry into general ledger"
+          }
+        >
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="text-sm">
               <span className="mb-1 block text-xs text-muted-foreground">Category</span>
@@ -79,22 +121,22 @@ function Expenses() {
               </Select>
             </label>
             <label className="text-sm">
-              <span className="mb-1 block text-xs text-muted-foreground">Vendor (optional)</span>
+              <span className="mb-1 block text-xs text-muted-foreground">Vendor / Workshop</span>
               <Select value={vendorId} onValueChange={setVendorId}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">No vendor</SelectItem>
+                  <SelectItem value="none">Direct expense (No vendor)</SelectItem>
                   {extras.vendors.map((v) => <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>)}
                 </SelectContent>
               </Select>
             </label>
             <label className="text-sm">
-              <span className="mb-1 block text-xs text-muted-foreground">Amount</span>
+              <span className="mb-1 block text-xs text-muted-foreground">Amount (₹)</span>
               <Input type="number" min={0} value={amount} onChange={(e) => setAmount(Number(e.target.value))} />
             </label>
             <label className="text-sm">
-              <span className="mb-1 block text-xs text-muted-foreground">Description</span>
-              <Input value={note} onChange={(e) => setNote(e.target.value)} placeholder="What was this for?" />
+              <span className="mb-1 block text-xs text-muted-foreground">Description / Voucher Note</span>
+              <Input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Trip ref, fuel slip, parts info…" />
             </label>
           </div>
           <Button
@@ -112,26 +154,28 @@ function Expenses() {
           </Button>
         </Panel>
 
-        <Panel title="Issue a credit note" description="Credits reduce the outstanding balance on the client invoice.">
+        <Panel title="Issue a Credit Note" description="Credits reduce the outstanding balance on the client invoice.">
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="text-sm sm:col-span-2">
-              <span className="mb-1 block text-xs text-muted-foreground">Invoice</span>
+              <span className="mb-1 block text-xs text-muted-foreground">Target Invoice</span>
               <Select value={invoiceId} onValueChange={setInvoiceId}>
-                <SelectTrigger><SelectValue placeholder="Invoice" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Select invoice" /></SelectTrigger>
                 <SelectContent>
                   {db.invoices.map((i) => (
-                    <SelectItem key={i.id} value={i.id}>{i.ref} · {money(i.total - i.paid)} outstanding</SelectItem>
+                    <SelectItem key={i.id} value={i.id}>
+                      {i.ref} · ₹{(i.total - i.paid).toLocaleString("en-IN")} outstanding
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </label>
             <label className="text-sm">
-              <span className="mb-1 block text-xs text-muted-foreground">Amount</span>
+              <span className="mb-1 block text-xs text-muted-foreground">Credit Amount (₹)</span>
               <Input type="number" min={0} value={cnAmount} onChange={(e) => setCnAmount(Number(e.target.value))} />
             </label>
             <label className="text-sm">
-              <span className="mb-1 block text-xs text-muted-foreground">Reason</span>
-              <Input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Why is this credited?" />
+              <span className="mb-1 block text-xs text-muted-foreground">Reason for Credit</span>
+              <Input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Shortage, demurrage waiver, damage…" />
             </label>
           </div>
           <Button
@@ -151,16 +195,16 @@ function Expenses() {
               <li key={c.id} className="flex items-center justify-between gap-3 py-2">
                 <div className="min-w-0">
                   <p className="numeric text-xs text-muted-foreground">{c.ref} · {invoiceRef(c.invoiceId)}</p>
-                  <p className="truncate">{c.reason}</p>
+                  <p className="truncate font-medium">{c.reason}</p>
                 </div>
-                <span className="numeric shrink-0">{money(c.amount)}</span>
+                <Amount value={toMoney(c.amount)} className="font-semibold text-destructive shrink-0" />
               </li>
             ))}
           </ul>
         </Panel>
       </div>
 
-      <Panel className="mt-4" title="Expense ledger">
+      <Panel className="mt-4" title="Expense & Disbursement Ledger">
         {prd.expenses.length === 0 ? (
           <EmptyState title="Nothing booked yet" message="Recorded expenses appear here with their approval status." />
         ) : (
@@ -168,33 +212,48 @@ function Expenses() {
             <table className="w-full min-w-[720px] text-sm">
               <thead>
                 <tr className="border-b border-border text-left text-[11px] uppercase tracking-wider text-muted-foreground">
-                  <th className="py-2 pr-3">Date</th>
-                  <th className="py-2 pr-3">Category</th>
-                  <th className="py-2 pr-3">Description</th>
-                  <th className="py-2 pr-3">Vendor</th>
-                  <th className="py-2 pr-3">Amount</th>
-                  <th className="py-2 pr-3">Status</th>
-                  <th className="py-2" />
+                  <th className="py-2.5 pr-3">Date</th>
+                  <th className="py-2.5 pr-3">Category</th>
+                  <th className="py-2.5 pr-3">Description</th>
+                  <th className="py-2.5 pr-3">Vendor</th>
+                  <th className="py-2.5 pr-3">Amount</th>
+                  <th className="py-2.5 pr-3">Status</th>
+                  <th className="py-2.5 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody>
-                {prd.expenses.map((e) => (
-                  <tr key={e.id} className="border-b border-border/60">
-                    <td className="py-2.5 pr-3 text-muted-foreground">{fmtDate(e.atISO)}</td>
-                    <td className="py-2.5 pr-3">{e.category}</td>
-                    <td className="py-2.5 pr-3">{e.note}</td>
-                    <td className="py-2.5 pr-3 text-muted-foreground">{vendorName(e.vendorId)}</td>
-                    <td className="numeric py-2.5 pr-3">{money(e.amount)}</td>
-                    <td className="py-2.5 pr-3"><StatusBadge status={e.status} /></td>
-                    <td className="py-2.5">
-                      {e.status !== "paid" && (
-                        <Button size="sm" variant="outline" onClick={() => run(() => advanceExpense(e.id, persona.name), "Expense updated.")}>
-                          {e.status === "recorded" ? "Approve" : "Mark paid"}
-                        </Button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+              <tbody className="divide-y divide-border/60">
+                {prd.expenses.map((e) => {
+                  const canAct = e.amount <= maxApprovalRupees;
+                  return (
+                    <tr key={e.id} className="hover:bg-surface/40 transition-colors">
+                      <td className="py-2.5 pr-3 text-muted-foreground text-xs">{fmtDate(e.atISO)}</td>
+                      <td className="py-2.5 pr-3">
+                        <span className="rounded bg-surface px-1.5 py-0.5 text-xs font-medium">
+                          {e.category}
+                        </span>
+                      </td>
+                      <td className="py-2.5 pr-3 font-medium">{e.note}</td>
+                      <td className="py-2.5 pr-3 text-muted-foreground text-xs">{vendorName(e.vendorId)}</td>
+                      <td className="numeric py-2.5 pr-3">
+                        <Amount value={toMoney(e.amount)} className="font-medium" />
+                      </td>
+                      <td className="py-2.5 pr-3"><StatusBadge status={e.status} /></td>
+                      <td className="py-2.5 text-right">
+                        {e.status !== "paid" && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={!canAct}
+                            title={!canAct ? `Amount exceeds your approval limit of ₹${maxApprovalRupees.toLocaleString("en-IN")}` : undefined}
+                            onClick={() => run(() => advanceExpense(e.id, persona.name), "Expense updated.")}
+                          >
+                            {e.status === "recorded" ? "Approve" : "Mark paid"}
+                          </Button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

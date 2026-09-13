@@ -652,6 +652,29 @@ export function sendInvoice(invoiceId: string, actor: string): ActionResult {
   return { ok: true, id: inv.id };
 }
 
+export function generateEInvoice(invoiceId: string, actor: string): ActionResult {
+  const d = getDb();
+  const inv = byId(d.invoices, invoiceId);
+  if (!inv) return { ok: false, reason: "Invoice not found." };
+  
+  // Generate deterministic 64-char hex IRN from invoice ID and tenant
+  const chars = "0123456789abcdef";
+  let fakeHex = "";
+  for (let i = 0; i < 64; i++) {
+    fakeHex += chars[(inv.id.charCodeAt(i % inv.id.length) * 31 + i * 7) % 16];
+  }
+  
+  inv.irn = fakeHex;
+  inv.ackNo = `1224${Math.floor(1000000000 + Math.random() * 9000000000)}`;
+  inv.ackDateISO = now();
+  inv.sacCode = "996511";
+  inv.rcm = false;
+  inv.qrCodeData = `NIC-IRP:GSTIN:${d.tenant.name.slice(0, 5).toUpperCase()}:IRN:${inv.irn}:DOC:${inv.ref}:VAL:${inv.total}:ACK:${inv.ackNo}`;
+  
+  audit(actor, "Generated e-Invoice IRN & Signed QR Code", "invoice", inv.id);
+  return { ok: true, id: inv.id };
+}
+
 export function recordPayment(invoiceId: string, amount: number, mode: "NEFT" | "UPI" | "Cheque" | "Cash", reference: string, actor: string): ActionResult {
   const d = getDb();
   const inv = byId(d.invoices, invoiceId);

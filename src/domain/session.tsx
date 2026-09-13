@@ -1,58 +1,75 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import type { Role } from "./types";
+import type { LegacyCapability, Permission, Role } from "./types";
+import { can as rbacCan, canAny as rbacCanAny, roleLabel as rbacRoleLabel, roleLandingRoute, APPROVAL_LIMITS, type ApprovalLimits } from "./rbac";
 
+/* ------------------------------------------------------------------ */
+/* Persona — a demo user for each of the 17 roles                     */
+/* ------------------------------------------------------------------ */
 export interface Persona {
   id: string;
   name: string;
   role: Role;
   title: string;
-  /** driver personas map to a seeded driver, client personas to a seeded client */
+  branchScope?: string[];
+  /** driver personas map to a seeded driver */
   driverId?: string;
+  /** customer personas map to a seeded client */
   clientId?: string;
 }
 
 export const PERSONAS: Persona[] = [
+  // ── Platform ──
+  { id: "u_platform_admin", name: "Raj Kapoor", role: "platform_admin", title: "Platform Admin" },
+  { id: "u_platform_support", name: "Sneha Mishra", role: "platform_support", title: "Platform Support" },
+
+  // ── Tenant leadership ──
   { id: "u_owner", name: "Aditi Marichi", role: "owner", title: "Director" },
-  { id: "u_manager", name: "Sanjay Deshpande", role: "manager", title: "Operations Manager" },
-  { id: "u_dispatcher", name: "Prisha Kale", role: "dispatcher", title: "Dispatcher" },
-  { id: "u_accountant", name: "Nikhil Bansal", role: "accountant", title: "Accounts Lead" },
-  { id: "u_workshop", name: "Faisal Ahmed", role: "workshop", title: "Workshop Manager" },
-  { id: "u_viewer", name: "Meera Rao", role: "viewer", title: "Read-only Reviewer" },
+  { id: "u_admin", name: "Vikram Shinde", role: "admin", title: "System Admin" },
+
+  // ── Operations ──
+  { id: "u_ops_manager", name: "Sanjay Deshpande", role: "ops_manager", title: "Operations Manager" },
+  { id: "u_branch_manager", name: "Manoj Patil", role: "branch_manager", title: "Branch Manager — Indore", branchScope: ["b_indore"] },
+  { id: "u_dispatcher", name: "Prisha Kale", role: "dispatcher", title: "Dispatcher — Indore", branchScope: ["b_indore"] },
+
+  // ── Finance ──
+  { id: "u_finance_manager", name: "Nikhil Bansal", role: "finance_manager", title: "Finance Manager" },
+  { id: "u_accountant", name: "Deepa Joshi", role: "accountant", title: "Accounts Lead" },
+
+  // ── Workshop ──
+  { id: "u_workshop_manager", name: "Faisal Ahmed", role: "workshop_manager", title: "Workshop Manager", branchScope: ["b_indore"] },
+  { id: "u_storekeeper", name: "Bharat Rane", role: "storekeeper", title: "Storekeeper", branchScope: ["b_indore"] },
+
+  // ── Compliance & HR ──
+  { id: "u_compliance_officer", name: "Kavita Sharma", role: "compliance_officer", title: "Compliance Officer" },
+  { id: "u_hr_payroll", name: "Sunita Verma", role: "hr_payroll", title: "HR & Payroll" },
+
+  // ── Field ──
   { id: "u_driver", name: "Ramesh Yadav", role: "driver", title: "Driver", driverId: "drv_1" },
-  { id: "u_client", name: "Rohit Kulkarni", role: "client", title: "Adarsh Steel Works", clientId: "cli_1" },
+
+  // ── External ──
+  { id: "u_customer", name: "Rohit Kulkarni", role: "customer_user", title: "Adarsh Steel Works", clientId: "cli_1" },
+  { id: "u_vendor", name: "Ajay Tyre Services", role: "vendor_user", title: "Roadside Vendor" },
+
+  // ── Audit ──
+  { id: "u_auditor", name: "Meera Rao", role: "auditor", title: "Statutory Auditor" },
 ];
 
-export type Capability =
-  | "view_operations"
-  | "view_finance"
-  | "edit_finance"
-  | "dispatch"
-  | "edit_fleet"
-  | "edit_booking"
-  | "view_workshop"
-  | "edit_workshop"
-  | "view_admin"
-  | "driver_app"
-  | "client_portal";
-
-const MATRIX: Record<Role, Capability[]> = {
-  owner: [
-    "view_operations", "view_finance", "edit_finance", "dispatch", "edit_fleet",
-    "edit_booking", "view_workshop", "edit_workshop", "view_admin",
-  ],
-  manager: ["view_operations", "view_finance", "dispatch", "edit_fleet", "edit_booking", "view_workshop", "view_admin"],
-  dispatcher: ["view_operations", "dispatch", "edit_booking"],
-  accountant: ["view_operations", "view_finance", "edit_finance"],
-  workshop: ["view_operations", "view_workshop", "edit_workshop", "edit_fleet"],
-  viewer: ["view_operations"],
-  driver: ["driver_app"],
-  client: ["client_portal"],
-};
-
+/* ------------------------------------------------------------------ */
+/* Session context                                                     */
+/* ------------------------------------------------------------------ */
 interface SessionValue {
   persona: Persona;
   setPersona: (id: string) => void;
-  can: (c: Capability) => boolean;
+  /** Check a single permission */
+  can: (perm: Permission | LegacyCapability) => boolean;
+  /** Check if the role has ANY of the given permissions */
+  canAny: (perms: (Permission | LegacyCapability)[]) => boolean;
+  /** Human-readable role label */
+  roleLabel: string;
+  /** Landing route for the current role */
+  landingRoute: string;
+  /** Approval limits for the current role */
+  approvalLimits: ApprovalLimits | undefined;
   ready: boolean;
   online: boolean;
   setOnline: (v: boolean) => void;
@@ -77,7 +94,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     window.localStorage.setItem(KEY, id);
   }, []);
 
-  const persona = PERSONAS.find((p) => p.id === personaId) ?? PERSONAS[2];
+  const persona = PERSONAS.find((p) => p.id === personaId) ?? PERSONAS[6]; // default: dispatcher
 
   const value = useMemo<SessionValue>(
     () => ({
@@ -86,7 +103,11 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       ready,
       online,
       setOnline,
-      can: (c: Capability) => MATRIX[persona.role].includes(c),
+      can: (perm: Permission | LegacyCapability) => rbacCan(persona.role, perm),
+      canAny: (perms: (Permission | LegacyCapability)[]) => rbacCanAny(persona.role, perms),
+      roleLabel: rbacRoleLabel(persona.role),
+      landingRoute: roleLandingRoute(persona.role),
+      approvalLimits: APPROVAL_LIMITS[persona.role],
     }),
     [persona, setPersona, ready, online],
   );
@@ -100,15 +121,5 @@ export function useSession() {
   return v;
 }
 
-export function roleLabel(role: Role) {
-  return {
-    owner: "Owner / Director",
-    manager: "Operations Manager",
-    dispatcher: "Dispatcher",
-    driver: "Driver",
-    accountant: "Accountant",
-    workshop: "Workshop Manager",
-    viewer: "Viewer",
-    client: "Client",
-  }[role];
-}
+/* Re-export roleLabel for use outside hooks */
+export { rbacRoleLabel as roleLabel };

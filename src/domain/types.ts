@@ -1,12 +1,99 @@
-export type Role =
+/* ------------------------------------------------------------------ */
+/* Roles — the full 17-role model from system_design.md s12.3          */
+/* ------------------------------------------------------------------ */
+export type CanonicalRole =
+  | "platform_admin"
+  | "platform_support"
   | "owner"
-  | "manager"
+  | "admin"
+  | "ops_manager"
+  | "branch_manager"
   | "dispatcher"
-  | "driver"
+  | "finance_manager"
   | "accountant"
-  | "workshop"
-  | "viewer"
-  | "client";
+  | "workshop_manager"
+  | "storekeeper"
+  | "compliance_officer"
+  | "hr_payroll"
+  | "driver"
+  | "customer_user"
+  | "vendor_user"
+  | "auditor";
+
+/* Legacy aliases for compatibility with existing store, seed & routes */
+export type LegacyRole = "manager" | "workshop" | "viewer" | "client";
+
+export type Role = CanonicalRole | LegacyRole;
+
+/* Legacy capabilities mapped to new granular permissions */
+export type LegacyCapability =
+  | "view_operations"
+  | "dispatch"
+  | "edit_booking"
+  | "view_finance"
+  | "edit_finance"
+  | "view_workshop"
+  | "edit_workshop"
+  | "edit_fleet"
+  | "view_admin";
+
+/* ------------------------------------------------------------------ */
+/* Money — integer minor units + ISO 4217, never a float (Law 2)       */
+/* ------------------------------------------------------------------ */
+export type Currency = "INR" | "ZMW" | "AED" | "SAR" | "USD";
+
+export interface Money {
+  minor: number;
+  currency: Currency;
+}
+
+/* ------------------------------------------------------------------ */
+/* Permission strings — granular, verb-based                           */
+/* ------------------------------------------------------------------ */
+export type Permission =
+  /* Tower & Dispatch */
+  | "tower:read"
+  | "dispatch:read" | "dispatch:assign" | "dispatch:plan"
+  /* Trips */
+  | "trips:read" | "trips:create" | "trips:reconcile"
+  /* Bookings */
+  | "bookings:read" | "bookings:create"
+  /* POD */
+  | "pod:read" | "pod:approve"
+  /* Incidents */
+  | "incidents:read" | "incidents:vendor"
+  /* Fleet */
+  | "fleet:read" | "fleet:track" | "devices:manage"
+  /* Directory */
+  | "directory:read" | "drivers:read" | "customers:read" | "vendors:read"
+  | "rate_cards:read" | "rate_cards:write" | "geofences:manage"
+  /* Documents & Compliance */
+  | "documents:read" | "documents:manage" | "compliance:read" | "compliance:manage"
+  /* Workshop & Inventory */
+  | "workshop:read" | "workshop:manage" | "inventory:read" | "inventory:manage"
+  /* Finance */
+  | "finance:read" | "billing:draft" | "billing:finalise"
+  | "payments:read" | "payments:apply"
+  | "ledger:read" | "ledger:close"
+  | "expenses:read" | "expenses:approve"
+  /* HR */
+  | "hr:read" | "hr:payroll"
+  /* Approvals */
+  | "approvals:read" | "approvals:decide"
+  /* Automation */
+  | "automation:read" | "automation:configure"
+  /* AI & Comms */
+  | "ai:command" | "comms:read" | "comms:send"
+  /* Analytics */
+  | "analytics:ops" | "analytics:finance" | "analytics:profitability" | "analytics:drivers"
+  /* Admin */
+  | "admin:users" | "admin:branches" | "admin:policies" | "admin:features"
+  /* Audit */
+  | "audit:read"
+  /* Platform */
+  | "platform:tenants" | "platform:impersonate"
+  /* Export */
+  | "exports:request";
 
 export type BookingStatus =
   | "draft"
@@ -223,6 +310,12 @@ export interface Invoice {
   issuedISO?: string;
   dueISO: string;
   createdISO: string;
+  irn?: string;
+  ackNo?: string;
+  ackDateISO?: string;
+  qrCodeData?: string;
+  rcm?: boolean;
+  sacCode?: string;
 }
 
 export interface Payment {

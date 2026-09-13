@@ -393,8 +393,13 @@ export function buildSeed(nowMs: number): DbShape {
           total,
           paid,
           issuedISO: iso(nowMs, ageH + 26),
-          dueISO: iso(nowMs, ageH + 26 + client.creditDays * 24 * (overdue ? 0.2 : 1)),
-          createdISO: iso(nowMs, ageH + 26),
+          dueISO: iso(nowMs, ageH + 26 + client.creditDays * 24),
+          createdISO: iso(nowMs, ageH + 25),
+          irn: i % 2 === 0 ? `8f9a2b1c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e${(9000 + i).toString(16)}` : undefined,
+          ackNo: i % 2 === 0 ? `1224${9012345000 + i}` : undefined,
+          ackDateISO: i % 2 === 0 ? iso(nowMs, ageH + 26) : undefined,
+          sacCode: "996511",
+          rcm: false,
         };
         invoices.push(invoice);
         booking.invoiceId = invId;

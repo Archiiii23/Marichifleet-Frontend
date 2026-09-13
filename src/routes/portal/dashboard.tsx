@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { KpiCard, Panel, StatusBadge } from "@/components/mf/primitives";
+import { Amount, toMoney } from "@/components/mf/amount";
 import { Button } from "@/components/ui/button";
-import { fmtDateTime, inr, inrCompact, useDb } from "@/domain/hooks";
+import { fmtDateTime, useDb } from "@/domain/hooks";
 import { useSession } from "@/domain/session";
 import { invoiceOutstanding } from "@/domain/store";
 
@@ -39,7 +40,13 @@ function PortalDashboard() {
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <KpiCard label="In transit" value={String(live.length)} hint="Moving right now" tone="info" to="/portal/bookings" />
         <KpiCard label="Total bookings" value={String(bookings.length)} hint="All time" to="/portal/bookings" />
-        <KpiCard label="Outstanding" value={inrCompact(outstanding)} hint={`${invoices.length} invoices`} to="/portal/invoices" />
+        <div className="rounded-lg border border-border bg-card p-4">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Outstanding</span>
+          <div className="mt-2 text-2xl font-bold tracking-tight">
+            <Amount value={toMoney(outstanding)} />
+          </div>
+          <p className="mt-1 text-[11px] text-muted-foreground">{invoices.length} invoices</p>
+        </div>
         <KpiCard label="Delivered" value={String(bookings.filter((b) => ["pod_received", "invoiced", "paid", "closed"].includes(b.status)).length)} tone="success" />
       </div>
 
@@ -73,7 +80,9 @@ function PortalDashboard() {
               <Link to="/portal/invoices/$invoiceId" params={{ invoiceId: i.id }} className="numeric text-primary hover:underline">
                 {i.ref}
               </Link>
-              <span className="numeric ml-auto">{inr(i.total)}</span>
+              <div className="ml-auto">
+                <Amount value={toMoney(i.total)} className="font-medium" />
+              </div>
               <StatusBadge status={i.status} />
             </li>
           ))}

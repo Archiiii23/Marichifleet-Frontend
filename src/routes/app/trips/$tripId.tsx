@@ -3,11 +3,13 @@ import { CheckCircle2, Circle } from "lucide-react";
 import { useState } from "react";
 import { FleetMap } from "@/components/mf/fleet-map";
 import { Metric, PageHeader, Panel, StatusBadge } from "@/components/mf/primitives";
+import { Amount, toMoney } from "@/components/mf/amount";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { fmtDateTime, inr, timeAgo, useAction, useDb } from "@/domain/hooks";
+import { fmtDateTime, timeAgo, useAction, useDb } from "@/domain/hooks";
 import { useSession } from "@/domain/session";
+import { canSeeField } from "@/domain/rbac";
 import {
   completeCheckpoint, markDelivered, reportException, resumeTrip, startTrip, tripProfit,
 } from "@/domain/store";
@@ -135,11 +137,57 @@ function TripDetail() {
         <div className="space-y-4">
           <Panel title="Trip economics">
             <div className="grid grid-cols-2 gap-4">
-              <Metric label="Revenue" value={inr(t.revenue)} />
-              <Metric label="Fuel" value={inr(t.fuelCost)} />
-              <Metric label="Tolls" value={inr(t.tollCost)} />
-              <Metric label="Driver cost" value={inr(t.driverCost)} />
-              <Metric label="Contribution" value={inr(tripProfit(t))} tone="success" />
+              <Metric
+                label="Revenue"
+                value={
+                  canSeeField(persona.role, "trip.freightAmountMinor") ? (
+                    <Amount value={toMoney(t.revenue)} />
+                  ) : (
+                    <Amount value={undefined} />
+                  )
+                }
+              />
+              <Metric
+                label="Fuel"
+                value={
+                  canSeeField(persona.role, "trip.costs") ? (
+                    <Amount value={toMoney(t.fuelCost)} />
+                  ) : (
+                    <Amount value={undefined} />
+                  )
+                }
+              />
+              <Metric
+                label="Tolls"
+                value={
+                  canSeeField(persona.role, "trip.costs") ? (
+                    <Amount value={toMoney(t.tollCost)} />
+                  ) : (
+                    <Amount value={undefined} />
+                  )
+                }
+              />
+              <Metric
+                label="Driver cost"
+                value={
+                  canSeeField(persona.role, "trip.costs") ? (
+                    <Amount value={toMoney(t.driverCost)} />
+                  ) : (
+                    <Amount value={undefined} />
+                  )
+                }
+              />
+              <Metric
+                label="Contribution"
+                value={
+                  canSeeField(persona.role, "trip.marginMinor") ? (
+                    <Amount value={toMoney(tripProfit(t))} />
+                  ) : (
+                    <Amount value={undefined} />
+                  )
+                }
+                tone="success"
+              />
               <Metric label="Delay" value={`${t.delayMins} min`} tone={t.delayMins > 30 ? "warning" : undefined} />
             </div>
           </Panel>

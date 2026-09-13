@@ -1,9 +1,10 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Activity, BadgeIndianRupee, BarChart3, Bell, Boxes, Building2, ClipboardCheck,
-  Command as CommandIcon, Fuel, Handshake, LayoutDashboard, LogOut, Map, MessageSquare, Package,
+  Command as CommandIcon, FileText, Fuel, Handshake, LayoutDashboard, LogOut, Map, MessageSquare, Package,
   Radio, Settings, ShieldCheck, Truck, Users, UsersRound, Warehouse, Wrench,
-  UserCircle2, Menu, TriangleAlert, TrendingUp,
+  UserCircle2, Menu, TriangleAlert, TrendingUp, Wifi, WifiOff, Zap,
+  Search, BookOpen, CircleDot, Scale, Factory, Globe,
 } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
@@ -19,98 +20,131 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/s
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { endDemoSession } from "@/domain/guard";
 import { useDb, timeAgo } from "@/domain/hooks";
-
-import { PERSONAS, roleLabel, useSession, type Capability } from "@/domain/session";
+import { PERSONAS, useSession } from "@/domain/session";
+import { roleLabel } from "@/domain/rbac";
+import { roleLandingRoute } from "@/domain/rbac";
 import { tickSimulation, bump } from "@/domain/store";
 import { ThemeToggle } from "@/domain/theme";
 import { cn } from "@/lib/utils";
 import { StatusBadge } from "./primitives";
+import type { Permission } from "@/domain/types";
 
+/* ------------------------------------------------------------------ */
+/* Navigation config — permission-gated, matching frontend.md s4.1-4.3 */
+/* ------------------------------------------------------------------ */
 interface NavItem {
   to: string;
   label: string;
   icon: typeof Truck;
-  cap: Capability;
+  perm: Permission;
 }
 
 const NAV: Array<{ group: string; items: NavItem[] }> = [
   {
     group: "Overview",
     items: [
-      { to: "/app/tower", label: "Control Tower", icon: Radio, cap: "view_operations" },
-      { to: "/app/dashboard", label: "Daily Briefing", icon: LayoutDashboard, cap: "view_operations" },
-      { to: "/app/approvals", label: "Approvals", icon: ClipboardCheck, cap: "view_operations" },
+      { to: "/app/tower", label: "Control Tower", icon: Radio, perm: "tower:read" },
+      { to: "/app/dashboard", label: "Daily Briefing", icon: LayoutDashboard, perm: "analytics:ops" },
+      { to: "/app/approvals", label: "Approvals", icon: ClipboardCheck, perm: "approvals:read" },
     ],
   },
   {
     group: "Operations",
     items: [
-      { to: "/app/bookings", label: "Bookings", icon: Package, cap: "view_operations" },
-      { to: "/app/dispatch", label: "Dispatch Board", icon: Radio, cap: "view_operations" },
-      { to: "/app/tracking", label: "Live Fleet", icon: Map, cap: "view_operations" },
-      { to: "/app/geofences", label: "Geofences", icon: Map, cap: "view_operations" },
-      { to: "/app/trips", label: "Trips", icon: Activity, cap: "view_operations" },
-      { to: "/app/playback", label: "Trip Playback", icon: Activity, cap: "view_operations" },
-      { to: "/app/incidents", label: "Incident Desk", icon: TriangleAlert, cap: "view_operations" },
-      { to: "/app/pod", label: "Proof of Delivery", icon: ClipboardCheck, cap: "view_operations" },
+      { to: "/app/dispatch", label: "Dispatch Board", icon: Radio, perm: "dispatch:read" },
+      { to: "/app/bookings", label: "Bookings", icon: Package, perm: "bookings:read" },
+      { to: "/app/trips", label: "Trips", icon: Activity, perm: "trips:read" },
+      { to: "/app/tracking", label: "Live Fleet", icon: Map, perm: "fleet:read" },
+      { to: "/app/geofences", label: "Geofences", icon: CircleDot, perm: "geofences:manage" },
+      { to: "/app/playback", label: "Trip Replay", icon: Activity, perm: "fleet:track" },
+      { to: "/app/incidents", label: "Incidents", icon: TriangleAlert, perm: "incidents:read" },
+      { to: "/app/pod", label: "POD Review", icon: ClipboardCheck, perm: "pod:read" },
     ],
   },
   {
     group: "Fleet",
     items: [
-      { to: "/app/vehicles", label: "Vehicles", icon: Truck, cap: "view_operations" },
-      { to: "/app/drivers", label: "Drivers", icon: Users, cap: "view_operations" },
-      { to: "/app/fuel", label: "Fuel", icon: Fuel, cap: "view_operations" },
-      { to: "/app/workshop", label: "Workshop", icon: Wrench, cap: "view_workshop" },
-      { to: "/app/compliance", label: "Compliance", icon: ShieldCheck, cap: "view_operations" },
+      { to: "/app/vehicles", label: "Vehicles", icon: Truck, perm: "fleet:read" },
+      { to: "/app/drivers", label: "Drivers", icon: Users, perm: "drivers:read" },
+      { to: "/app/fuel", label: "Fuel", icon: Fuel, perm: "expenses:read" },
     ],
   },
   {
-    group: "Supply chain",
+    group: "Directory",
     items: [
-      { to: "/app/inventory", label: "Spare Parts", icon: Warehouse, cap: "view_operations" },
-      { to: "/app/purchase-orders", label: "Purchase Orders", icon: Package, cap: "view_operations" },
-      { to: "/app/vendors", label: "Vendors", icon: Handshake, cap: "view_operations" },
+      { to: "/app/clients", label: "Customers", icon: Boxes, perm: "customers:read" },
+      { to: "/app/vendors", label: "Vendors", icon: Handshake, perm: "vendors:read" },
     ],
   },
   {
-    group: "Commercial",
+    group: "Workshop",
     items: [
-      { to: "/app/clients", label: "Clients", icon: Boxes, cap: "view_operations" },
-      { to: "/app/finance/invoices/", label: "Invoices", icon: BadgeIndianRupee, cap: "view_finance" },
-      { to: "/app/finance/receivables", label: "Receivables", icon: BadgeIndianRupee, cap: "view_finance" },
-      { to: "/app/expenses", label: "Expenses & Credits", icon: BadgeIndianRupee, cap: "view_finance" },
-      { to: "/app/ledger", label: "Ledger", icon: BadgeIndianRupee, cap: "view_finance" },
-      { to: "/app/finance/pnl", label: "Profit & Loss", icon: TrendingUp, cap: "view_finance" },
-      { to: "/app/reports", label: "Reports", icon: BarChart3, cap: "view_operations" },
-      { to: "/app/report-builder", label: "Report Builder", icon: BarChart3, cap: "view_operations" },
+      { to: "/app/workshop", label: "Job Cards", icon: Wrench, perm: "workshop:read" },
+      { to: "/app/inventory", label: "Spare Parts", icon: Warehouse, perm: "inventory:read" },
     ],
   },
   {
-    group: "Organisation",
+    group: "Finance",
     items: [
-      { to: "/app/hr", label: "People & Payroll", icon: UsersRound, cap: "view_admin" },
-      { to: "/app/conversations", label: "Conversations", icon: MessageSquare, cap: "view_operations" },
-      { to: "/app/communications", label: "Message Log", icon: MessageSquare, cap: "view_operations" },
-      { to: "/app/automation", label: "Automation", icon: Activity, cap: "view_operations" },
-      { to: "/app/alerts", label: "Alert Preferences", icon: Bell, cap: "view_admin" },
-      { to: "/app/roles", label: "Users & Roles", icon: UsersRound, cap: "view_admin" },
-      { to: "/app/audit", label: "Audit Log", icon: ShieldCheck, cap: "view_admin" },
-      { to: "/app/subscription", label: "Subscription", icon: Building2, cap: "view_admin" },
-      { to: "/app/settings", label: "Settings", icon: Settings, cap: "view_admin" },
-      { to: "/admin", label: "Platform Admin", icon: Building2, cap: "view_admin" },
+      { to: "/app/finance/invoices/", label: "Invoices", icon: BadgeIndianRupee, perm: "finance:read" },
+      { to: "/app/finance/receivables", label: "Receivables", icon: BadgeIndianRupee, perm: "finance:read" },
+      { to: "/app/expenses", label: "Expenses", icon: BadgeIndianRupee, perm: "expenses:read" },
+      { to: "/app/ledger", label: "Ledger", icon: BookOpen, perm: "ledger:read" },
+      { to: "/app/finance/pnl", label: "Profit & Loss", icon: TrendingUp, perm: "analytics:profitability" },
+    ],
+  },
+  {
+    group: "Compliance",
+    items: [
+      { to: "/app/compliance", label: "Compliance", icon: ShieldCheck, perm: "compliance:read" },
+    ],
+  },
+  {
+    group: "Analytics",
+    items: [
+      { to: "/app/reports", label: "Reports", icon: BarChart3, perm: "analytics:ops" },
+    ],
+  },
+  {
+    group: "People",
+    items: [
+      { to: "/app/hr", label: "HR & Payroll", icon: UsersRound, perm: "hr:read" },
+    ],
+  },
+  {
+    group: "Communication",
+    items: [
+      { to: "/app/conversations", label: "WhatsApp Inbox", icon: MessageSquare, perm: "comms:read" },
+      { to: "/app/automation", label: "Automation", icon: Zap, perm: "automation:read" },
+    ],
+  },
+  {
+    group: "Administration",
+    items: [
+      { to: "/app/roles", label: "Users & Roles", icon: UsersRound, perm: "admin:users" },
+      { to: "/app/settings", label: "Settings", icon: Settings, perm: "admin:policies" },
+      { to: "/app/audit", label: "Audit Log", icon: ShieldCheck, perm: "audit:read" },
+      { to: "/admin", label: "Platform Admin", icon: Globe, perm: "platform:tenants" },
     ],
   },
 ];
 
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const { persona, setPersona, can } = useSession();
+  const { persona, setPersona, can, roleLabel: currentRoleLabel, landingRoute, online, setOnline } = useSession();
   const db = useDb();
+  const [selectedBranchId, setSelectedBranchId] = useState<string | null>(
+    persona.branchScope?.[0] ?? null,
+  );
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [mobileNav, setMobileNav] = useState(false);
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  const activeBranch = useMemo(
+    () => db.branches.find((b) => b.id === selectedBranchId) ?? null,
+    [db.branches, selectedBranchId],
+  );
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -131,8 +165,9 @@ export function AppShell({ children }: { children: ReactNode }) {
     return () => window.clearInterval(t);
   }, []);
 
+  // Filter nav by permissions — only show items the role can access
   const groups = useMemo(
-    () => NAV.map((g) => ({ ...g, items: g.items.filter((i) => can(i.cap)) })).filter((g) => g.items.length),
+    () => NAV.map((g) => ({ ...g, items: g.items.filter((i) => can(i.perm)) })).filter((g) => g.items.length),
     [can],
   );
 
@@ -205,6 +240,49 @@ export function AppShell({ children }: { children: ReactNode }) {
             <kbd className="ml-auto hidden rounded border border-border px-1.5 py-0.5 text-[10px] md:inline">⌘K</kbd>
           </button>
 
+          {/* Branch switcher */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="hidden h-9 items-center gap-1.5 px-2.5 text-xs md:flex">
+                <Building2 className="size-3.5 text-muted-foreground" aria-hidden />
+                <span className="max-w-[120px] truncate font-medium">
+                  {activeBranch ? activeBranch.name : "All Branches"}
+                </span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-52">
+              <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                Operating Branch
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setSelectedBranchId(null)}>
+                <span className="flex-1">All Branches (Global)</span>
+                {!selectedBranchId && <span className="text-[10px] text-primary">Active</span>}
+              </DropdownMenuItem>
+              {db.branches.map((b) => (
+                <DropdownMenuItem key={b.id} onClick={() => setSelectedBranchId(b.id)}>
+                  <span className="flex-1">{b.name}</span>
+                  {selectedBranchId === b.id && <span className="text-[10px] text-primary">Active</span>}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Connection status chip */}
+          <button
+            onClick={() => setOnline(!online)}
+            title="Click to toggle simulated online/offline state"
+            className={cn(
+              "hidden items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors md:flex",
+              online
+                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                : "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400",
+            )}
+          >
+            {online ? <Wifi className="size-3" aria-hidden /> : <WifiOff className="size-3" aria-hidden />}
+            <span>{online ? "Live" : "Offline"}</span>
+          </button>
+
           <div className="ml-auto flex items-center gap-1">
             <ThemeToggle />
             <DropdownMenu>
@@ -246,21 +324,20 @@ export function AppShell({ children }: { children: ReactNode }) {
                   <UserCircle2 className="size-5" aria-hidden />
                   <span className="hidden text-left leading-tight sm:block">
                     <span className="block text-xs font-medium">{persona.name}</span>
-                    <span className="block text-[10px] text-muted-foreground">{roleLabel(persona.role)}</span>
+                    <span className="block text-[10px] text-muted-foreground">{currentRoleLabel}</span>
                   </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-64">
-                <DropdownMenuLabel>Switch demo persona</DropdownMenuLabel>
+              <DropdownMenuContent align="end" className="w-72 max-h-[70vh] overflow-auto">
+                <DropdownMenuLabel>Switch demo persona ({PERSONAS.length} roles)</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {PERSONAS.map((p) => (
                   <DropdownMenuItem
                     key={p.id}
                     onClick={() => {
                       setPersona(p.id);
-                      if (p.role === "driver") navigate({ to: "/driver/home" });
-                      else if (p.role === "client") navigate({ to: "/portal/dashboard" });
-                      else navigate({ to: "/app/dashboard" });
+                      const dest = roleLandingRoute(p.role);
+                      navigate({ to: dest });
                     }}
                   >
                     <span className="flex-1">
@@ -322,7 +399,7 @@ export function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenCh
             <CommandEmpty>No matching record.</CommandEmpty>
             <CommandGroup heading="Go to">
               {[
-                ["Control Tower", "/app/dashboard"],
+                ["Control Tower", "/app/tower"],
                 ["Dispatch Board", "/app/dispatch"],
                 ["Live Fleet", "/app/tracking"],
                 ["Receivables", "/app/finance/receivables"],

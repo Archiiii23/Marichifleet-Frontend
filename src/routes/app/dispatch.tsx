@@ -2,10 +2,11 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Check, ShieldAlert } from "lucide-react";
 import { useState } from "react";
 import { EmptyState, NoAccess, PageHeader, Panel, StatusBadge } from "@/components/mf/primitives";
+import { Amount, toMoney } from "@/components/mf/amount";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { fmtDate, inr, useAction, useDb } from "@/domain/hooks";
+import { fmtDate, useAction, useDb } from "@/domain/hooks";
 import { useSession } from "@/domain/session";
 import { assignTrip, clientName, rankCandidates } from "@/domain/store";
 import { cn } from "@/lib/utils";
@@ -85,7 +86,7 @@ function Dispatch() {
                 >
                   <div className="flex items-center justify-between gap-2">
                     <span className="numeric text-sm font-medium">{b.ref}</span>
-                    <span className="numeric text-xs text-muted-foreground">{inr(b.rate)}</span>
+                    <Amount value={toMoney(b.rate)} className="text-xs text-muted-foreground" />
                   </div>
                   <p className="mt-1 text-xs">{b.pickup.city} → {b.drop.city}</p>
                   <p className="text-xs text-muted-foreground">

@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { startDemoSession } from "@/domain/guard";
 import { PERSONAS, roleLabel, useSession } from "@/domain/session";
+import { roleLandingRoute } from "@/domain/rbac";
 
 import { ThemeToggle } from "@/domain/theme";
 import { cn } from "@/lib/utils";
@@ -35,10 +36,8 @@ function Login() {
     const p = PERSONAS.find((x) => x.id === selected) ?? PERSONAS[2];
     startDemoSession();
     setPersona(p.id);
-
-    if (p.role === "driver") navigate({ to: "/driver/home" });
-    else if (p.role === "client") navigate({ to: "/portal/dashboard" });
-    else navigate({ to: "/app/dashboard" });
+    const route = roleLandingRoute(p.role);
+    navigate({ to: route as any });
   };
 
   return (

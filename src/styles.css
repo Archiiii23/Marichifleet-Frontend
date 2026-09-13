@@ -357,3 +357,28 @@
     opacity: 0.72;
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Information Density Modes — frontend.md s1.3                        */
+/* ------------------------------------------------------------------ */
+[data-density="compact"] {
+  --row-h: 2rem;
+  --cell-py: 0.25rem;
+  --cell-px: 0.5rem;
+  --font-size-data: 0.75rem;
+}
+
+[data-density="standard"], :root {
+  --row-h: 2.75rem;
+  --cell-py: 0.625rem;
+  --cell-px: 0.75rem;
+  --font-size-data: 0.875rem;
+}
+
+[data-density="relaxed"] {
+  --row-h: 3.5rem;
+  --cell-py: 1rem;
+  --cell-px: 1rem;
+  --font-size-data: 1rem;
+}
+

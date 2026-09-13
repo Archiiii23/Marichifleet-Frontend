@@ -4,10 +4,12 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { EmptyState, KpiCard, PageHeader, Panel } from "@/components/mf/primitives";
+import { Amount } from "@/components/mf/amount";
 import { deriveApprovals } from "@/domain/os/ops";
 import { AUTOMATION_LEVEL, canApprove, type OsRole } from "@/domain/os/roles";
-import { useDb, money } from "@/domain/hooks";
+import { useDb } from "@/domain/hooks";
 import { useSession } from "@/domain/session";
+import { normalizeRole } from "@/domain/rbac";
 
 export const Route = createFileRoute("/app/approvals")({
   head: () => ({
@@ -24,27 +26,15 @@ export const Route = createFileRoute("/app/approvals")({
   component: Approvals,
 });
 
-/** Maps the demo persona onto the OS role model until real accounts drive this. */
-const PERSONA_ROLE: Record<string, OsRole> = {
-  owner: "owner",
-  manager: "ops_manager",
-  dispatcher: "dispatcher",
-  accountant: "accountant",
-  workshop: "workshop_manager",
-  viewer: "auditor",
-  driver: "driver",
-  client: "customer_user",
-};
-
 function Approvals() {
   const db = useDb();
   const { persona } = useSession();
-  const role = PERSONA_ROLE[persona.role] ?? "dispatcher";
+  const role = normalizeRole(persona.role) as OsRole;
   const all = useMemo(() => deriveApprovals(db), [db]);
   const [decided, setDecided] = useState<Record<string, "granted" | "denied">>({});
 
   const pending = all.filter((a) => !decided[a.id]);
-  const exposure = pending.reduce((s, a) => s + a.costDeltaMinor, 0) / 100;
+  const exposureMinor = pending.reduce((s, a) => s + a.costDeltaMinor, 0);
 
   return (
     <>
@@ -55,7 +45,16 @@ function Approvals() {
 
       <div className="grid gap-4 md:grid-cols-3">
         <KpiCard label="Pending" value={String(pending.length)} hint="Expiring approvals escalate automatically" icon={Clock} />
-        <KpiCard label="Money at stake" value={money(exposure)} hint="Sum of proposed cost deltas" tone="warning" />
+        <div className="rounded-lg border border-border bg-card p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Money at stake</span>
+            <span className="size-2 rounded-full bg-warning" aria-hidden />
+          </div>
+          <div className="mt-2 text-2xl font-bold tracking-tight">
+            <Amount value={{ minor: exposureMinor, currency: "INR" }} />
+          </div>
+          <p className="mt-1 text-[11px] text-muted-foreground">Sum of proposed cost deltas</p>
+        </div>
         <KpiCard label="Decided today" value={String(Object.keys(decided).length)} hint="Idempotent — double taps are safe" icon={CheckCircle2} />
       </div>
 
@@ -74,7 +73,7 @@ function Approvals() {
               key={a.id}
               title={a.summary}
               description={`${a.command} · requested by ${a.requestedBy}`}
-              actions={<span className="numeric text-sm font-semibold">{money(a.costDeltaMinor / 100)}</span>}
+              actions={<Amount value={{ minor: a.costDeltaMinor, currency: "INR" }} className="text-sm font-semibold" />}
             >
               <ul className="space-y-1.5 text-sm">
                 {a.diff.map((d) => (
