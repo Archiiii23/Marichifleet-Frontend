@@ -16,12 +16,76 @@ import type {
   Vehicle,
 } from "./types";
 
+import { apiClient } from "@/services/apiClient";
+
 let db: DbShape | null = null;
 let seq = 1000;
+let hasSynced = false;
+
+export async function syncBackendData() {
+  if (typeof window === "undefined") return;
+  try {
+    const [remoteVehicles, remoteDrivers] = await Promise.all([
+      apiClient.get<any[]>("/fleet/vehicles").catch(() => []),
+      apiClient.get<any[]>("/fleet/drivers").catch(() => []),
+    ]);
+
+    const d = getDb();
+    if (Array.isArray(remoteVehicles) && remoteVehicles.length > 0) {
+      for (const rv of remoteVehicles) {
+        const reg = (rv.regNumber || rv.regNo || "").toUpperCase();
+        if (reg && !d.vehicles.some((v) => v.regNo.toUpperCase() === reg)) {
+          d.vehicles.unshift({
+            id: rv.id || `v_${rv._id}`,
+            regNo: reg,
+            make: rv.model || rv.make || "Tata Prima",
+            type: (rv.type === "CONTAINER_CLOSED" ? "Container" : rv.type) as any || "Truck",
+            capacityTons: rv.capacityTons || 28,
+            odometerKm: rv.odometerKm || 0,
+            fuelPct: rv.fuelLevelPercent || rv.fuelPct || 85,
+            status: (rv.status === "AVAILABLE" ? "available" : rv.status === "MAINTENANCE" ? "maintenance" : "available") as any,
+            branchId: d.branches[0]?.id || "br_01",
+            lastPingISO: new Date().toISOString(),
+            lat: rv.currentLocation?.latitude || 28.6139,
+            lng: rv.currentLocation?.longitude || 77.2090,
+            speedKph: rv.currentLocation?.speedKmH || 0,
+          });
+        }
+      }
+    }
+
+    if (Array.isArray(remoteDrivers) && remoteDrivers.length > 0) {
+      for (const rd of remoteDrivers) {
+        if (rd.name && !d.drivers.some((drv) => drv.name === rd.name || drv.phone === rd.phone)) {
+          d.drivers.unshift({
+            id: rd.id || `d_${rd._id}`,
+            name: rd.name,
+            phone: rd.phone,
+            licenceNo: rd.licenseNumber || rd.licenceNo || "DL-PENDING",
+            licenceExpiryISO: rd.licenseValidUntil || new Date(Date.now() + 365 * 86400000).toISOString(),
+            status: "available",
+            branchId: d.branches[0]?.id || "br_01",
+            rating: rd.rating || 4.8,
+            totalTrips: rd.totalTripsCompleted || 0,
+          });
+        }
+      }
+    }
+    bump();
+  } catch {
+    // Ignore network sync hiccup
+  }
+}
 
 /** Lazy init — never at module scope (Workers forbid globals doing work). */
 export function getDb(): DbShape {
-  if (!db) db = buildSeed(Date.now());
+  if (!db) {
+    db = buildSeed(Date.now());
+    if (!hasSynced) {
+      hasSynced = true;
+      setTimeout(() => void syncBackendData(), 100);
+    }
+  }
   return db;
 }
 
@@ -415,6 +479,27 @@ export function acceptTrip(tripId: string, actor: string): ActionResult {
   });
   if (b.status === "assigned") setBookingStatus(b.id, "dispatched", "System");
   return res;
+}
+
+export function dispatchBooking(bookingId: string, actor: string): ActionResult {
+  const d = getDb();
+  const b = byId(d.bookings, bookingId);
+  if (!b) return { ok: false, reason: "Booking not found." };
+  if (!["assigned", "confirmed"].includes(b.status)) {
+    return { ok: false, reason: `Booking must be assigned to dispatch (currently ${labelize(b.status)}).` };
+  }
+
+  if (b.tripId) {
+    const t = byId(d.trips, b.tripId);
+    if (t) {
+      if (t.status === "driver_assigned") {
+        acceptTrip(t.id, actor);
+      }
+      return startTrip(t.id, actor);
+    }
+  }
+
+  return setBookingStatus(b.id, "dispatched", actor);
 }
 
 export function startTrip(tripId: string, actor: string): ActionResult {

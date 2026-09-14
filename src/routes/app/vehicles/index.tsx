@@ -11,6 +11,7 @@ import { timeAgo, useAction, useDb } from "@/domain/hooks";
 import { useSession } from "@/domain/session";
 import { createVehicle } from "@/domain/store";
 import type { Vehicle } from "@/domain/types";
+import { apiClient } from "@/services/apiClient";
 
 export const Route = createFileRoute("/app/vehicles/")({
   head: () => ({
@@ -57,10 +58,22 @@ function Vehicles() {
       return;
     }
 
+    const cleanReg = regNo.trim().toUpperCase().replace(/\s+/g, "");
+
+    // Also persist directly to backend MongoDB
+    apiClient.post("/fleet/vehicles", {
+      regNumber: cleanReg,
+      model: make.trim(),
+      type,
+      capacityTons,
+      odometerKm,
+      fuelLevelPercent: fuelPct,
+    }).catch((err) => console.warn("Backend sync vehicle warning:", err));
+
     const res = run(
       () =>
         createVehicle({
-          regNo,
+          regNo: cleanReg,
           make,
           type,
           capacityTons,
@@ -69,7 +82,7 @@ function Vehicles() {
           branchId,
           actor: persona.name,
         }),
-      `Vehicle ${regNo.toUpperCase()} registered successfully`
+      `Vehicle ${cleanReg} registered successfully`
     );
 
     if (res.ok) {

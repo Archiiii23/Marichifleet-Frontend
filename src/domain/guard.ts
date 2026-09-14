@@ -1,11 +1,5 @@
 import { redirect } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
 
-/**
- * Entry guard for the ERP, driver and client surfaces.
- * A real signed-in account passes; so does an explicit demo session started
- * from `/login`, which keeps the seeded walkthrough available.
- */
 export const DEMO_KEY = "marichifleet.demo";
 
 export function startDemoSession() {
@@ -23,6 +17,5 @@ export function isDemoSession() {
 export async function requireSignIn() {
   if (isDemoSession()) return;
   if (typeof window !== "undefined" && window.localStorage.getItem("marichifleet.jwt_token")) return;
-  const { data } = await supabase.auth.getUser();
-  if (!data.user) throw redirect({ to: "/auth" });
+  throw redirect({ to: "/auth" });
 }

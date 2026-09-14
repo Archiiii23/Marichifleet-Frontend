@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Check, ShieldAlert } from "lucide-react";
+import { Check, ShieldAlert, Truck, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { EmptyState, NoAccess, PageHeader, Panel, StatusBadge } from "@/components/mf/primitives";
 import { Amount, toMoney } from "@/components/mf/amount";
@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { fmtDate, useAction, useDb } from "@/domain/hooks";
 import { useSession } from "@/domain/session";
-import { assignTrip, clientName, rankCandidates } from "@/domain/store";
+import { assignTrip, clientName, confirmBooking, dispatchBooking, rankCandidates } from "@/domain/store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/app/dispatch")({
@@ -31,8 +31,15 @@ function Dispatch() {
   const run = useAction();
   const { persona, can } = useSession();
 
-  const queue = db.bookings.filter((b) => b.status === "confirmed");
-  const [selectedId, setSelectedId] = useState<string | undefined>(search.booking ?? queue[0]?.id);
+  const [filterTab, setFilterTab] = useState<"all" | "pending" | "assigned">("all");
+  const allLoads = db.bookings.filter((b) => ["submitted", "confirmed", "assigned"].includes(b.status));
+  const queue = allLoads.filter((b) => {
+    if (filterTab === "pending") return b.status === "confirmed" || b.status === "submitted";
+    if (filterTab === "assigned") return b.status === "assigned";
+    return true;
+  });
+
+  const [selectedId, setSelectedId] = useState<string | undefined>(search.booking ?? allLoads[0]?.id);
   const [vehicleId, setVehicleId] = useState<string | null>(null);
   const [driverId, setDriverId] = useState<string | null>(null);
   const [override, setOverride] = useState("");
@@ -46,7 +53,7 @@ function Dispatch() {
     );
   }
 
-  const booking = db.bookings.find((b) => b.id === selectedId) ?? queue[0];
+  const booking = db.bookings.find((b) => b.id === (selectedId || search.booking)) ?? queue[0] ?? allLoads[0];
   const ranked = booking ? rankCandidates(booking) : null;
   const chosenVehicle = ranked?.vehicles.find((v) => v.vehicle.id === vehicleId);
   const chosenDriver = ranked?.drivers.find((d) => d.driver.id === driverId);
@@ -59,7 +66,7 @@ function Dispatch() {
         subtitle="Confirmed loads on the left, ranked assets on the right. Ineligible assets explain why."
       />
 
-      {queue.length === 0 ? (
+      {allLoads.length === 0 ? (
         <EmptyState
           title="Nothing waiting for dispatch"
           message="Confirmed bookings appear here automatically. Confirm a submitted booking to fill the queue."
@@ -67,8 +74,32 @@ function Dispatch() {
           onAction={() => navigate({ to: "/app/bookings" })}
         />
       ) : (
-        <div className="grid gap-4 xl:grid-cols-[320px_1fr]">
-          <Panel title="Awaiting dispatch" description={`${queue.length} confirmed loads`}>
+        <div className="grid gap-4 xl:grid-cols-[340px_1fr]">
+          <Panel title="Dispatch queue" description={`${queue.length} loads matching filter`}>
+            <div className="flex gap-1 border-b border-border pb-2 mb-2 text-xs">
+              <button
+                type="button"
+                onClick={() => setFilterTab("all")}
+                className={cn("px-2 py-1 rounded font-medium transition-colors", filterTab === "all" ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground hover:text-foreground")}
+              >
+                All ({allLoads.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setFilterTab("pending")}
+                className={cn("px-2 py-1 rounded font-medium transition-colors", filterTab === "pending" ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground hover:text-foreground")}
+              >
+                Needs Asset ({allLoads.filter((b) => b.status !== "assigned").length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setFilterTab("assigned")}
+                className={cn("px-2 py-1 rounded font-medium transition-colors", filterTab === "assigned" ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground hover:text-foreground")}
+              >
+                Assigned ({allLoads.filter((b) => b.status === "assigned").length})
+              </button>
+            </div>
+
             <div className="space-y-2">
               {queue.map((b) => (
                 <button
@@ -86,10 +117,13 @@ function Dispatch() {
                 >
                   <div className="flex items-center justify-between gap-2">
                     <span className="numeric text-sm font-medium">{b.ref}</span>
-                    <Amount value={toMoney(b.rate)} className="text-xs text-muted-foreground" />
+                    <StatusBadge status={b.status} />
                   </div>
-                  <p className="mt-1 text-xs">{b.pickup.city} → {b.drop.city}</p>
-                  <p className="text-xs text-muted-foreground">
+                  <div className="mt-1 flex items-center justify-between">
+                    <p className="text-xs font-medium">{b.pickup.city} → {b.drop.city}</p>
+                    <Amount value={toMoney(b.rate)} className="text-xs font-semibold" />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-0.5">
                     {clientName(b.clientId)} · {b.weightTons}t {b.vehicleType} · {fmtDate(b.pickupISO)}
                   </p>
                 </button>
@@ -103,26 +137,49 @@ function Dispatch() {
                 title={`Assign ${booking.ref}`}
                 description={`${booking.pickup.city} → ${booking.drop.city} · ${booking.distanceKm} km · ${booking.weightTons}t`}
                 actions={
-                  <Button
-                    size="sm"
-                    disabled={!vehicleId || !driverId}
-                    onClick={() => {
-                      const res = run(
-                        () =>
-                          assignTrip({
-                            bookingId: booking.id,
-                            vehicleId: vehicleId!,
-                            driverId: driverId!,
-                            overrideReason: override || undefined,
-                            actor: persona.name,
-                          }),
-                        "Trip created and driver notified on WhatsApp",
-                      );
-                      if (res.ok && res.id) navigate({ to: "/app/trips/$tripId", params: { tripId: res.id } });
-                    }}
-                  >
-                    Create trip
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    {booking.status === "submitted" && (
+                      <Button
+                        size="sm"
+                        onClick={() => run(() => confirmBooking(booking.id, persona.name), "Booking confirmed")}
+                      >
+                        Confirm Booking
+                      </Button>
+                    )}
+                    {booking.status === "assigned" && (
+                      <Button
+                        size="sm"
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
+                        onClick={() => {
+                          const res = run(() => dispatchBooking(booking.id, persona.name), "Trip dispatched — vehicle is on trip");
+                          if (res.ok) navigate({ to: "/app/trips" });
+                        }}
+                      >
+                        <Truck className="size-3.5 mr-1.5" /> Dispatch Trip Now
+                      </Button>
+                    )}
+                    <Button
+                      size="sm"
+                      variant={booking.status === "assigned" ? "outline" : "default"}
+                      disabled={!vehicleId || !driverId}
+                      onClick={() => {
+                        const res = run(
+                          () =>
+                            assignTrip({
+                              bookingId: booking.id,
+                              vehicleId: vehicleId!,
+                              driverId: driverId!,
+                              overrideReason: override || undefined,
+                              actor: persona.name,
+                            }),
+                          booking.status === "assigned" ? "Assets reassigned successfully" : "Trip created and driver notified on WhatsApp",
+                        );
+                        if (res.ok && res.id) navigate({ to: "/app/trips/$tripId", params: { tripId: res.id } });
+                      }}
+                    >
+                      {booking.status === "assigned" ? "Reassign Assets" : "Assign & Create Trip"}
+                    </Button>
+                  </div>
                 }
               >
                 {needsOverride && (
