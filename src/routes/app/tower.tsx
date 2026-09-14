@@ -63,6 +63,55 @@ function Tower() {
   const slaRiskCount = exceptions.filter((e) => e.kind === "trip.sla.at_risk").length;
   const dispatchBlockedCount = exceptions.filter((e) => e.kind === "compliance.dispatch.blocked").length;
 
+  // Filter map vehicles by severity and active exceptions
+  const mapItems = useMemo(() => {
+    // 1. Gather vehicle IDs associated with currently shown exceptions
+    const exceptionVehicleIds = new Set<string>();
+    shown.forEach((e) => {
+      if (e.link) {
+        const idMatch = e.link.split("/").pop();
+        const trip = db.trips.find((t) => t.id === idMatch || t.ref === idMatch);
+        if (trip) exceptionVehicleIds.add(trip.vehicleId);
+      }
+      db.vehicles.forEach((v) => {
+        if (e.context.includes(v.regNo) || e.title.includes(v.regNo)) {
+          exceptionVehicleIds.add(v.id);
+        }
+      });
+    });
+
+    let targetVehicles = db.vehicles;
+    if (severity === "critical") {
+      targetVehicles = db.vehicles.filter(
+        (v) => exceptionVehicleIds.has(v.id) || v.status === "maintenance"
+      );
+    } else if (severity === "high") {
+      targetVehicles = db.vehicles.filter((v) => {
+        if (exceptionVehicleIds.has(v.id)) return true;
+        const trip = db.trips.find((t) => t.id === v.currentTripId);
+        return (trip?.delayMins ?? 0) >= 30 || v.status === "maintenance";
+      });
+    } else if (severity === "medium") {
+      targetVehicles = db.vehicles.filter((v) => {
+        if (exceptionVehicleIds.has(v.id)) return true;
+        const trip = db.trips.find((t) => t.id === v.currentTripId);
+        return (trip?.delayMins ?? 0) > 0;
+      });
+    } else {
+      // 'all': display all moving vehicles or any vehicle linked to an exception
+      targetVehicles = db.vehicles.filter((v) => v.status === "on_trip" || exceptionVehicleIds.has(v.id));
+    }
+
+    return targetVehicles.map((v) => {
+      const trip = db.trips.find((t) => t.id === v.currentTripId);
+      return {
+        vehicle: v,
+        trip,
+        delayed: (trip?.delayMins ?? 0) > 25 || v.status === "maintenance",
+      };
+    });
+  }, [db.vehicles, db.trips, shown, severity]);
+
   const handleAcknowledge = (id: string, title: string) => {
     setAcknowledgedIds((prev) => new Set([...prev, id]));
     toast.success("Exception Acknowledged", {
@@ -259,15 +308,12 @@ function Tower() {
               }
             >
               <FleetMap
-                items={moving.map((v) => {
-                  const trip = db.trips.find((t) => t.id === v.currentTripId);
-                  return { vehicle: v, trip, delayed: (trip?.delayMins ?? 0) > 25 };
-                })}
-                height={layout === "map" ? 520 : 300}
+                items={mapItems}
+                height={layout === "map" ? 640 : 360}
               />
             </Panel>
 
-            {active && layout === "split" && (
+            {active && (layout === "split" || layout === "map") && (
               <ExceptionDetail
                 exception={active}
                 isAcknowledged={acknowledgedIds.has(active.id)}

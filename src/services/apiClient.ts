@@ -1,21 +1,19 @@
 function resolveApiBase(): string {
   let envUrl = (import.meta.env as Record<string, string | undefined>)["VITE_API_URL"] || '';
-  if (!envUrl) {
-    return 'https://marichifleet-backend.onrender.com/api';
-  }
-  // Handle case where environment variable has quotes or concatenated env lines
   const match = envUrl.match(/https?:\/\/[^\s"'\\]+/);
   if (match) {
     envUrl = match[0];
   }
   let clean = envUrl.trim().replace(/^["']+|["']+$/g, '').replace(/\/+$/, '');
   if (!clean || !clean.startsWith('http')) {
-    return 'https://marichifleet-backend.onrender.com/api';
+    return typeof window !== 'undefined' && window.location.hostname === 'localhost'
+      ? 'http://localhost:4000/api'
+      : 'https://marichifleet-backend.onrender.com/api';
   }
-  if (!clean.endsWith('/api')) {
-    clean = `${clean}/api`;
+  if (clean.endsWith('/api')) {
+    return clean;
   }
-  return clean;
+  return `${clean}/api`;
 }
 
 export const API_BASE = resolveApiBase();

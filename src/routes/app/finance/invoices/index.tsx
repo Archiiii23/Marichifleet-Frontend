@@ -1,8 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ShieldCheck } from "lucide-react";
+import { AlertCircle, FileCheck2, Printer, Send, ShieldCheck, Sparkles } from "lucide-react";
+import { useState } from "react";
 import { DataTable } from "@/components/mf/data-table";
-import { KpiCard, NoAccess, PageHeader, Panel, StatusBadge } from "@/components/mf/primitives";
 import { Amount, toMoney } from "@/components/mf/amount";
+import { EmptyState, KpiCard, NoAccess, PageHeader, Panel, StatusBadge } from "@/components/mf/primitives";
+import { PrintableInvoiceModal } from "@/components/mf/printable-invoice-modal";
 import { Button } from "@/components/ui/button";
 import { fmtDate, useAction, useDb } from "@/domain/hooks";
 import { useSession } from "@/domain/session";
@@ -40,6 +42,7 @@ function Invoices() {
 
   const ready = db.bookings.filter((b) => b.status === "pod_received" && !b.invoiceId);
   const outstandingMinor = db.invoices.reduce((sum, invoice) => sum + invoiceOutstanding(invoice) * 100, 0);
+  const [selectedPrintInvoice, setSelectedPrintInvoice] = useState<Invoice | null>(null);
 
   return (
     <>
@@ -149,22 +152,43 @@ function Invoices() {
             key: "action",
             header: "",
             className: "text-right",
-            cell: (i) =>
-              (can("billing:draft") || can("edit_finance")) && (i.status === "draft" || i.status === "issued") ? (
+            cell: (i) => (
+              <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    run(() => sendInvoice(i.id, persona.name), "Invoice sent to client");
-                  }}
+                  className="h-7 text-xs gap-1"
+                  onClick={() => setSelectedPrintInvoice(i)}
                 >
-                  Send
+                  <Printer className="size-3" />
+                  Print
                 </Button>
-              ) : null,
+                {(can("billing:draft") || can("edit_finance")) && (i.status === "draft" || i.status === "issued") && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 text-xs"
+                    onClick={() => run(() => sendInvoice(i.id, persona.name), "Invoice sent to client")}
+                  >
+                    Send
+                  </Button>
+                )}
+              </div>
+            ),
           },
         ]}
       />
+
+      {selectedPrintInvoice && (
+        <PrintableInvoiceModal
+          open={!!selectedPrintInvoice}
+          onOpenChange={(open) => !open && setSelectedPrintInvoice(null)}
+          invoice={selectedPrintInvoice}
+          client={db.clients.find((c) => c.id === selectedPrintInvoice.clientId) || null}
+          booking={db.bookings.find((b) => b.id === selectedPrintInvoice.bookingId) || null}
+          trip={selectedPrintInvoice.tripId ? db.trips.find((t) => t.id === selectedPrintInvoice.tripId) : null}
+        />
+      )}
     </>
   );
 }

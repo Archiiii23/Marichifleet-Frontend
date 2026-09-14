@@ -342,3 +342,76 @@ export function setTenantStatus(id: string, status: TenantAccount["status"], act
   audit(actor, `Tenant ${status}`, "tenant", id, from, status);
   return ok;
 }
+
+export function addVendor(
+  input: Omit<Vendor, "id" | "spendYtd"> & { spendYtd?: number },
+  actor: string = "Operations"
+): GuardResult & { id?: string } {
+  const e = getExtras();
+  const id = nid("vnd");
+  const vendor: Vendor = {
+    id,
+    name: input.name,
+    kind: input.kind,
+    contact: input.contact,
+    phone: input.phone,
+    city: input.city,
+    rating: input.rating || 4.5,
+    spendYtd: input.spendYtd || 0,
+    payable: input.payable || 0,
+  };
+  e.vendors.unshift(vendor);
+  audit(actor, `Vendor ${vendor.name} onboarded`, "vendor", id);
+  return { ok: true, id };
+}
+
+export function updateVendor(id: string, updates: Partial<Vendor>, actor: string = "Operations"): GuardResult {
+  const e = getExtras();
+  const v = e.vendors.find((x) => x.id === id);
+  if (!v) return no("Vendor not found.");
+  Object.assign(v, updates);
+  audit(actor, `Vendor ${v.name} updated`, "vendor", id);
+  return ok;
+}
+
+export function deleteVendor(id: string, actor: string = "Operations"): GuardResult {
+  const e = getExtras();
+  const idx = e.vendors.findIndex((x) => x.id === id);
+  if (idx < 0) return no("Vendor not found.");
+  const name = e.vendors[idx].name;
+  e.vendors.splice(idx, 1);
+  audit(actor, `Vendor ${name} deleted`, "vendor", id);
+  return ok;
+}
+
+export function addEmployee(
+  input: Omit<Employee, "id" | "joinedISO" | "present"> & { joinedISO?: string; present?: boolean },
+  actor: string = "HR"
+): GuardResult & { id?: string } {
+  const e = getExtras();
+  const id = nid("emp");
+  const employee: Employee = {
+    id,
+    name: input.name,
+    designation: input.designation,
+    department: input.department,
+    branch: input.branch || "Bhiwandi Depot",
+    phone: input.phone,
+    monthlySalary: input.monthlySalary || 35000,
+    joinedISO: input.joinedISO || now(),
+    present: input.present ?? true,
+  };
+  e.employees.unshift(employee);
+  audit(actor, `Staff member ${employee.name} added`, "employee", id);
+  return { ok: true, id };
+}
+
+export function updateEmployee(id: string, updates: Partial<Employee>, actor: string = "HR"): GuardResult {
+  const e = getExtras();
+  const emp = e.employees.find((x) => x.id === id);
+  if (!emp) return no("Employee not found.");
+  Object.assign(emp, updates);
+  audit(actor, `Employee ${emp.name} updated`, "employee", id);
+  return ok;
+}
+

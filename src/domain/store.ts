@@ -3,6 +3,7 @@ import { buildSeed, distanceKm } from "./seed";
 import type {
   Booking,
   BookingStatus,
+  Client,
   DbShape,
   DocumentStatus,
   Driver,
@@ -59,6 +60,8 @@ export async function syncBackendData() {
         if (reg && !d.vehicles.some((v) => v.regNo.toUpperCase() === reg)) {
           d.vehicles.unshift({
             id: rv.id || `v_${rv._id}`,
+            tenantId: d.tenant.id || "tenant_delhi_01",
+            serviceDueKm: 15000,
             regNo: reg,
             make: rv.model || rv.make || "Tata Prima",
             type: (rv.type === "CONTAINER_CLOSED" ? "Container" : rv.type) as any || "Truck",
@@ -81,6 +84,8 @@ export async function syncBackendData() {
         if (rd.name && !d.drivers.some((drv) => drv.name === rd.name || drv.phone === rd.phone)) {
           d.drivers.unshift({
             id: rd.id || `d_${rd._id}`,
+            tenantId: d.tenant.id || "tenant_delhi_01",
+            tripsCompleted: rd.totalTripsCompleted || 0,
             name: rd.name,
             phone: rd.phone,
             licenceNo: rd.licenseNumber || rd.licenceNo || "DL-PENDING",
@@ -88,7 +93,6 @@ export async function syncBackendData() {
             status: "available",
             branchId: d.branches[0]?.id || "br_01",
             rating: rd.rating || 4.8,
-            totalTrips: rd.totalTripsCompleted || 0,
           });
         }
       }
@@ -160,6 +164,49 @@ export const byId = <T extends { id: string }>(arr: T[], id?: string) => arr.fin
 
 export function clientName(id: string) {
   return getDb().clients.find((c) => c.id === id)?.name ?? "Unknown client";
+}
+
+export function addClient(
+  input: Omit<Client, "id" | "tenantId"> & { tenantId?: string },
+  actor: string = "Sales / Dispatch"
+): ActionResult {
+  const d = getDb();
+  const id = nid("cli");
+  const client: Client = {
+    id,
+    tenantId: input.tenantId || d.tenant.id || "tenant_delhi_01",
+    name: input.name,
+    segment: input.segment,
+    contactName: input.contactName,
+    phone: input.phone,
+    email: input.email,
+    city: input.city,
+    gstin: input.gstin || "07AAAAA0000A1Z5",
+    creditDays: input.creditDays || 30,
+    ratePerKm: input.ratePerKm || 45,
+  };
+  d.clients.unshift(client);
+  audit(actor, `Client ${client.name} onboarded`, "client", id);
+  return { ok: true, id };
+}
+
+export function updateClient(id: string, updates: Partial<Client>, actor: string = "Sales / Dispatch"): ActionResult {
+  const d = getDb();
+  const client = byId(d.clients, id);
+  if (!client) return { ok: false, reason: "Client not found" };
+  Object.assign(client, updates);
+  audit(actor, `Client ${client.name} updated`, "client", id);
+  return { ok: true, id };
+}
+
+export function deleteClient(id: string, actor: string = "Sales / Dispatch"): ActionResult {
+  const d = getDb();
+  const idx = d.clients.findIndex((c) => c.id === id);
+  if (idx < 0) return { ok: false, reason: "Client not found" };
+  const name = d.clients[idx].name;
+  d.clients.splice(idx, 1);
+  audit(actor, `Client ${name} deleted`, "client", id);
+  return { ok: true };
 }
 
 export function tripProfit(t: Trip) {

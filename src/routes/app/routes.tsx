@@ -372,13 +372,13 @@ function RoutesPage() {
 
       {/* KPI Ribbon */}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-4">
-        <KpiCard title="Active Corridors" value={activeCount} hint="Standard freight lanes" />
-        <KpiCard title="Avg Lane Distance" value={`${avgDistance} km`} hint="Across all standard corridors" />
-        <KpiCard title="Hub Coverage" value={uniqueHubs} hint="Major origin & delivery cities" />
+        <KpiCard label="Active Corridors" value={String(activeCount)} hint="Standard freight lanes" />
+        <KpiCard label="Avg Lane Distance" value={`${avgDistance} km`} hint="Across all standard corridors" />
+        <KpiCard label="Hub Coverage" value={String(uniqueHubs)} hint="Major origin & delivery cities" />
         <KpiCard
-          title="Booking Integration"
+          label="Booking Integration"
           value="Enabled"
-          status="good"
+          tone="success"
           hint="Directly selectable in booking form"
         />
       </div>

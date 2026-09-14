@@ -90,7 +90,7 @@ function TripDetail() {
     fetchRoadRoute();
   }, [b?.pickup?.city, b?.drop?.city]);
 
-  const actualDistance = mapboxRoute ? mapboxRoute.distanceKm : t.distanceKm;
+  const actualDistance = mapboxRoute ? mapboxRoute.distanceKm : (b?.distanceKm || 450);
   const coveredDistance = Math.round(actualDistance * t.progress * 10) / 10;
   const remainingDistance = Math.max(0, Math.round((actualDistance - coveredDistance) * 10) / 10);
   const estHours = mapboxRoute ? mapboxRoute.durationHours : Math.round((actualDistance / 42) * 10) / 10;

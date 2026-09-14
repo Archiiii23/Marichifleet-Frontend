@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [session, setSession] = useState<AuthSession | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [roles, setRoles] = useState<Role[]>(['FLEET_OWNER']);
+  const [roles, setRoles] = useState<Role[]>(['owner']);
 
   const hydrate = useCallback(async () => {
     if (typeof window === 'undefined') {
@@ -147,7 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       profile,
       tenantId: profile?.tenant_id ?? null,
       roles,
-      can: (c) => caps.has(c) || roles.includes('FLEET_OWNER') || roles.includes('SUPER_ADMIN' as any),
+      can: (c) => caps.has(c) || roles.includes('owner') || (roles as any).includes('FLEET_OWNER') || (roles as any).includes('SUPER_ADMIN'),
       refresh,
       signOut,
     };

@@ -16,7 +16,7 @@ import type { Vehicle, TransportRoute } from "@/domain/types";
 
 export const Route = createFileRoute("/app/bookings/new")({
   validateSearch: (search: Record<string, unknown>): { routeId?: string } => ({
-    routeId: typeof search.routeId === "string" ? search.routeId : undefined,
+    routeId: typeof search["routeId"] === "string" ? (search["routeId"] as string) : undefined,
   }),
   head: () => ({
     meta: [

@@ -73,6 +73,8 @@ export function FleetMap({
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
+    let resizeObserver: ResizeObserver | null = null;
+
     try {
       // Calculate initial center based on vehicles or default to Central India
       let initialCenter: [number, number] = [78.9629, 20.5937]; // India centroid
@@ -102,12 +104,13 @@ export function FleetMap({
 
       map.on("load", () => {
         setMapLoaded(true);
-        try {
-          map.resize();
-        } catch {}
+        setTimeout(() => {
+          try {
+            map.resize();
+          } catch {}
+        }, 100);
       });
 
-      let resizeObserver: ResizeObserver | null = null;
       if (typeof ResizeObserver !== "undefined") {
         resizeObserver = new ResizeObserver(() => {
           if (mapRef.current) {
@@ -125,6 +128,7 @@ export function FleetMap({
           resizeObserver.observe(mapContainerRef.current);
         }
       }
+
       map.on("error", (e) => {
         console.warn("Mapbox GL warning:", e);
       });
@@ -212,7 +216,7 @@ export function FleetMap({
         const popup = new mapboxgl.Popup({ offset: 25, closeButton: false }).setHTML(`
           <div style="font-family: monospace; padding: 4px; color: #0f172a;">
             <div style="font-weight: 700; font-size: 12px;">${vehicle.regNo}</div>
-            <div style="font-size: 11px; color: #475569;">${vehicle.model}</div>
+            <div style="font-size: 11px; color: #475569;">${(vehicle as any).model || vehicle.make}</div>
             ${trip ? `<div style="font-size: 10px; color: #0284c7; margin-top: 2px;">Trip: ${trip.ref}</div>` : ""}
             <div style="font-size: 10px; color: ${colour}; font-weight: 600; margin-top: 2px;">
               ${delayed ? "DELAYED" : active ? "ON TRIP (LIVE)" : vehicle.status.toUpperCase()}
@@ -242,7 +246,7 @@ export function FleetMap({
       const roadCasingId = "active-mapbox-road-casing";
       const roadLineId = "active-mapbox-road-line";
 
-      const roadGeoJson: GeoJSON.Feature<GeoJSON.LineString> = {
+      const roadGeoJson: any = {
         type: "Feature",
         properties: {},
         geometry: {
@@ -334,7 +338,7 @@ export function FleetMap({
         const sourceId = `route-src-${vehicle.id}`;
         const layerId = `route-layer-${vehicle.id}`;
 
-        const geojsonData: GeoJSON.Feature<GeoJSON.LineString> = {
+        const geojsonData: any = {
           type: "Feature",
           properties: {},
           geometry: {
@@ -369,7 +373,6 @@ export function FleetMap({
       });
     }
   }, [items, selectedId, mapLoaded, showRoutes, mapStyle, activeRoadPath, pickupLocation, dropLocation]);
-
 
   // 4. Fly to selected vehicle
   useEffect(() => {

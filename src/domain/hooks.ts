@@ -14,11 +14,13 @@ export function useDb(): DbShape {
  * error toast, successes surface confirmation and refresh every screen.
  */
 export function useAction() {
-  return useCallback(<T extends ActionResult>(run: () => T, successMessage: string): T => {
+  return useCallback(<T extends ActionResult>(run: () => T, successMessage?: string): T => {
     const res = run();
     if (res.ok) {
       bump();
-      toast.success(successMessage);
+      if (successMessage) {
+        toast.success(successMessage);
+      }
     } else {
       toast.error("Action blocked", { description: res.reason });
     }

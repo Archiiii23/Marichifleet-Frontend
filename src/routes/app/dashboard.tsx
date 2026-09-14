@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  AlertTriangle, BadgeIndianRupee, ClipboardCheck, Clock, ShieldCheck, Truck, TrendingUp,
+  AlertTriangle, BadgeIndianRupee, ClipboardCheck, Clock, Filter, MapPin, ShieldCheck, Truck, TrendingUp,
 } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
@@ -37,14 +37,49 @@ function Dashboard() {
   const completed = db.trips.filter((t) => t.status === "completed");
   const profit = completed.reduce((s, t) => s + tripProfit(t), 0);
 
-  const mapItems = useMemo(
-    () =>
-      db.vehicles.map((v) => {
+  const [fleetFilter, setFleetFilter] = useState<"all" | "moving" | "delayed" | "available" | "workshop">("all");
+  const [selectedCorridor, setSelectedCorridor] = useState<string>("all");
+
+  // Extract corridors currently active
+  const corridors = useMemo(() => {
+    const set = new Set<string>();
+    db.trips.forEach((t) => {
+      const b = db.bookings.find((x) => x.id === t.bookingId);
+      if (b) {
+        set.add(`${b.pickup.city} → ${b.drop.city}`);
+      }
+    });
+    return Array.from(set);
+  }, [db]);
+
+  const filteredMapItems = useMemo(() => {
+    return db.vehicles
+      .filter((v) => {
         const trip = db.trips.find((t) => t.id === v.currentTripId);
-        return { vehicle: v, trip, delayed: !!trip && (trip.delayMins > 30 || trip.status === "exception") };
-      }),
-    [db],
-  );
+        const isDelayed = !!trip && (trip.delayMins > 25 || trip.status === "exception");
+
+        // Status check
+        if (fleetFilter === "moving" && v.status !== "on_trip") return false;
+        if (fleetFilter === "delayed" && (!isDelayed || v.status !== "on_trip")) return false;
+        if (fleetFilter === "available" && v.status !== "available") return false;
+        if (fleetFilter === "workshop" && v.status !== "maintenance") return false;
+
+        // Corridor check
+        if (selectedCorridor !== "all") {
+          if (!trip) return false;
+          const b = db.bookings.find((x) => x.id === trip.bookingId);
+          if (!b) return false;
+          const corridor = `${b.pickup.city} → ${b.drop.city}`;
+          if (corridor !== selectedCorridor) return false;
+        }
+
+        return true;
+      })
+      .map((v) => {
+        const trip = db.trips.find((t) => t.id === v.currentTripId);
+        return { vehicle: v, trip, delayed: !!trip && (trip.delayMins > 25 || trip.status === "exception") };
+      });
+  }, [db, fleetFilter, selectedCorridor]);
 
   const lane = useMemo(() => {
     const map = new Map<string, { lane: string; trips: number; revenue: number }>();
@@ -136,14 +171,67 @@ function Dashboard() {
       <div className="mt-4 grid gap-4 xl:grid-cols-[1.6fr_1fr]">
         <Panel
           title="Live fleet"
-          description={`${live.length} trips moving now · positions refresh every few seconds`}
+          description={`${live.length} trips moving now · filter by status & transit corridor`}
           actions={
             <Button asChild size="sm" variant="ghost">
               <Link to="/app/tracking">Open full map</Link>
             </Button>
           }
         >
-          <FleetMap items={mapItems} height={420} />
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
+            {/* Status filters */}
+            <div className="flex flex-wrap items-center gap-1">
+              {(
+                [
+                  { id: "all", label: "All", count: db.vehicles.length },
+                  { id: "moving", label: "Moving", count: db.vehicles.filter((v) => v.status === "on_trip").length },
+                  { id: "delayed", label: "Delayed/Risk", count: delayed.length },
+                  { id: "available", label: "Available", count: db.vehicles.filter((v) => v.status === "available").length },
+                  { id: "workshop", label: "Workshop", count: db.vehicles.filter((v) => v.status === "maintenance").length },
+                ] as const
+              ).map((f) => (
+                <button
+                  key={f.id}
+                  onClick={() => setFleetFilter(f.id)}
+                  className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                    fleetFilter === f.id
+                      ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                      : "bg-surface hover:bg-surface/80 text-muted-foreground"
+                  }`}
+                >
+                  <span>{f.label}</span>
+                  <span
+                    className={`rounded-full px-1 text-[10px] ${
+                      fleetFilter === f.id ? "bg-primary-foreground/20 text-white" : "bg-border text-muted-foreground"
+                    }`}
+                  >
+                    {f.count}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            {/* Corridor selector */}
+            {corridors.length > 0 && (
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <MapPin className="size-3.5 text-primary" />
+                <select
+                  value={selectedCorridor}
+                  onChange={(e) => setSelectedCorridor(e.target.value)}
+                  className="rounded-md border border-border bg-card px-2 py-1 text-xs text-foreground focus:outline-hidden"
+                >
+                  <option value="all">All Corridors ({corridors.length})</option>
+                  {corridors.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+
+          <FleetMap items={filteredMapItems} height={420} />
         </Panel>
 
         <Panel title="Needs attention" description="Ranked by operational risk">

@@ -87,7 +87,7 @@ const NAV: Array<{ group: string; items: NavItem[] }> = [
   {
     group: "Finance",
     items: [
-      { to: "/app/finance/invoices/", label: "Invoices", icon: BadgeIndianRupee, perm: "finance:read" },
+      { to: "/app/finance/invoices", label: "Invoices", icon: BadgeIndianRupee, perm: "finance:read" },
       { to: "/app/finance/receivables", label: "Receivables", icon: BadgeIndianRupee, perm: "finance:read" },
       { to: "/app/expenses", label: "Expenses", icon: BadgeIndianRupee, perm: "expenses:read" },
       { to: "/app/ledger", label: "Ledger", icon: BookOpen, perm: "ledger:read" },
@@ -182,7 +182,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             {g.group}
           </p>
           {g.items.map((item) => {
-            const active = pathname === item.to || pathname.startsWith(item.to + "/");
+            const cleanItemTo = item.to.replace(/\/+$/, "");
+            const cleanPathname = pathname.replace(/\/+$/, "");
+            const active = cleanPathname === cleanItemTo || cleanPathname.startsWith(cleanItemTo + "/");
             return (
               <Link
                 key={item.to}

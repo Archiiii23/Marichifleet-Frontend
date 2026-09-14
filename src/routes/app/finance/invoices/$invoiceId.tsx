@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Copy, FileCheck2, QrCode, Send, ShieldCheck } from "lucide-react";
+import { Copy, FileCheck2, Printer, QrCode, Send, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Metric, PageHeader, Panel, StatusBadge } from "@/components/mf/primitives";
+import { PrintableInvoiceModal } from "@/components/mf/printable-invoice-modal";
 import { Amount, toMoney } from "@/components/mf/amount";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,11 +36,12 @@ function InvoiceDetail() {
   const [amount, setAmount] = useState("");
   const [mode, setMode] = useState<"NEFT" | "UPI" | "Cheque" | "Cash">("NEFT");
   const [reference, setReference] = useState("");
+  const [printModalOpen, setPrintModalOpen] = useState(false);
 
   if (!inv) {
     return (
       <>
-        <PageHeader title="Invoice not found" breadcrumb={[{ label: "Invoices", to: "/app/finance/invoices/" }]} />
+        <PageHeader title="Invoice not found" breadcrumb={[{ label: "Invoices", to: "/app/finance/invoices" }]} />
         <p className="text-sm text-muted-foreground">This invoice no longer exists.</p>
       </>
     );
@@ -56,11 +58,20 @@ function InvoiceDetail() {
     <>
       <PageHeader
         title={inv.ref}
-        breadcrumb={[{ label: "Invoices", to: "/app/finance/invoices/" }, { label: inv.ref }]}
+        breadcrumb={[{ label: "Invoices", to: "/app/finance/invoices" }, { label: inv.ref }]}
         subtitle={`${client.name} · GSTIN ${client.gstin}`}
         actions={
           <div className="flex items-center gap-2">
             <StatusBadge status={isOverdue(inv) ? "overdue" : inv.status} />
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-1.5 font-medium shadow-xs"
+              onClick={() => setPrintModalOpen(true)}
+            >
+              <Printer className="size-3.5" />
+              Print Bill
+            </Button>
             {can("edit_finance") && (inv.status === "draft" || inv.status === "issued") && (
               <Button
                 size="sm"
@@ -298,6 +309,16 @@ function InvoiceDetail() {
           </Panel>
         </div>
       </div>
+
+      <PrintableInvoiceModal
+        open={printModalOpen}
+        onOpenChange={setPrintModalOpen}
+        invoice={inv}
+        client={client}
+        booking={booking}
+        trip={booking?.tripId ? db.trips.find((t) => t.id === booking.tripId) : null}
+        vehicle={booking?.tripId ? db.vehicles.find((v) => v.currentTripId === booking.tripId) : null}
+      />
     </>
   );
 }
