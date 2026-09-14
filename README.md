@@ -1056,7 +1056,7 @@ Never hard-code production credentials.
 
 ==================================================
 
-13. ADDITION #5 — MASTER LOVABLE IMPLEMENTATION RULES
+13. ADDITION #5 — MASTER IMPLEMENTATION RULES
 
 ==================================================
 
@@ -2006,19 +2006,16 @@ This prompt provides the implementation discipline and final five additions:
 
 - Acceptance criteria
 
-- Master Lovable implementation rules
+- Master implementation rules
 
 Build MarichiFleet as a cohesive product, not as a collection of unrelated pages.
 
-This project was built with [Lovable](https://lovable.dev).
+## Architecture: MERN Stack
 
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/cd550af0-1c96-479d-b5d5-8937111fe9e3).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+- **MongoDB**: MongoDB Atlas cloud cluster with Mongoose ORM models
+- **Express**: Node.js REST API with Google OAuth2 authentication
+- **React**: Modern React 19 SPA with Vite and Tailwind CSS
+- **Node.js**: Backend server runtime on port 4000
 
 ## Development
 
