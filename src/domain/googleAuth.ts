@@ -15,20 +15,22 @@ export interface GoogleAuthResponse {
   };
 }
 
-import { API_BASE } from '../services/apiClient.js';
+import { API_BASE } from '../services/apiClient';
 
 export async function loginWithGoogle(customProfile?: {
-  email: string;
-  name: string;
+  email?: string;
+  name?: string;
   avatarUrl?: string;
   credential?: string;
 }): Promise<GoogleAuthResponse> {
-  const profile = customProfile || {
-    email: 'dewarsh.jain@google.com',
-    name: 'Dewarsh Jain',
-    avatarUrl: 'https://lh3.googleusercontent.com/a/default-user',
-    googleId: 'google_oauth_sub_10928391823',
-  };
+  const profile = customProfile?.credential
+    ? { credential: customProfile.credential }
+    : {
+        email: customProfile?.email || 'dewarsh.jain@google.com',
+        name: customProfile?.name || 'Dewarsh Jain',
+        avatarUrl: customProfile?.avatarUrl || 'https://lh3.googleusercontent.com/a/default-user',
+        googleId: 'google_oauth_sub_10928391823',
+      };
 
   try {
     const res = await fetch(`${API_BASE}/auth/google`, {

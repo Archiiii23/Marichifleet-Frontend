@@ -207,9 +207,8 @@ function Settings() {
                 <button
                   key={t}
                   onClick={() => setTheme(t)}
-                  className={`rounded-lg border px-4 py-3 text-left text-sm capitalize ${
-                    theme === t ? "border-primary bg-surface" : "border-border hover:border-border-strong"
-                  }`}
+                  className={`rounded-lg border px-4 py-3 text-left text-sm capitalize ${theme === t ? "border-primary bg-surface" : "border-border hover:border-border-strong"
+                    }`}
                 >
                   <span className="block font-medium">{t} appearance</span>
                   <span className="block text-xs text-muted-foreground">

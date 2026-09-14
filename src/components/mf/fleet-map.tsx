@@ -125,7 +125,6 @@ export function FleetMap({
           resizeObserver.observe(mapContainerRef.current);
         }
       }
-
       map.on("error", (e) => {
         console.warn("Mapbox GL warning:", e);
       });

@@ -67,8 +67,13 @@ function getAuthHeaders(): Record<string, string> {
 }
 
 export async function request<T = any>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-  const url = cleanEndpoint.startsWith('http') ? cleanEndpoint : `${API_BASE}${cleanEndpoint}`;
+  let url: string;
+  if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
+    url = endpoint;
+  } else {
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    url = `${API_BASE}${cleanEndpoint}`;
+  }
 
   const headers = {
     ...getAuthHeaders(),

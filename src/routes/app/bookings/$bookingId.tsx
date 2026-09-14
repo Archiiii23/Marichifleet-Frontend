@@ -1,7 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowRight, CheckCircle, RefreshCw, Send, Trash2, Truck } from "lucide-react";
+import { ArrowRight, CheckCircle, FileCheck2, FileText, RefreshCw, Send, Trash2, Truck } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Metric, PageHeader, Panel, StatusBadge } from "@/components/mf/primitives";
+import { PodReviewModal } from "@/components/mf/pod-review-modal";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { fmtDate, fmtDateTime, inr, timeAgo, useAction, useDb } from "@/domain/hooks";
@@ -42,6 +44,7 @@ function BookingDetail() {
   const invoice = db.invoices.find((i) => i.id === b.invoiceId);
   const history = db.audit.filter((a) => a.entityId === b.id || (trip && a.entityId === trip.id));
   const canInvoiceNow = invoiceEligibility(b.id);
+  const [podReviewOpen, setPodReviewOpen] = useState(false);
 
   return (
     <>
@@ -94,6 +97,15 @@ function BookingDetail() {
                 onClick={() => run(() => markVehicleDelivered(b.id, persona.name), `Vehicle marked delivered for ${b.ref}`)}
               >
                 <CheckCircle className="size-3.5" /> Mark Vehicle Delivered
+              </Button>
+            )}
+            {["delivered", "pod_pending"].includes(b.status) && (
+              <Button
+                size="sm"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-sm gap-1.5"
+                onClick={() => setPodReviewOpen(true)}
+              >
+                <FileCheck2 className="size-3.5" /> Review & Approve POD
               </Button>
             )}
             {can("edit_finance") && canInvoiceNow.ok && (
@@ -217,16 +229,54 @@ function BookingDetail() {
             )}
           </Panel>
 
-          <Panel title="Proof of delivery">
+          <Panel
+            title="Proof of delivery"
+            actions={
+              <Button size="sm" variant="outline" className="gap-1.5" onClick={() => setPodReviewOpen(true)}>
+                <FileText className="size-3.5" /> {pod ? "Inspect Signed POD" : "Review / Upload POD"}
+              </Button>
+            }
+          >
             {pod ? (
-              <div className="grid gap-4 sm:grid-cols-3 text-sm">
-                <Metric label="Received by" value={pod.receiverName} />
-                <Metric label="Captured" value={fmtDateTime(pod.capturedISO)} />
-                <Metric label="OTP verified" value={pod.verified ? "Yes" : "No"} tone={pod.verified ? "success" : "warning"} />
-                <p className="sm:col-span-3 text-muted-foreground">{pod.photoNote}</p>
+              <div className="space-y-3">
+                <div className="grid gap-4 sm:grid-cols-4 text-sm">
+                  <Metric label="Received by" value={pod.receiverName} />
+                  <Metric label="Captured" value={fmtDateTime(pod.capturedISO)} />
+                  <Metric label="OTP verified" value={pod.verified ? "Yes" : "No"} tone={pod.verified ? "success" : "warning"} />
+                  <Metric label="Status" value={pod.status === "approved" || b.status === "pod_received" ? "Verified" : "Pending Review"} tone="success" />
+                  <p className="sm:col-span-4 text-muted-foreground">{pod.photoNote}</p>
+                </div>
+                <div
+                  onClick={() => setPodReviewOpen(true)}
+                  className="flex items-center gap-3 p-3 rounded-lg border border-border bg-muted/30 hover:bg-muted/60 transition-colors cursor-pointer text-xs"
+                >
+                  <FileText className="size-5 text-primary shrink-0" />
+                  <div className="flex-1">
+                    <div className="font-semibold text-foreground">Official Lorry Receipt & POD Stamp</div>
+                    <div className="text-muted-foreground">LR-{b.ref.replace("MF-", "882")} · Stamped & Signed by {pod.receiverName}</div>
+                  </div>
+                  <Button size="sm" variant="secondary" className="h-7 text-xs">
+                    Open Document View
+                  </Button>
+                </div>
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground">POD is captured by the driver at unloading. Not available yet.</p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm py-1">
+                <p className="text-muted-foreground">
+                  {["delivered", "pod_pending"].includes(b.status)
+                    ? "Consignment delivered. Ready for POD verification and consignee sign-off."
+                    : "POD is captured at destination upon vehicle arrival and unloading."}
+                </p>
+                {["delivered", "pod_pending"].includes(b.status) && (
+                  <Button
+                    size="sm"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs gap-1.5 shrink-0"
+                    onClick={() => setPodReviewOpen(true)}
+                  >
+                    <FileCheck2 className="size-3.5" /> Review & Mark Received
+                  </Button>
+                )}
+              </div>
             )}
           </Panel>
 
@@ -283,6 +333,14 @@ function BookingDetail() {
           </Panel>
         </div>
       </div>
+
+      <PodReviewModal
+        booking={b}
+        trip={trip}
+        pod={pod}
+        open={podReviewOpen}
+        onOpenChange={setPodReviewOpen}
+      />
     </>
   );
 }

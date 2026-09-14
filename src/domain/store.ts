@@ -959,6 +959,103 @@ export function capturePod(input: {
   return { ok: true, id: podId };
 }
 
+export function reviewAndApprovePod(input: {
+  bookingId: string;
+  actor: string;
+  receiverName?: string;
+  remarks?: string;
+  imageUrl?: string;
+}): ActionResult {
+  const d = getDb();
+  const b = byId(d.bookings, input.bookingId);
+  if (!b) return { ok: false, reason: "Booking not found." };
+
+  let pod = d.pods.find((p) => p.bookingId === b.id);
+  const trip = b.tripId ? byId(d.trips, b.tripId) : undefined;
+
+  if (!pod) {
+    const podId = nid("pod");
+    pod = {
+      id: podId,
+      tripId: trip?.id || `tr_${b.id}`,
+      bookingId: b.id,
+      receiverName: input.receiverName || "Warehouse In-charge",
+      signatureSeed: `${b.ref}-approved-sig`,
+      photoNote: input.remarks || "Physical POD verified and stamped at destination bay.",
+      otp: "849201",
+      capturedISO: now(),
+      verified: true,
+      imageUrl: input.imageUrl,
+      reviewedBy: input.actor,
+      reviewedISO: now(),
+      status: "approved",
+    };
+    d.pods.unshift(pod);
+    if (trip) trip.podId = podId;
+  } else {
+    pod.verified = true;
+    pod.reviewedBy = input.actor;
+    pod.reviewedISO = now();
+    pod.status = "approved";
+    if (input.receiverName) pod.receiverName = input.receiverName;
+    if (input.remarks) pod.photoNote = input.remarks;
+    if (input.imageUrl) pod.imageUrl = input.imageUrl;
+  }
+
+  setBookingStatus(b.id, "pod_received", input.actor);
+
+  if (trip && trip.status !== "completed") {
+    tripTransition(trip.id, "pod_uploaded", input.actor);
+    tripTransition(trip.id, "completed", "System");
+  }
+
+  audit(input.actor, `POD reviewed and marked received for ${b.ref}`, "booking", b.id);
+
+  const client = byId(d.clients, b.clientId);
+  notify({
+    event: "POD_AVAILABLE",
+    channel: "whatsapp",
+    recipient: client?.phone || "919876543210",
+    recipientRole: "client",
+    body: `POD for ${b.ref} has been reviewed and verified. Ready for invoice generation.`,
+    link: `/portal/pod/${b.id}`,
+    entityRef: b.ref,
+  });
+
+  return { ok: true, id: pod.id };
+}
+
+export function rejectPod(input: {
+  bookingId: string;
+  actor: string;
+  reason: string;
+}): ActionResult {
+  const d = getDb();
+  const b = byId(d.bookings, input.bookingId);
+  if (!b) return { ok: false, reason: "Booking not found." };
+  const pod = d.pods.find((p) => p.bookingId === b.id);
+  if (pod) {
+    pod.verified = false;
+    pod.status = "rejected";
+    pod.reviewedBy = input.actor;
+    pod.reviewedISO = now();
+    pod.photoNote = `REJECTED: ${input.reason}`;
+  }
+  setBookingStatus(b.id, "pod_pending", input.actor);
+  audit(input.actor, `POD rejected for ${b.ref}: ${input.reason}`, "booking", b.id);
+  const client = byId(d.clients, b.clientId);
+  notify({
+    event: "POD_REJECTED",
+    channel: "whatsapp",
+    recipient: client?.phone || "919876543210",
+    recipientRole: "client",
+    body: `POD for ${b.ref} was rejected: ${input.reason}. Please re-upload legible proof.`,
+    link: `/app/pod`,
+    entityRef: b.ref,
+  });
+  return { ok: true };
+}
+
 export function invoiceEligibility(bookingId: string): GuardResult {
   const d = getDb();
   const b = byId(d.bookings, bookingId);
@@ -1045,21 +1142,21 @@ export function generateEInvoice(invoiceId: string, actor: string): ActionResult
   const d = getDb();
   const inv = byId(d.invoices, invoiceId);
   if (!inv) return { ok: false, reason: "Invoice not found." };
-  
+
   // Generate deterministic 64-char hex IRN from invoice ID and tenant
   const chars = "0123456789abcdef";
   let fakeHex = "";
   for (let i = 0; i < 64; i++) {
     fakeHex += chars[(inv.id.charCodeAt(i % inv.id.length) * 31 + i * 7) % 16];
   }
-  
+
   inv.irn = fakeHex;
   inv.ackNo = `1224${Math.floor(1000000000 + Math.random() * 9000000000)}`;
   inv.ackDateISO = now();
   inv.sacCode = "996511";
   inv.rcm = false;
   inv.qrCodeData = `NIC-IRP:GSTIN:${d.tenant.name.slice(0, 5).toUpperCase()}:IRN:${inv.irn}:DOC:${inv.ref}:VAL:${inv.total}:ACK:${inv.ackNo}`;
-  
+
   audit(actor, "Generated e-Invoice IRN & Signed QR Code", "invoice", inv.id);
   return { ok: true, id: inv.id };
 }

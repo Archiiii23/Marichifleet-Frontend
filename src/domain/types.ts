@@ -288,6 +288,10 @@ export interface Pod {
   otp: string;
   capturedISO: string;
   verified: boolean;
+  imageUrl?: string;
+  reviewedBy?: string;
+  reviewedISO?: string;
+  status?: "pending" | "approved" | "rejected";
 }
 
 export interface InvoiceLine {

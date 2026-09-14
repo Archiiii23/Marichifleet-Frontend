@@ -17,14 +17,33 @@ export const Route = createFileRoute("/app/pod")({
   component: PodDesk,
 });
 
+import { useState } from "react";
+import { Eye, FileCheck2 } from "lucide-react";
+import { PodReviewModal } from "@/components/mf/pod-review-modal";
+
 function PodDesk() {
   const db = useDb();
   const run = useAction();
   const navigate = useNavigate();
   const { persona, can } = useSession();
 
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+
   const pending = db.bookings.filter((b) => ["delivered", "pod_pending"].includes(b.status));
   const received = db.bookings.filter((b) => b.status === "pod_received");
+
+  const openPodReview = (b: Booking) => {
+    setSelectedBooking(b);
+    setReviewModalOpen(true);
+  };
+
+  const selectedTrip = selectedBooking?.tripId
+    ? db.trips.find((t) => t.id === selectedBooking.tripId)
+    : null;
+  const selectedPod = selectedBooking
+    ? db.pods.find((p) => p.bookingId === selectedBooking.id)
+    : null;
 
   return (
     <>
@@ -33,19 +52,34 @@ function PodDesk() {
         subtitle="Deliveries awaiting signed proof, and signed proofs waiting to be billed."
       />
       <div className="space-y-6">
-        <Panel title="Awaiting POD" description={`${pending.length} deliveries without signed proof`}>
+        <Panel
+          title="Awaiting POD Review"
+          description={`${pending.length} deliveries awaiting POD review & consignee sign-off`}
+        >
           {pending.length === 0 ? (
             <p className="py-6 text-center text-sm text-muted-foreground">Every delivery has a signed POD.</p>
           ) : (
             <ul className="space-y-2">
               {pending.map((b) => (
-                <li key={b.id} className="flex flex-wrap items-center gap-3 rounded-md border border-border p-3">
-                  <span className="numeric text-sm font-medium">{b.ref}</span>
-                  <span className="text-sm">{b.pickup.city} → {b.drop.city}</span>
+                <li
+                  key={b.id}
+                  className="flex flex-wrap items-center gap-3 rounded-md border border-border p-3 hover:bg-muted/30 transition-colors cursor-pointer"
+                  onClick={() => openPodReview(b)}
+                >
+                  <span className="numeric text-sm font-semibold text-primary">{b.ref}</span>
+                  <span className="text-sm font-medium">{b.pickup.city} → {b.drop.city}</span>
                   <span className="text-xs text-muted-foreground">{clientName(b.clientId)}</span>
                   <StatusBadge status={b.status} className="ml-auto" />
-                  <Button size="sm" variant="outline" onClick={() => navigate({ to: "/app/bookings/$bookingId", params: { bookingId: b.id } })}>
-                    Open
+                  <Button
+                    size="sm"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-xs"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openPodReview(b);
+                    }}
+                  >
+                    <FileCheck2 className="size-3.5 mr-1" />
+                    Review POD
                   </Button>
                 </li>
               ))}
@@ -56,7 +90,7 @@ function PodDesk() {
         <DataTable<Booking>
           rows={received}
           searchKeys={(b) => `${b.ref} ${clientName(b.clientId)} ${b.drop.city}`}
-          onRowClick={(b) => navigate({ to: "/app/bookings/$bookingId", params: { bookingId: b.id } })}
+          onRowClick={(b) => openPodReview(b)}
           emptyTitle="Nothing ready to bill"
           emptyMessage="Signed PODs appear here and can be converted into invoices in one click."
           columns={[
@@ -65,12 +99,30 @@ function PodDesk() {
             { key: "lane", header: "Lane", cell: (b) => `${b.pickup.city} → ${b.drop.city}` },
             {
               key: "pod",
-              header: "Signed",
+              header: "Signed & Stamped",
               cell: (b) => {
                 const p = db.pods.find((x) => x.bookingId === b.id);
                 return p ? `${p.receiverName} · ${fmtDateTime(p.capturedISO)}` : "—";
               },
               hideOnMobile: true,
+            },
+            {
+              key: "view",
+              header: "Proof",
+              cell: (b) => (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 text-xs gap-1"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openPodReview(b);
+                  }}
+                >
+                  <Eye className="size-3" />
+                  Inspect POD
+                </Button>
+              ),
             },
             {
               key: "action",
@@ -95,6 +147,15 @@ function PodDesk() {
           ]}
         />
       </div>
+
+      {/* Dedicated POD Review & Approval Modal */}
+      <PodReviewModal
+        booking={selectedBooking}
+        trip={selectedTrip}
+        pod={selectedPod}
+        open={reviewModalOpen}
+        onOpenChange={setReviewModalOpen}
+      />
     </>
   );
 }
