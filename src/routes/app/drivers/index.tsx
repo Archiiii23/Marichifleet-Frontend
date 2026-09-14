@@ -11,6 +11,7 @@ import { fmtDate, useAction, useDb } from "@/domain/hooks";
 import { useSession } from "@/domain/session";
 import { createDriver } from "@/domain/store";
 import type { Driver } from "@/domain/types";
+import { apiClient } from "@/services/apiClient";
 
 export const Route = createFileRoute("/app/drivers/")({
   head: () => ({
@@ -58,6 +59,14 @@ function Drivers() {
       toast.error("Driving licence number is required");
       return;
     }
+
+    // Also persist directly to backend MongoDB
+    apiClient.post("/fleet/drivers", {
+      name: name.trim(),
+      phone: phone.trim(),
+      licenseNumber: licenceNo.trim().toUpperCase(),
+      licenseValidUntil: licenceExpiryISO,
+    }).catch((err) => console.warn("Backend sync driver warning:", err));
 
     const res = run(
       () =>

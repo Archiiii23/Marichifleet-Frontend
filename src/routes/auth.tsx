@@ -5,7 +5,6 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/domain/auth";
 import { startDemoSession } from "@/domain/guard";
 import { homeRouteFor } from "@/domain/rbac";
@@ -35,7 +34,7 @@ export const Route = createFileRoute("/auth")({
 });
 
 function AuthPage() {
-  const { session, roles, loading } = useAuth();
+  const { session, roles, loading, refresh } = useAuth();
   const navigate = useNavigate();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
@@ -53,24 +52,15 @@ function AuthPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: window.location.origin,
-            data: { full_name: fullName, company_name: company },
-          },
-        });
-        if (error) throw error;
-        setCheckEmail(true);
-        toast.success("Account created", { description: "Check your email to confirm and finish signing in." });
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-      }
+      await loginWithGoogle({
+        email: email.trim(),
+        name: fullName.trim() || email.split('@')[0],
+      });
+      await refresh();
+      toast.success("Signed in successfully", { description: `Connected to MongoDB as ${email}` });
+      navigate({ to: "/app/dashboard" });
     } catch (error) {
-      toast.error(mode === "signup" ? "Could not create the account" : "Could not sign in", {
+      toast.error("Could not sign in", {
         description: error instanceof Error ? error.message : "Please try again.",
       });
     } finally {

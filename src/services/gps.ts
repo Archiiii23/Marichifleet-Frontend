@@ -1,5 +1,5 @@
-import { supabase } from "@/integrations/supabase/client";
-import type { Tables } from "@/integrations/supabase/types";
+import { apiClient } from "./apiClient";
+import type { Tables } from "@/types/database";
 
 export interface GpsFix {
   vehicleId: string;
@@ -47,44 +47,30 @@ export function getGpsProvider() {
   return provider;
 }
 
-export async function pushFix(tenantId: string, fix: GpsFix) {
-  await supabase.from("gps_pings").insert({
-    tenant_id: tenantId,
-    vehicle_id: fix.vehicleId,
-    trip_id: fix.tripId ?? null,
-    lat: fix.lat,
-    lng: fix.lng,
-    speed_kph: fix.speedKph,
-    heading: fix.heading,
-    source: provider.id,
-    recorded_at: fix.recordedAt,
-  });
-  await supabase
-    .from("vehicles")
-    .update({ lat: fix.lat, lng: fix.lng, speed_kph: fix.speedKph, last_ping_at: fix.recordedAt })
-    .eq("id", fix.vehicleId);
+export async function pushFix(_tenantId: string, fix: GpsFix) {
+  await apiClient.post(`/tower/vehicles/${fix.vehicleId}/location`, {
+    latitude: fix.lat,
+    longitude: fix.lng,
+    speedKmH: fix.speedKph,
+    bearing: fix.heading,
+  }).catch(() => undefined);
 }
 
 /** Advances every moving vehicle by one simulated fix. */
 export async function tickFleet(tenantId: string) {
-  const { data: trips } = await supabase
-    .from("trips")
-    .select("*")
-    .in("status", ["started", "in_transit"]);
-  if (!trips?.length) return 0;
-  const vehicleIds = trips.map((t) => t.vehicle_id).filter(Boolean) as string[];
-  if (!vehicleIds.length) return 0;
-  const { data: vehicles } = await supabase.from("vehicles").select("*").in("id", vehicleIds);
+  try {
+    const trips = await apiClient.get<any[]>('/tower/trips').catch(() => []);
+    if (!trips?.length) return 0;
+    const vehicles = await apiClient.get<any[]>('/tower/vehicles').catch(() => []);
 
-  for (const trip of trips) {
-    const vehicle = vehicles?.find((v) => v.id === trip.vehicle_id);
-    if (!vehicle) continue;
-    const fix = provider.next(vehicle, trip);
-    await pushFix(tenantId, fix);
-    await supabase
-      .from("trips")
-      .update({ progress: Math.min(100, Number(trip.progress) + 4) })
-      .eq("id", trip.id);
+    for (const trip of trips) {
+      const vehicle = vehicles?.find((v: any) => v.id === trip.vehicleId || v.regNumber === trip.vehicleRegNumber);
+      if (!vehicle) continue;
+      const fix = provider.next(vehicle, trip);
+      await pushFix(tenantId, fix);
+    }
+    return trips.length;
+  } catch {
+    return 0;
   }
-  return trips.length;
 }

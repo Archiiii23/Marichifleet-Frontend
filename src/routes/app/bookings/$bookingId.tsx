@@ -1,12 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, RefreshCw, Send, Truck } from "lucide-react";
 import { Metric, PageHeader, Panel, StatusBadge } from "@/components/mf/primitives";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { fmtDate, fmtDateTime, inr, timeAgo, useAction, useDb } from "@/domain/hooks";
 import { bookingOrder } from "@/domain/machines";
 import { useSession } from "@/domain/session";
-import { confirmBooking, createInvoice, invoiceEligibility, setBookingStatus, tripProfit } from "@/domain/store";
+import { confirmBooking, createInvoice, dispatchBooking, invoiceEligibility, setBookingStatus, tripProfit } from "@/domain/store";
 
 export const Route = createFileRoute("/app/bookings/$bookingId")({
   head: () => ({
@@ -49,22 +49,35 @@ function BookingDetail() {
         breadcrumb={[{ label: "Bookings", to: "/app/bookings" }, { label: b.ref }]}
         subtitle={`${client.name} · ${b.cargo} · ${b.weightTons}t · ${b.vehicleType}`}
         actions={
-          <>
+          <div className="flex items-center gap-2 flex-wrap">
             <StatusBadge status={b.status} />
-            {can("edit_booking") && b.status === "submitted" && (
-              <Button size="sm" onClick={() => run(() => confirmBooking(b.id, persona.name), "Booking confirmed")}>
-                Confirm booking
-              </Button>
-            )}
             {can("edit_booking") && b.status === "draft" && (
               <Button size="sm" onClick={() => run(() => setBookingStatus(b.id, "submitted", persona.name), "Booking submitted")}>
                 Submit
               </Button>
             )}
+            {can("edit_booking") && b.status === "submitted" && (
+              <Button size="sm" onClick={() => {
+                const res = run(() => confirmBooking(b.id, persona.name), "Booking confirmed");
+                if (res.ok) navigate({ to: "/app/dispatch", search: { booking: b.id } });
+              }}>
+                Confirm & Move to Dispatch <ArrowRight className="size-3.5 ml-1" />
+              </Button>
+            )}
             {can("dispatch") && b.status === "confirmed" && (
               <Button size="sm" onClick={() => navigate({ to: "/app/dispatch", search: { booking: b.id } })}>
-                Assign vehicle <ArrowRight className="size-3.5" />
+                Assign vehicle & Dispatch <ArrowRight className="size-3.5 ml-1" />
               </Button>
+            )}
+            {can("dispatch") && b.status === "assigned" && (
+              <>
+                <Button size="sm" variant="outline" onClick={() => navigate({ to: "/app/dispatch", search: { booking: b.id } })}>
+                  <RefreshCw className="size-3.5 mr-1" /> Reassign
+                </Button>
+                <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium" onClick={() => run(() => dispatchBooking(b.id, persona.name), "Booking dispatched — vehicle is on trip")}>
+                  <Truck className="size-3.5 mr-1.5" /> Dispatch Load
+                </Button>
+              </>
             )}
             {can("edit_finance") && canInvoiceNow.ok && (
               <Button
@@ -77,7 +90,7 @@ function BookingDetail() {
                 Create invoice
               </Button>
             )}
-          </>
+          </div>
         }
       />
 
@@ -131,11 +144,18 @@ function BookingDetail() {
             title="Trip"
             description={trip ? `${trip.ref} · ${Math.round(trip.progress * 100)}% complete` : "Not dispatched yet"}
             actions={
-              trip && (
-                <Button asChild size="sm" variant="ghost">
-                  <Link to="/app/trips/$tripId" params={{ tripId: trip.id }}>Open trip</Link>
-                </Button>
-              )
+              <div className="flex items-center gap-2">
+                {can("dispatch") && (b.status === "assigned" || trip?.status === "driver_assigned") && (
+                  <Button size="sm" onClick={() => run(() => dispatchBooking(b.id, persona.name), "Trip dispatched — vehicle is on trip")}>
+                    <Truck className="size-3.5 mr-1.5" /> Dispatch Trip
+                  </Button>
+                )}
+                {trip && (
+                  <Button asChild size="sm" variant="ghost">
+                    <Link to="/app/trips/$tripId" params={{ tripId: trip.id }}>Open trip</Link>
+                  </Button>
+                )}
+              </div>
             }
           >
             {trip ? (

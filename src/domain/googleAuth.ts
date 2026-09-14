@@ -15,7 +15,7 @@ export interface GoogleAuthResponse {
   };
 }
 
-const API_BASE = (import.meta.env as Record<string, string | undefined>)["VITE_API_URL"] || 'http://localhost:4000/api';
+import { API_BASE } from '../services/apiClient.js';
 
 export async function loginWithGoogle(customProfile?: {
   email: string;

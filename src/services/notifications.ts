@@ -1,5 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
-import { insertRow } from "./api";
+import { insertRow, updateRow } from "./api";
 
 export type NotificationEventName =
   | "BOOKING_CREATED" | "BOOKING_CONFIRMED" | "DRIVER_ASSIGNED" | "DRIVER_ACCEPTED"
@@ -18,10 +17,6 @@ export interface MessagingProvider {
   send(message: MessagePayload): Promise<{ ok: true } | { ok: false; reason: string }>;
 }
 
-/**
- * Development adapter. A real WhatsApp Business API adapter implements the same
- * interface and is swapped in without touching any caller.
- */
 export const mockWhatsAppProvider: MessagingProvider = {
   id: "mock-whatsapp",
   async send(message) {
@@ -62,14 +57,13 @@ export async function emitNotification(input: {
     variables: (input.payload ?? {}) as Record<string, string | number>,
   });
 
-  await supabase
-    .from("notifications")
-    .update(
-      result.ok
-        ? { status: "sent", sent_at: new Date().toISOString() }
-        : { status: "failed", failure_reason: result.reason },
-    )
-    .eq("id", row.id);
+  await updateRow(
+    "notifications",
+    row.id,
+    result.ok
+      ? { status: "sent", sent_at: new Date().toISOString() }
+      : { status: "failed", failure_reason: result.reason },
+  ).catch(() => undefined);
 
   return row;
 }
@@ -91,5 +85,5 @@ export async function writeAudit(input: {
     entity: input.entity,
     entity_id: input.entityId ?? null,
     metadata: (input.metadata ?? {}) as never,
-  });
+  }).catch(() => undefined);
 }

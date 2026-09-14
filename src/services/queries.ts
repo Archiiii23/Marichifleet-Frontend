@@ -1,8 +1,7 @@
 import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient, type QueryKey } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import type { Tables } from "@/integrations/supabase/types";
+import type { Tables } from "@/types/database";
 import { DataError, selectAll, selectOne, type TableName } from "./api";
 
 export const keys = {
@@ -52,19 +51,14 @@ export function useWorkflow<TArgs, TResult>(
   });
 }
 
-/** Keeps a table's cached rows fresh from live database changes. */
+/** Keeps a table's cached rows fresh from live backend changes via periodic polling. */
 export function useLiveTable(table: "gps_pings" | "trips" | "bookings" | "notifications") {
   const qc = useQueryClient();
   useEffect(() => {
-    const channel = supabase
-      .channel(`live-${table}`)
-      .on("postgres_changes", { event: "*", schema: "public", table }, () => {
-        void qc.invalidateQueries({ queryKey: ["db", table] });
-      })
-      .subscribe();
-    return () => {
-      void supabase.removeChannel(channel);
-    };
+    const interval = setInterval(() => {
+      void qc.invalidateQueries({ queryKey: ["db", table] });
+    }, 12_000);
+    return () => clearInterval(interval);
   }, [table, qc]);
 }
 
