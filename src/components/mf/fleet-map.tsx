@@ -20,6 +20,7 @@ export interface MapVehicle {
   vehicle: Vehicle;
   trip?: Trip;
   delayed: boolean;
+  roadGeometry?: [number, number][];
 }
 
 export function FleetMap({
@@ -29,6 +30,9 @@ export function FleetMap({
   showRoutes = true,
   className,
   height = 460,
+  activeRoadPath,
+  pickupLocation,
+  dropLocation,
 }: {
   items: MapVehicle[];
   selectedId?: string | null;
@@ -36,10 +40,14 @@ export function FleetMap({
   showRoutes?: boolean;
   className?: string;
   height?: number;
+  activeRoadPath?: [number, number][];
+  pickupLocation?: { city: string; coords: [number, number] };
+  dropLocation?: { city: string; coords: [number, number] };
 }) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<{ [key: string]: mapboxgl.Marker }>({});
+  const waypointMarkersRef = useRef<mapboxgl.Marker[]>([]);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapStyle, setMapStyle] = useState<"dark" | "streets" | "satellite">("dark");
   const [webglError, setWebglError] = useState(false);
@@ -93,7 +101,6 @@ export function FleetMap({
       if (mapContainerRef.current) {
         resizeObserver.observe(mapContainerRef.current);
       }
-
       map.on("error", (e) => {
         console.warn("Mapbox GL warning:", e);
       });
@@ -198,21 +205,114 @@ export function FleetMap({
       }
     });
 
-    // Render Routes as GeoJSON Lines
-    if (showRoutes) {
-      items.forEach(({ vehicle, trip, delayed }) => {
-        if (!trip || !trip.route || trip.route.length < 2) return;
+    // Remove old waypoint markers
+    waypointMarkersRef.current.forEach((m) => m.remove());
+    waypointMarkersRef.current = [];
+
+    // Render Dedicated Active Road Corridor from Mapbox Directions API
+    if (activeRoadPath && activeRoadPath.length > 1) {
+      const roadSrcId = "active-mapbox-road-src";
+      const roadCasingId = "active-mapbox-road-casing";
+      const roadLineId = "active-mapbox-road-line";
+
+      const roadGeoJson: GeoJSON.Feature<GeoJSON.LineString> = {
+        type: "Feature",
+        properties: {},
+        geometry: {
+          type: "LineString",
+          coordinates: activeRoadPath,
+        },
+      };
+
+      if (map.getSource(roadSrcId)) {
+        (map.getSource(roadSrcId) as mapboxgl.GeoJSONSource).setData(roadGeoJson);
+      } else {
+        map.addSource(roadSrcId, {
+          type: "geojson",
+          data: roadGeoJson,
+        });
+
+        // Glowing casing
+        map.addLayer({
+          id: roadCasingId,
+          type: "line",
+          source: roadSrcId,
+          layout: {
+            "line-join": "round",
+            "line-cap": "round",
+          },
+          paint: {
+            "line-color": "#0284c7",
+            "line-width": 7,
+            "line-opacity": 0.45,
+            "line-blur": 2,
+          },
+        });
+
+        // Crisp inner road route
+        map.addLayer({
+          id: roadLineId,
+          type: "line",
+          source: roadSrcId,
+          layout: {
+            "line-join": "round",
+            "line-cap": "round",
+          },
+          paint: {
+            "line-color": "#38bdf8",
+            "line-width": 3.5,
+            "line-opacity": 0.95,
+          },
+        });
+      }
+
+      // Add Origin Marker (Pickup)
+      if (pickupLocation?.coords) {
+        const pEl = document.createElement("div");
+        pEl.className = "flex items-center gap-1.5 bg-background/90 text-foreground border border-success/40 px-2 py-1 rounded-md shadow-lg text-[11px] font-semibold backdrop-blur-sm pointer-events-none";
+        pEl.innerHTML = `<span class="size-2 rounded-full bg-success animate-ping inline-block"></span><span>${pickupLocation.city} (Pickup)</span>`;
+        const pMarker = new mapboxgl.Marker({ element: pEl, anchor: "bottom" })
+          .setLngLat(pickupLocation.coords)
+          .addTo(map);
+        waypointMarkersRef.current.push(pMarker);
+      }
+
+      // Add Destination Marker (Drop)
+      if (dropLocation?.coords) {
+        const dEl = document.createElement("div");
+        dEl.className = "flex items-center gap-1.5 bg-background/90 text-foreground border border-destructive/40 px-2 py-1 rounded-md shadow-lg text-[11px] font-semibold backdrop-blur-sm pointer-events-none";
+        dEl.innerHTML = `<span class="size-2 rounded-full bg-destructive animate-ping inline-block"></span><span>${dropLocation.city} (Drop)</span>`;
+        const dMarker = new mapboxgl.Marker({ element: dEl, anchor: "bottom" })
+          .setLngLat(dropLocation.coords)
+          .addTo(map);
+        waypointMarkersRef.current.push(dMarker);
+      }
+
+      // Auto-fit road bounds on initial load
+      const bounds = new mapboxgl.LngLatBounds();
+      activeRoadPath.forEach((pt) => bounds.extend(pt as [number, number]));
+      map.fitBounds(bounds, {
+        padding: { top: 60, bottom: 60, left: 60, right: 60 },
+        maxZoom: 12,
+        duration: 1200,
+      });
+    }
+
+    // Render standard vehicle routes if activeRoadPath is not present
+    if (showRoutes && (!activeRoadPath || activeRoadPath.length === 0)) {
+      items.forEach(({ vehicle, trip, delayed, roadGeometry }) => {
+        const rawCoords = roadGeometry || (trip?.route ? trip.route.map((p) => [p.lng, p.lat]) : null);
+        if (!rawCoords || rawCoords.length < 2) return;
 
         const sourceId = `route-src-${vehicle.id}`;
         const layerId = `route-layer-${vehicle.id}`;
-        const coordinates = trip.route.map((p) => [p.lng, p.lat]);
 
         const geojsonData: GeoJSON.Feature<GeoJSON.LineString> = {
           type: "Feature",
           properties: {},
           geometry: {
             type: "LineString",
-            coordinates,
+            coordinates: rawCoords,
           },
         };
 
@@ -241,7 +341,8 @@ export function FleetMap({
         }
       });
     }
-  }, [items, selectedId, mapLoaded, showRoutes, mapStyle]);
+  }, [items, selectedId, mapLoaded, showRoutes, mapStyle, activeRoadPath, pickupLocation, dropLocation]);
+
 
   // 4. Fly to selected vehicle
   useEffect(() => {

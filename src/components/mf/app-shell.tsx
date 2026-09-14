@@ -4,7 +4,7 @@ import {
   Command as CommandIcon, FileText, Fuel, Handshake, LayoutDashboard, LogOut, Map, MessageSquare, Package,
   Radio, Settings, ShieldCheck, Truck, Users, UsersRound, Warehouse, Wrench,
   UserCircle2, Menu, TriangleAlert, TrendingUp, Wifi, WifiOff, Zap,
-  Search, BookOpen, CircleDot, Scale, Factory, Globe,
+  Search, BookOpen, CircleDot, Scale, Factory, Globe, Navigation,
 } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
@@ -53,6 +53,7 @@ const NAV: Array<{ group: string; items: NavItem[] }> = [
     items: [
       { to: "/app/dispatch", label: "Dispatch Board", icon: Radio, perm: "dispatch:read" },
       { to: "/app/bookings", label: "Bookings", icon: Package, perm: "bookings:read" },
+      { to: "/app/routes", label: "Routes", icon: Navigation, perm: "dispatch:read" },
       { to: "/app/trips", label: "Trips", icon: Activity, perm: "trips:read" },
       { to: "/app/tracking", label: "Live Fleet", icon: Map, perm: "fleet:read" },
       { to: "/app/geofences", label: "Geofences", icon: CircleDot, perm: "geofences:manage" },

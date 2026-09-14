@@ -1,12 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowRight, RefreshCw, Send, Truck } from "lucide-react";
+import { ArrowRight, CheckCircle, RefreshCw, Send, Trash2, Truck } from "lucide-react";
+import { toast } from "sonner";
 import { Metric, PageHeader, Panel, StatusBadge } from "@/components/mf/primitives";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { fmtDate, fmtDateTime, inr, timeAgo, useAction, useDb } from "@/domain/hooks";
 import { bookingOrder } from "@/domain/machines";
 import { useSession } from "@/domain/session";
-import { confirmBooking, createInvoice, dispatchBooking, invoiceEligibility, setBookingStatus, tripProfit } from "@/domain/store";
+import { confirmBooking, createInvoice, deleteBooking, dispatchBooking, invoiceEligibility, markVehicleDelivered, setBookingStatus, tripProfit } from "@/domain/store";
 
 export const Route = createFileRoute("/app/bookings/$bookingId")({
   head: () => ({
@@ -77,7 +78,23 @@ function BookingDetail() {
                 <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium" onClick={() => run(() => dispatchBooking(b.id, persona.name), "Booking dispatched — vehicle is on trip")}>
                   <Truck className="size-3.5 mr-1.5" /> Dispatch Load
                 </Button>
+                <Button
+                  size="sm"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-sm gap-1.5"
+                  onClick={() => run(() => markVehicleDelivered(b.id, persona.name), `Vehicle marked delivered for ${b.ref}`)}
+                >
+                  <CheckCircle className="size-3.5" /> Mark Vehicle Delivered
+                </Button>
               </>
+            )}
+            {can("dispatch") && ["dispatched", "in_transit"].includes(b.status) && (
+              <Button
+                size="sm"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-sm gap-1.5"
+                onClick={() => run(() => markVehicleDelivered(b.id, persona.name), `Vehicle marked delivered for ${b.ref}`)}
+              >
+                <CheckCircle className="size-3.5" /> Mark Vehicle Delivered
+              </Button>
             )}
             {can("edit_finance") && canInvoiceNow.ok && (
               <Button
@@ -90,6 +107,21 @@ function BookingDetail() {
                 Create invoice
               </Button>
             )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                if (confirm(`Are you sure you want to delete booking ${b.ref}?`)) {
+                  deleteBooking(b.id, persona.name);
+                  toast.success(`Booking ${b.ref} deleted`);
+                  navigate({ to: "/app/bookings" });
+                }
+              }}
+              className="gap-1.5 text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/30"
+            >
+              <Trash2 className="size-4" />
+              Delete Booking
+            </Button>
           </div>
         }
       />
@@ -148,6 +180,15 @@ function BookingDetail() {
                 {can("dispatch") && (b.status === "assigned" || trip?.status === "driver_assigned") && (
                   <Button size="sm" onClick={() => run(() => dispatchBooking(b.id, persona.name), "Trip dispatched — vehicle is on trip")}>
                     <Truck className="size-3.5 mr-1.5" /> Dispatch Trip
+                  </Button>
+                )}
+                {trip && ["driver_assigned", "driver_accepted", "started", "in_transit", "arrived"].includes(trip.status) && (
+                  <Button
+                    size="sm"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium gap-1.5"
+                    onClick={() => run(() => markVehicleDelivered(b.id, persona.name), `Vehicle marked delivered for ${b.ref}`)}
+                  >
+                    <CheckCircle className="size-3.5" /> Mark Vehicle Delivered
                   </Button>
                 )}
                 {trip && (

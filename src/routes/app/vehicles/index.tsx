@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Plus, Truck, X } from "lucide-react";
+import { Plus, Trash2, Truck, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { DataTable } from "@/components/mf/data-table";
 import { KpiCard, PageHeader, StatusBadge } from "@/components/mf/primitives";
 import { timeAgo, useAction, useDb } from "@/domain/hooks";
 import { useSession } from "@/domain/session";
-import { createVehicle } from "@/domain/store";
+import { createVehicle, deleteVehicle } from "@/domain/store";
 import type { Vehicle } from "@/domain/types";
 import { apiClient } from "@/services/apiClient";
 
@@ -146,6 +146,28 @@ function Vehicles() {
           },
           { key: "ping", header: "Last ping", cell: (v) => timeAgo(v.lastPingISO), hideOnMobile: true },
           { key: "status", header: "Status", cell: (v) => <StatusBadge status={v.status} /> },
+          {
+            key: "actions",
+            header: "",
+            className: "w-10 text-right",
+            cell: (v) => (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (confirm(`Are you sure you want to delete vehicle ${v.regNo}?`)) {
+                    deleteVehicle(v.id, persona.name);
+                    toast.success(`Vehicle ${v.regNo} deleted`);
+                  }
+                }}
+                title={`Delete vehicle ${v.regNo}`}
+              >
+                <Trash2 className="size-4" />
+              </Button>
+            ),
+          },
         ]}
       />
 

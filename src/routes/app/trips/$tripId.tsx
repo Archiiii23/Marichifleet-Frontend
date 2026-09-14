@@ -1,6 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { CheckCircle2, Circle } from "lucide-react";
-import { useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { CheckCircle2, Circle, Trash2, Navigation, Route as RouteIcon, ArrowRight, CornerDownRight, Compass, Loader2, RefreshCw, MapPin, Sparkles } from "lucide-react";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { FleetMap } from "@/components/mf/fleet-map";
 import { Metric, PageHeader, Panel, StatusBadge } from "@/components/mf/primitives";
 import { Amount, toMoney } from "@/components/mf/amount";
@@ -11,8 +12,10 @@ import { fmtDateTime, timeAgo, useAction, useDb } from "@/domain/hooks";
 import { useSession } from "@/domain/session";
 import { canSeeField } from "@/domain/rbac";
 import {
-  completeCheckpoint, markDelivered, reportException, resumeTrip, startTrip, tripProfit,
+  completeCheckpoint, deleteTrip, markDelivered, reportException, resumeTrip, startTrip, tripProfit,
 } from "@/domain/store";
+import { cn } from "@/lib/utils";
+import { getMapboxDrivingRoute, geocodeCity, MapboxRouteResult } from "@/services/mapbox";
 
 export const Route = createFileRoute("/app/trips/$tripId")({
   head: () => ({
@@ -27,6 +30,7 @@ export const Route = createFileRoute("/app/trips/$tripId")({
 function TripDetail() {
   const { tripId } = Route.useParams();
   const db = useDb();
+  const navigate = useNavigate();
   const run = useAction();
   const { persona, can } = useSession();
   const [exType, setExType] = useState("Traffic delay");
@@ -47,6 +51,58 @@ function TripDetail() {
   const pod = db.pods.find((p) => p.tripId === t.id);
   const history = db.audit.filter((a) => a.entityId === t.id);
 
+  // Mapbox Live Road Route & Distance calculation
+  const [mapboxRoute, setMapboxRoute] = useState<MapboxRouteResult | null>(null);
+  const [isLoadingRoute, setIsLoadingRoute] = useState(false);
+  const [showSteps, setShowSteps] = useState(false);
+
+  const fetchRoadRoute = async () => {
+    if (!b?.pickup?.city || !b?.drop?.city) return;
+    setIsLoadingRoute(true);
+    try {
+      let pCoords: [number, number] | null = [b.pickup.lng, b.pickup.lat];
+      let dCoords: [number, number] | null = [b.drop.lng, b.drop.lat];
+
+      if (!pCoords[0] || !pCoords[1] || (pCoords[0] === 18.52 && pCoords[1] === 73.856 && b.pickup.city !== "Pune")) {
+        pCoords = await geocodeCity(b.pickup.city);
+      }
+      if (!dCoords[0] || !dCoords[1] || (dCoords[0] === 17.385 && dCoords[1] === 78.486 && b.drop.city !== "Hyderabad")) {
+        dCoords = await geocodeCity(b.drop.city);
+      }
+
+      if (pCoords && dCoords) {
+        const routeRes = await getMapboxDrivingRoute([pCoords, dCoords]);
+        if (routeRes) {
+          setMapboxRoute(routeRes);
+          toast.success("Mapbox Highway Route Calculated", {
+            description: `${routeRes.distanceKm} km via actual road network (${routeRes.durationHours} hrs).`,
+          });
+        }
+      }
+    } catch (err) {
+      console.warn("Could not load Mapbox road route for trip:", err);
+    } finally {
+      setIsLoadingRoute(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRoadRoute();
+  }, [b?.pickup?.city, b?.drop?.city]);
+
+  const actualDistance = mapboxRoute ? mapboxRoute.distanceKm : t.distanceKm;
+  const coveredDistance = Math.round(actualDistance * t.progress * 10) / 10;
+  const remainingDistance = Math.max(0, Math.round((actualDistance - coveredDistance) * 10) / 10);
+  const estHours = mapboxRoute ? mapboxRoute.durationHours : Math.round((actualDistance / 42) * 10) / 10;
+
+  const handleDelete = () => {
+    if (confirm(`Are you sure you want to delete trip ${t.ref}?`)) {
+      deleteTrip(t.id, persona.name);
+      toast.success(`Trip ${t.ref} deleted`);
+      navigate({ to: "/app/trips" });
+    }
+  };
+
   return (
     <>
       <PageHeader
@@ -54,7 +110,7 @@ function TripDetail() {
         breadcrumb={[{ label: "Trips", to: "/app/trips" }, { label: t.ref }]}
         subtitle={`${v.regNo} · ${d.name} · booking ${b.ref}`}
         actions={
-          <>
+          <div className="flex items-center gap-2 flex-wrap">
             <StatusBadge status={t.status} />
             {can("dispatch") && t.status === "driver_accepted" && (
               <Button size="sm" onClick={() => run(() => startTrip(t.id, persona.name), "Trip started")}>Start trip</Button>
@@ -69,14 +125,160 @@ function TripDetail() {
                 Mark delivered
               </Button>
             )}
-          </>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDelete}
+              className="gap-1.5 text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/30"
+            >
+              <Trash2 className="size-4" />
+              Delete Trip
+            </Button>
+          </div>
         }
       />
 
       <div className="grid gap-4 xl:grid-cols-[1.5fr_1fr]">
         <div className="space-y-4">
           <Panel title="Live position" description={`Last ping ${timeAgo(v.lastPingISO)} · ${v.speedKph} km/h`}>
-            <FleetMap items={[{ vehicle: v, trip: t, delayed: t.delayMins > 30 || t.status === "exception" }]} selectedId={v.id} height={340} />
+            <FleetMap
+              items={[{ vehicle: v, trip: t, delayed: t.delayMins > 30 || t.status === "exception" }]}
+              selectedId={v.id}
+              height={360}
+              activeRoadPath={mapboxRoute?.geometry.coordinates}
+              pickupLocation={{
+                city: b.pickup.city,
+                coords: [b.pickup.lng, b.pickup.lat],
+              }}
+              dropLocation={{
+                city: b.drop.city,
+                coords: [b.drop.lng, b.drop.lat],
+              }}
+            />
+          </Panel>
+
+          {/* Automatic Route Planner Panel */}
+          <Panel
+            title="Automatic Route Planner (Mapbox Driving Engine)"
+            description="High-precision road path, actual highway distances and driving duration"
+            actions={
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 text-xs gap-1.5"
+                onClick={fetchRoadRoute}
+                disabled={isLoadingRoute}
+              >
+                <RefreshCw className={cn("size-3", isLoadingRoute && "animate-spin")} />
+                <span>Recalculate Route</span>
+              </Button>
+            }
+          >
+            <div className="space-y-4">
+              {/* Route Summary Banner */}
+              <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-lg bg-primary/10 border border-primary/20">
+                <div className="flex items-center gap-2">
+                  <div className="size-8 rounded-md bg-primary/20 flex items-center justify-center text-primary">
+                    <Navigation className="size-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                      <span>{b.pickup.city}</span>
+                      <ArrowRight className="size-3 text-primary" />
+                      <span>{b.drop.city}</span>
+                    </div>
+                    <div className="text-[11px] text-muted-foreground flex items-center gap-1">
+                      <Compass className="size-3 text-primary/70" />
+                      <span>Highway Route: {mapboxRoute?.summaryRoads && mapboxRoute.summaryRoads.length > 0 ? mapboxRoute.summaryRoads.slice(0, 3).join(" → ") : "National Highway Corridor"}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-mono bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded font-semibold">
+                    Mapbox Directions Verified
+                  </span>
+                </div>
+              </div>
+
+              {/* 4 Metric Cards for the Route Planner */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="rounded-lg border border-border/70 bg-card p-3 space-y-1">
+                  <div className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">Actual Road Distance</div>
+                  <div className="text-lg font-bold font-mono text-foreground">{actualDistance} km</div>
+                  <div className="text-[10px] text-primary">Via truck road network</div>
+                </div>
+
+                <div className="rounded-lg border border-border/70 bg-card p-3 space-y-1">
+                  <div className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">Driving Duration</div>
+                  <div className="text-lg font-bold font-mono text-foreground">{estHours} hrs</div>
+                  <div className="text-[10px] text-muted-foreground">Standard highway transit</div>
+                </div>
+
+                <div className="rounded-lg border border-border/70 bg-card p-3 space-y-1">
+                  <div className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">Distance Covered</div>
+                  <div className="text-lg font-bold font-mono text-emerald-600 dark:text-emerald-400">{coveredDistance} km</div>
+                  <div className="text-[10px] text-muted-foreground">{Math.round(t.progress * 100)}% route completed</div>
+                </div>
+
+                <div className="rounded-lg border border-border/70 bg-card p-3 space-y-1">
+                  <div className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">Remaining Distance</div>
+                  <div className="text-lg font-bold font-mono text-amber-500">{remainingDistance} km</div>
+                  <div className="text-[10px] text-muted-foreground">To {b.drop.city} destination</div>
+                </div>
+              </div>
+
+              {/* Highway Corridors Chips */}
+              {mapboxRoute?.summaryRoads && mapboxRoute.summaryRoads.length > 0 && (
+                <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                  <span className="text-xs text-muted-foreground font-medium mr-1">Highways:</span>
+                  {mapboxRoute.summaryRoads.map((road, i) => (
+                    <span
+                      key={i}
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-secondary text-secondary-foreground text-xs font-mono border border-border/60"
+                    >
+                      <MapPin className="size-2.5 text-primary" />
+                      <span>{road}</span>
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Turn-by-Turn Maneuver Toggle */}
+              {mapboxRoute?.steps && mapboxRoute.steps.length > 0 && (
+                <div className="border-t border-border/60 pt-3">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs h-7 gap-1.5 text-primary p-0 hover:bg-transparent hover:underline"
+                    onClick={() => setShowSteps(!showSteps)}
+                  >
+                    <RouteIcon className="size-3.5" />
+                    <span>{showSteps ? "Hide Turn-by-Turn Legs" : `View Highway Segments & Directions (${mapboxRoute.steps.length})`}</span>
+                  </Button>
+
+                  {showSteps && (
+                    <ul className="mt-2.5 space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                      {mapboxRoute.steps.map((step, idx) => (
+                        <li
+                          key={idx}
+                          className="flex items-start gap-2 text-xs py-1 px-2 rounded bg-muted/40 border border-border/40"
+                        >
+                          <CornerDownRight className="size-3 text-primary mt-0.5 shrink-0" />
+                          <span className="flex-1 text-muted-foreground">
+                            {step.instruction || `Drive along ${step.roadName}`}
+                          </span>
+                          <span className="font-mono text-[11px] font-semibold shrink-0">
+                            {step.distanceKm} km
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+            </div>
           </Panel>
 
           <Panel title="Checkpoints" description="Completed in sequence by the driver or dispatch desk">

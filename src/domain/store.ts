@@ -12,6 +12,7 @@ import type {
   NotificationEvent,
   Place,
   Role,
+  TransportRoute,
   Trip,
   Vehicle,
 } from "./types";
@@ -25,12 +26,33 @@ let hasSynced = false;
 export async function syncBackendData() {
   if (typeof window === "undefined") return;
   try {
-    const [remoteVehicles, remoteDrivers] = await Promise.all([
+    const [remoteVehicles, remoteDrivers, remoteRoutes] = await Promise.all([
       apiClient.get<any[]>("/fleet/vehicles").catch(() => []),
       apiClient.get<any[]>("/fleet/drivers").catch(() => []),
+      apiClient.get<any[]>("/routes").catch(() => []),
     ]);
 
     const d = getDb();
+    if (Array.isArray(remoteRoutes) && remoteRoutes.length > 0) {
+      for (const rr of remoteRoutes) {
+        if (rr.id && !d.routes.some((r) => r.id === rr.id || r.code === rr.code)) {
+          d.routes.unshift({
+            id: rr.id,
+            name: rr.name,
+            code: rr.code,
+            originCity: rr.originCity,
+            destinationCity: rr.destinationCity,
+            distanceKm: rr.distanceKm,
+            estTransitHours: rr.estTransitHours || 12,
+            defaultRate: rr.defaultRate || 30000,
+            tollEstimate: rr.tollEstimate || 1500,
+            stops: rr.stops || [],
+            status: rr.status || "active",
+            createdAtISO: rr.createdAt || new Date().toISOString(),
+          });
+        }
+      }
+    }
     if (Array.isArray(remoteVehicles) && remoteVehicles.length > 0) {
       for (const rv of remoteVehicles) {
         const reg = (rv.regNumber || rv.regNo || "").toUpperCase();
@@ -233,6 +255,7 @@ export function createBooking(input: {
   actor: string;
   source: string;
   submit: boolean;
+  routeId?: string;
 }): ActionResult {
   const d = getDb();
   const client = byId(d.clients, input.clientId);
@@ -262,6 +285,7 @@ export function createBooking(input: {
     pickupISO: input.pickupISO,
     createdISO: now(),
     createdBy: input.source,
+    routeId: input.routeId,
   };
   d.bookings.unshift(booking);
   audit(input.actor, "Created booking", "booking", id, undefined, labelize(booking.status));
@@ -276,6 +300,163 @@ export function createBooking(input: {
   });
   return { ok: true, id };
 }
+
+export function createRoute(input: {
+  name?: string;
+  code?: string;
+  originCity: string;
+  destinationCity: string;
+  distanceKm: number;
+  estTransitHours?: number;
+  defaultRate?: number;
+  tollEstimate?: number;
+  stops?: string[];
+  actor?: string;
+}): ActionResult {
+  const d = getDb();
+  if (!d.routes) d.routes = [];
+
+  const origin = input.originCity?.trim();
+  const dest = input.destinationCity?.trim();
+  if (!origin || !dest) {
+    return { ok: false, reason: "Origin and destination cities are required." };
+  }
+  if (origin.toLowerCase() === dest.toLowerCase()) {
+    return { ok: false, reason: "Origin and destination cities must be different." };
+  }
+  if (!input.distanceKm || input.distanceKm <= 0) {
+    return { ok: false, reason: "Valid corridor distance in km is required." };
+  }
+
+  const id = nid("rt");
+  const code =
+    input.code?.trim().toUpperCase() ||
+    `RT-${origin.slice(0, 3).toUpperCase()}-${dest.slice(0, 3).toUpperCase()}`;
+
+  const name = input.name?.trim() || `${origin} → ${dest} Corridor`;
+
+  const newRoute: TransportRoute = {
+    id,
+    name,
+    code,
+    originCity: origin,
+    destinationCity: dest,
+    distanceKm: Number(input.distanceKm),
+    estTransitHours: Number(input.estTransitHours) || Math.round((Number(input.distanceKm) / 40) * 10) / 10,
+    defaultRate: Number(input.defaultRate) || Math.round(Number(input.distanceKm) * 48),
+    tollEstimate: Number(input.tollEstimate) || Math.round(Number(input.distanceKm) * 3),
+    stops: input.stops || [],
+    status: "active",
+    createdAtISO: now(),
+  };
+
+  d.routes.unshift(newRoute);
+  audit(input.actor || "Operations", "Created transport route", "route", id, undefined, newRoute.code);
+  bump();
+
+  // Async persist to MongoDB backend if online
+  apiClient.post("/routes", newRoute).catch(() => {});
+
+  return { ok: true, id };
+}
+
+export function deleteRoute(routeId: string, actor?: string): ActionResult {
+  const d = getDb();
+  if (!d.routes) d.routes = [];
+  const idx = d.routes.findIndex((r) => r.id === routeId);
+  if (idx === -1) return { ok: false, reason: "Route not found." };
+  const removed = d.routes.splice(idx, 1)[0];
+  audit(actor || "Operations", "Deleted transport route", "route", routeId, removed.code, undefined);
+  bump();
+
+  // Async delete from backend
+  apiClient.delete(`/routes/${routeId}`).catch(() => {});
+
+  return { ok: true, id: routeId };
+}
+
+export function deleteVehicle(vehicleId: string, actor?: string): ActionResult {
+  const d = getDb();
+  const idx = d.vehicles.findIndex((v) => v.id === vehicleId);
+  if (idx === -1) return { ok: false, reason: "Vehicle not found." };
+  const removed = d.vehicles.splice(idx, 1)[0];
+
+  d.drivers.forEach((drv) => {
+    if (drv.assignedVehicleId === vehicleId) {
+      drv.assignedVehicleId = undefined;
+    }
+  });
+
+  audit(actor || "Fleet Manager", `Deleted vehicle ${removed.regNo}`, "vehicle", vehicleId, removed.status, undefined);
+  bump();
+
+  apiClient.delete(`/fleet/vehicles/${vehicleId}`).catch(() => {});
+  return { ok: true, id: vehicleId };
+}
+
+export function deleteDriver(driverId: string, actor?: string): ActionResult {
+  const d = getDb();
+  const idx = d.drivers.findIndex((drv) => drv.id === driverId);
+  if (idx === -1) return { ok: false, reason: "Driver not found." };
+  const removed = d.drivers.splice(idx, 1)[0];
+
+  audit(actor || "Fleet Manager", `Deleted driver ${removed.name}`, "driver", driverId, removed.status, undefined);
+  bump();
+
+  apiClient.delete(`/fleet/drivers/${driverId}`).catch(() => {});
+  return { ok: true, id: driverId };
+}
+
+export function deleteTrip(tripId: string, actor?: string): ActionResult {
+  const d = getDb();
+  const idx = d.trips.findIndex((t) => t.id === tripId);
+  if (idx === -1) return { ok: false, reason: "Trip not found." };
+  const removed = d.trips.splice(idx, 1)[0];
+
+  const vehicle = d.vehicles.find((v) => v.id === removed.vehicleId);
+  if (vehicle && vehicle.currentTripId === tripId) {
+    vehicle.currentTripId = undefined;
+    if (vehicle.status === "on_trip") vehicle.status = "available";
+  }
+
+  const driver = d.drivers.find((dr) => dr.id === removed.driverId);
+  if (driver && driver.status === "on_trip") {
+    driver.status = "available";
+  }
+
+  const booking = d.bookings.find((b) => b.tripId === tripId || b.id === removed.bookingId);
+  if (booking) {
+    booking.tripId = undefined;
+    if (booking.status === "dispatched" || booking.status === "in_transit") {
+      booking.status = "confirmed";
+    }
+  }
+
+  audit(actor || "Control Tower", `Deleted trip ${removed.ref}`, "trip", tripId, removed.status, undefined);
+  bump();
+
+  apiClient.delete(`/trips/${tripId}`).catch(() => {});
+  return { ok: true, id: tripId };
+}
+
+export function deleteBooking(bookingId: string, actor?: string): ActionResult {
+  const d = getDb();
+  const idx = d.bookings.findIndex((b) => b.id === bookingId);
+  if (idx === -1) return { ok: false, reason: "Booking not found." };
+  const removed = d.bookings.splice(idx, 1)[0];
+
+  const linkedTrip = d.trips.find((t) => t.bookingId === bookingId || t.id === removed.tripId);
+  if (linkedTrip) {
+    linkedTrip.bookingId = "";
+  }
+
+  audit(actor || "Sales / Dispatch", `Deleted booking ${removed.ref}`, "booking", bookingId, removed.status, undefined);
+  bump();
+
+  apiClient.delete(`/bookings/${bookingId}`).catch(() => {});
+  return { ok: true, id: bookingId };
+}
+
 
 export function createVehicle(input: {
   regNo: string;
@@ -649,31 +830,75 @@ export function advanceJobCard(
 }
 
 export function markDelivered(tripId: string, actor: string): ActionResult {
+  return markVehicleDelivered(tripId, actor);
+}
+
+export function markVehicleDelivered(bookingOrTripId: string, actor: string): ActionResult {
   const d = getDb();
-  const t = byId(d.trips, tripId);
-  if (!t) return { ok: false, reason: "Trip not found." };
-  if (t.status === "in_transit" || t.status === "exception") {
-    if (t.checkpoints.some((c) => !c.doneISO))
-      return { ok: false, reason: "All checkpoints must be completed before delivery." };
-    t.status = "arrived";
+  let booking = d.bookings.find((b) => b.id === bookingOrTripId);
+  let trip = booking?.tripId ? byId(d.trips, booking.tripId) : byId(d.trips, bookingOrTripId);
+
+  if (!trip && !booking) {
+    return { ok: false, reason: "Booking or trip not found." };
   }
-  const res = tripTransition(tripId, "delivered", actor);
-  if (!res.ok) return res;
-  t.deliveredISO = now();
-  t.progress = 1;
-  const b = byId(d.bookings, t.bookingId)!;
-  if (b.status === "in_transit") setBookingStatus(b.id, "delivered", "System");
-  if (b.status === "delivered") setBookingStatus(b.id, "pod_pending", "System");
-  notify({
-    event: "TRIP_DELIVERED",
-    channel: "whatsapp",
-    recipient: byId(d.clients, b.clientId)!.phone,
-    recipientRole: "client",
-    body: `Shipment ${b.ref} delivered at ${b.drop.city}. POD will follow shortly.`,
-    link: `/portal/bookings/${b.id}`,
-    entityRef: b.ref,
-  });
-  return res;
+
+  if (!booking && trip) {
+    booking = byId(d.bookings, trip.bookingId);
+  }
+
+  if (trip) {
+    // Complete all checkpoints
+    trip.checkpoints.forEach((c) => {
+      if (!c.doneISO) c.doneISO = now();
+    });
+    trip.status = "delivered";
+    trip.deliveredISO = now();
+    trip.progress = 1;
+
+    // Release vehicle
+    const vehicle = byId(d.vehicles, trip.vehicleId);
+    if (vehicle) {
+      vehicle.status = "available";
+      vehicle.currentTripId = undefined;
+      vehicle.speedKph = 0;
+      if (trip.route && trip.route.length > 0) {
+        const last = trip.route[trip.route.length - 1];
+        vehicle.lat = last.lat;
+        vehicle.lng = last.lng;
+      }
+      vehicle.lastPingISO = now();
+    }
+
+    // Release driver
+    const driver = byId(d.drivers, trip.driverId);
+    if (driver) {
+      driver.status = "available";
+      driver.assignedVehicleId = undefined;
+      driver.tripsCompleted = (driver.tripsCompleted || 0) + 1;
+    }
+
+    audit(actor, `Vehicle ${vehicle?.regNo || ""} marked delivered at destination`, "trip", trip.id, undefined, "Delivered");
+  }
+
+  if (booking) {
+    booking.status = "pod_pending";
+    audit(actor, "Shipment delivered at destination — POD pending", "booking", booking.id, undefined, "Delivered");
+
+    const client = byId(d.clients, booking.clientId);
+    if (client) {
+      notify({
+        event: "TRIP_DELIVERED",
+        channel: "whatsapp",
+        recipient: client.phone,
+        recipientRole: "client",
+        body: `Shipment ${booking.ref} delivered at ${booking.drop.city}. Vehicle has arrived. POD will follow shortly.`,
+        link: `/portal/tracking/${booking.id}`,
+        entityRef: booking.ref,
+      });
+    }
+  }
+
+  return { ok: true, id: trip?.id || booking?.id };
 }
 
 export function capturePod(input: {

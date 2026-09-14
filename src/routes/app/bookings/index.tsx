@@ -1,9 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { DataTable } from "@/components/mf/data-table";
 import { PageHeader, StatusBadge } from "@/components/mf/primitives";
 import { Button } from "@/components/ui/button";
 import { fmtDate, inr, useDb } from "@/domain/hooks";
-import { clientName } from "@/domain/store";
+import { useSession } from "@/domain/session";
+import { clientName, deleteBooking } from "@/domain/store";
 import type { Booking } from "@/domain/types";
 
 export const Route = createFileRoute("/app/bookings/")({
@@ -19,6 +22,7 @@ export const Route = createFileRoute("/app/bookings/")({
 function Bookings() {
   const db = useDb();
   const navigate = useNavigate();
+  const { persona } = useSession();
 
   return (
     <>
@@ -60,6 +64,28 @@ function Bookings() {
           { key: "pickup", header: "Pickup", cell: (b) => fmtDate(b.pickupISO), sortValue: (b) => b.pickupISO, hideOnMobile: true },
           { key: "rate", header: "Rate", cell: (b) => <span className="numeric">{inr(b.rate)}</span>, sortValue: (b) => b.rate, className: "text-right" },
           { key: "status", header: "Status", cell: (b) => <StatusBadge status={b.status} /> },
+          {
+            key: "actions",
+            header: "",
+            className: "w-10 text-right",
+            cell: (b) => (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (confirm(`Are you sure you want to delete booking ${b.ref}?`)) {
+                    deleteBooking(b.id, persona.name);
+                    toast.success(`Booking ${b.ref} deleted`);
+                  }
+                }}
+                title={`Delete booking ${b.ref}`}
+              >
+                <Trash2 className="size-4" />
+              </Button>
+            ),
+          },
         ]}
       />
     </>

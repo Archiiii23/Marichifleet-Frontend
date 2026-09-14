@@ -39,6 +39,7 @@ import { Route as AppPurchaseOrdersRouteImport } from './routes/app/purchase-ord
 import { Route as AppReportBuilderRouteImport } from './routes/app/report-builder'
 import { Route as AppReportsRouteImport } from './routes/app/reports'
 import { Route as AppRolesRouteImport } from './routes/app/roles'
+import { Route as AppRoutesRouteImport } from './routes/app/routes'
 import { Route as AppSettingsRouteImport } from './routes/app/settings'
 import { Route as AppSubscriptionRouteImport } from './routes/app/subscription'
 import { Route as AppTowerRouteImport } from './routes/app/tower'
@@ -230,6 +231,11 @@ const AppReportsRoute = AppReportsRouteImport.update({
 const AppRolesRoute = AppRolesRouteImport.update({
   id: '/roles',
   path: '/roles',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppRoutesRoute = AppRoutesRouteImport.update({
+  id: '/routes',
+  path: '/routes',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
@@ -475,6 +481,7 @@ export interface FileRoutesByFullPath {
   '/app/report-builder': typeof AppReportBuilderRoute
   '/app/reports': typeof AppReportsRoute
   '/app/roles': typeof AppRolesRoute
+  '/app/routes': typeof AppRoutesRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/subscription': typeof AppSubscriptionRoute
   '/app/tower': typeof AppTowerRoute
@@ -547,6 +554,7 @@ export interface FileRoutesByTo {
   '/app/report-builder': typeof AppReportBuilderRoute
   '/app/reports': typeof AppReportsRoute
   '/app/roles': typeof AppRolesRoute
+  '/app/routes': typeof AppRoutesRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/subscription': typeof AppSubscriptionRoute
   '/app/tower': typeof AppTowerRoute
@@ -621,6 +629,7 @@ export interface FileRoutesById {
   '/app/report-builder': typeof AppReportBuilderRoute
   '/app/reports': typeof AppReportsRoute
   '/app/roles': typeof AppRolesRoute
+  '/app/routes': typeof AppRoutesRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/subscription': typeof AppSubscriptionRoute
   '/app/tower': typeof AppTowerRoute
@@ -697,6 +706,7 @@ export interface FileRouteTypes {
     | '/app/report-builder'
     | '/app/reports'
     | '/app/roles'
+    | '/app/routes'
     | '/app/settings'
     | '/app/subscription'
     | '/app/tower'
@@ -769,6 +779,7 @@ export interface FileRouteTypes {
     | '/app/report-builder'
     | '/app/reports'
     | '/app/roles'
+    | '/app/routes'
     | '/app/settings'
     | '/app/subscription'
     | '/app/tower'
@@ -842,6 +853,7 @@ export interface FileRouteTypes {
     | '/app/report-builder'
     | '/app/reports'
     | '/app/roles'
+    | '/app/routes'
     | '/app/settings'
     | '/app/subscription'
     | '/app/tower'
@@ -1108,6 +1120,13 @@ declare module '@tanstack/react-router' {
       path: '/roles'
       fullPath: '/app/roles'
       preLoaderRoute: typeof AppRolesRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/routes': {
+      id: '/app/routes'
+      path: '/routes'
+      fullPath: '/app/routes'
+      preLoaderRoute: typeof AppRoutesRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/app/settings': {
@@ -1455,6 +1474,7 @@ interface AppRouteRouteChildren {
   AppReportBuilderRoute: typeof AppReportBuilderRoute
   AppReportsRoute: typeof AppReportsRoute
   AppRolesRoute: typeof AppRolesRoute
+  AppRoutesRoute: typeof AppRoutesRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppSubscriptionRoute: typeof AppSubscriptionRoute
   AppTowerRoute: typeof AppTowerRoute
@@ -1500,6 +1520,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppReportBuilderRoute: AppReportBuilderRoute,
   AppReportsRoute: AppReportsRoute,
   AppRolesRoute: AppRolesRoute,
+  AppRoutesRoute: AppRoutesRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppSubscriptionRoute: AppSubscriptionRoute,
   AppTowerRoute: AppTowerRoute,

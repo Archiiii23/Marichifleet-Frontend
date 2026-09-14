@@ -1,8 +1,12 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { FleetMap } from "@/components/mf/fleet-map";
 import { Metric, PageHeader, Panel, StatusBadge } from "@/components/mf/primitives";
+import { Button } from "@/components/ui/button";
 import { fmtDate, fmtDateTime, inr, timeAgo, useDb } from "@/domain/hooks";
-import { tripProfit } from "@/domain/store";
+import { useSession } from "@/domain/session";
+import { deleteVehicle, tripProfit } from "@/domain/store";
 
 export const Route = createFileRoute("/app/vehicles/$vehicleId")({
   head: () => ({
@@ -17,6 +21,8 @@ export const Route = createFileRoute("/app/vehicles/$vehicleId")({
 function VehicleDetail() {
   const { vehicleId } = Route.useParams();
   const db = useDb();
+  const navigate = useNavigate();
+  const { persona } = useSession();
   const v = db.vehicles.find((x) => x.id === vehicleId);
 
   if (!v) {
@@ -34,13 +40,34 @@ function VehicleDetail() {
   const jobs = db.jobCards.filter((j) => j.vehicleId === v.id);
   const liveTrip = db.trips.find((t) => t.id === v.currentTripId);
 
+  const handleDelete = () => {
+    if (confirm(`Are you sure you want to delete vehicle ${v.regNo}?`)) {
+      deleteVehicle(v.id, persona.name);
+      toast.success(`Vehicle ${v.regNo} deleted`);
+      navigate({ to: "/app/vehicles" });
+    }
+  };
+
   return (
     <>
       <PageHeader
         title={v.regNo}
         breadcrumb={[{ label: "Vehicles", to: "/app/vehicles" }, { label: v.regNo }]}
         subtitle={`${v.make} · ${v.type} · ${v.capacityTons}t capacity`}
-        actions={<StatusBadge status={v.status} />}
+        actions={
+          <div className="flex items-center gap-2">
+            <StatusBadge status={v.status} />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDelete}
+              className="gap-1.5 text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/30"
+            >
+              <Trash2 className="size-4" />
+              Delete Vehicle
+            </Button>
+          </div>
+        }
       />
       <div className="grid gap-4 xl:grid-cols-[1.4fr_1fr]">
         <div className="space-y-4">

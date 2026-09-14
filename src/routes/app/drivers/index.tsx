@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Plus, UserPlus, X } from "lucide-react";
+import { Plus, Trash2, UserPlus, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { DataTable } from "@/components/mf/data-table";
 import { PageHeader, StatusBadge } from "@/components/mf/primitives";
 import { fmtDate, useAction, useDb } from "@/domain/hooks";
 import { useSession } from "@/domain/session";
-import { createDriver } from "@/domain/store";
+import { createDriver, deleteDriver } from "@/domain/store";
 import type { Driver } from "@/domain/types";
 import { apiClient } from "@/services/apiClient";
 
@@ -123,6 +123,28 @@ function Drivers() {
           { key: "rating", header: "Rating", cell: (d) => <span className="numeric">★ {d.rating.toFixed(1)}</span>, sortValue: (d) => d.rating },
           { key: "trips", header: "Trips", cell: (d) => <span className="numeric">{d.tripsCompleted}</span>, sortValue: (d) => d.tripsCompleted },
           { key: "status", header: "Status", cell: (d) => <StatusBadge status={d.status} /> },
+          {
+            key: "actions",
+            header: "",
+            className: "w-10 text-right",
+            cell: (d) => (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (confirm(`Are you sure you want to delete driver ${d.name}?`)) {
+                    deleteDriver(d.id, persona.name);
+                    toast.success(`Driver ${d.name} deleted`);
+                  }
+                }}
+                title={`Delete driver ${d.name}`}
+              >
+                <Trash2 className="size-4" />
+              </Button>
+            ),
+          },
         ]}
       />
 

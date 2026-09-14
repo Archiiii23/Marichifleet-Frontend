@@ -1,8 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { DataTable } from "@/components/mf/data-table";
 import { PageHeader, StatusBadge } from "@/components/mf/primitives";
+import { Button } from "@/components/ui/button";
 import { fmtDateTime, inr, useDb } from "@/domain/hooks";
-import { tripProfit } from "@/domain/store";
+import { useSession } from "@/domain/session";
+import { deleteTrip, tripProfit } from "@/domain/store";
 import type { Trip } from "@/domain/types";
 
 export const Route = createFileRoute("/app/trips/")({
@@ -18,6 +22,7 @@ export const Route = createFileRoute("/app/trips/")({
 function Trips() {
   const db = useDb();
   const navigate = useNavigate();
+  const { persona } = useSession();
   const veh = (id: string) => db.vehicles.find((v) => v.id === id)?.regNo ?? "—";
   const drv = (id: string) => db.drivers.find((d) => d.id === id)?.name ?? "—";
   const lane = (t: Trip) => {
@@ -67,6 +72,28 @@ function Trips() {
             className: "text-right",
           },
           { key: "status", header: "Status", cell: (t) => <StatusBadge status={t.status} /> },
+          {
+            key: "actions",
+            header: "",
+            className: "w-10 text-right",
+            cell: (t) => (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (confirm(`Are you sure you want to delete trip ${t.ref}?`)) {
+                    deleteTrip(t.id, persona.name);
+                    toast.success(`Trip ${t.ref} deleted`);
+                  }
+                }}
+                title={`Delete trip ${t.ref}`}
+              >
+                <Trash2 className="size-4" />
+              </Button>
+            ),
+          },
         ]}
       />
     </>

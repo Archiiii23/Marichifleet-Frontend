@@ -242,6 +242,7 @@ export interface Booking {
   createdISO: string;
   tripId?: string;
   invoiceId?: string;
+  routeId?: string;
   createdBy: string;
 }
 
@@ -403,6 +404,21 @@ export interface AuditEntry {
   atISO: string;
 }
 
+export interface TransportRoute {
+  id: string;
+  name: string;
+  code: string;
+  originCity: string;
+  destinationCity: string;
+  distanceKm: number;
+  estTransitHours: number;
+  defaultRate: number;
+  tollEstimate: number;
+  stops?: string[];
+  status: "active" | "inactive";
+  createdAtISO: string;
+}
+
 export interface DbShape {
   tenant: Tenant;
   branches: Branch[];
@@ -410,6 +426,7 @@ export interface DbShape {
   drivers: Driver[];
   clients: Client[];
   rateCards: RateCard[];
+  routes: TransportRoute[];
   bookings: Booking[];
   trips: Trip[];
   pods: Pod[];

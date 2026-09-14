@@ -1,7 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { Metric, PageHeader, Panel, StatusBadge } from "@/components/mf/primitives";
+import { Button } from "@/components/ui/button";
 import { fmtDate, inr, useDb } from "@/domain/hooks";
-import { tripProfit } from "@/domain/store";
+import { useSession } from "@/domain/session";
+import { deleteDriver, tripProfit } from "@/domain/store";
 
 export const Route = createFileRoute("/app/drivers/$driverId")({
   head: () => ({
@@ -16,6 +20,8 @@ export const Route = createFileRoute("/app/drivers/$driverId")({
 function DriverDetail() {
   const { driverId } = Route.useParams();
   const db = useDb();
+  const navigate = useNavigate();
+  const { persona } = useSession();
   const d = db.drivers.find((x) => x.id === driverId);
 
   if (!d) {
@@ -30,13 +36,34 @@ function DriverDetail() {
   const trips = db.trips.filter((t) => t.driverId === d.id);
   const docs = db.docs.filter((x) => x.entityType === "driver" && x.entityId === d.id);
 
+  const handleDelete = () => {
+    if (confirm(`Are you sure you want to delete driver ${d.name}?`)) {
+      deleteDriver(d.id, persona.name);
+      toast.success(`Driver ${d.name} deleted`);
+      navigate({ to: "/app/drivers" });
+    }
+  };
+
   return (
     <>
       <PageHeader
         title={d.name}
         breadcrumb={[{ label: "Drivers", to: "/app/drivers" }, { label: d.name }]}
         subtitle={`${d.phone} · licence ${d.licenceNo}`}
-        actions={<StatusBadge status={d.status} />}
+        actions={
+          <div className="flex items-center gap-2">
+            <StatusBadge status={d.status} />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDelete}
+              className="gap-1.5 text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/30"
+            >
+              <Trash2 className="size-4" />
+              Delete Driver
+            </Button>
+          </div>
+        }
       />
       <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
         <Panel title="Trips" description={`${trips.length} assigned`}>

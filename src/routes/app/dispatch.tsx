@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Check, ShieldAlert, Truck, ArrowRight } from "lucide-react";
+import { Check, CheckCircle, ShieldAlert, Truck, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { EmptyState, NoAccess, PageHeader, Panel, StatusBadge } from "@/components/mf/primitives";
 import { Amount, toMoney } from "@/components/mf/amount";
@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { fmtDate, useAction, useDb } from "@/domain/hooks";
 import { useSession } from "@/domain/session";
-import { assignTrip, clientName, confirmBooking, dispatchBooking, rankCandidates } from "@/domain/store";
+import { assignTrip, clientName, confirmBooking, dispatchBooking, markVehicleDelivered, rankCandidates } from "@/domain/store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/app/dispatch")({
@@ -31,11 +31,12 @@ function Dispatch() {
   const run = useAction();
   const { persona, can } = useSession();
 
-  const [filterTab, setFilterTab] = useState<"all" | "pending" | "assigned">("all");
-  const allLoads = db.bookings.filter((b) => ["submitted", "confirmed", "assigned"].includes(b.status));
+  const [filterTab, setFilterTab] = useState<"all" | "pending" | "assigned" | "dispatched">("all");
+  const allLoads = db.bookings.filter((b) => ["submitted", "confirmed", "assigned", "dispatched", "in_transit"].includes(b.status));
   const queue = allLoads.filter((b) => {
     if (filterTab === "pending") return b.status === "confirmed" || b.status === "submitted";
     if (filterTab === "assigned") return b.status === "assigned";
+    if (filterTab === "dispatched") return b.status === "dispatched" || b.status === "in_transit";
     return true;
   });
 
@@ -59,6 +60,10 @@ function Dispatch() {
   const chosenDriver = ranked?.drivers.find((d) => d.driver.id === driverId);
   const needsOverride = (chosenVehicle && !chosenVehicle.eligible) || (chosenDriver && !chosenDriver.eligible);
 
+  const activeTrip = booking?.tripId ? db.trips.find((t) => t.id === booking.tripId) : null;
+  const assignedVehicle = activeTrip ? db.vehicles.find((v) => v.id === activeTrip.vehicleId) : null;
+  const assignedDriver = activeTrip ? db.drivers.find((d) => d.id === activeTrip.driverId) : null;
+
   return (
     <>
       <PageHeader
@@ -76,7 +81,7 @@ function Dispatch() {
       ) : (
         <div className="grid gap-4 xl:grid-cols-[340px_1fr]">
           <Panel title="Dispatch queue" description={`${queue.length} loads matching filter`}>
-            <div className="flex gap-1 border-b border-border pb-2 mb-2 text-xs">
+            <div className="flex flex-wrap gap-1 border-b border-border pb-2 mb-2 text-xs">
               <button
                 type="button"
                 onClick={() => setFilterTab("all")}
@@ -89,7 +94,7 @@ function Dispatch() {
                 onClick={() => setFilterTab("pending")}
                 className={cn("px-2 py-1 rounded font-medium transition-colors", filterTab === "pending" ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground hover:text-foreground")}
               >
-                Needs Asset ({allLoads.filter((b) => b.status !== "assigned").length})
+                Needs Asset ({allLoads.filter((b) => b.status === "submitted" || b.status === "confirmed").length})
               </button>
               <button
                 type="button"
@@ -97,6 +102,13 @@ function Dispatch() {
                 className={cn("px-2 py-1 rounded font-medium transition-colors", filterTab === "assigned" ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground hover:text-foreground")}
               >
                 Assigned ({allLoads.filter((b) => b.status === "assigned").length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setFilterTab("dispatched")}
+                className={cn("px-2 py-1 rounded font-medium transition-colors", filterTab === "dispatched" ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground hover:text-foreground")}
+              >
+                Dispatched ({allLoads.filter((b) => b.status === "dispatched" || b.status === "in_transit").length})
               </button>
             </div>
 
@@ -134,10 +146,10 @@ function Dispatch() {
           {booking && ranked && (
             <div className="space-y-4">
               <Panel
-                title={`Assign ${booking.ref}`}
+                title={`Dispatch & Assignment: ${booking.ref}`}
                 description={`${booking.pickup.city} → ${booking.drop.city} · ${booking.distanceKm} km · ${booking.weightTons}t`}
                 actions={
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     {booking.status === "submitted" && (
                       <Button
                         size="sm"
@@ -147,20 +159,55 @@ function Dispatch() {
                       </Button>
                     )}
                     {booking.status === "assigned" && (
-                      <Button
-                        size="sm"
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
-                        onClick={() => {
-                          const res = run(() => dispatchBooking(booking.id, persona.name), "Trip dispatched — vehicle is on trip");
-                          if (res.ok) navigate({ to: "/app/trips" });
-                        }}
-                      >
-                        <Truck className="size-3.5 mr-1.5" /> Dispatch Trip Now
-                      </Button>
+                      <>
+                        <Button
+                          size="sm"
+                          className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium gap-1.5"
+                          onClick={() => {
+                            const res = run(() => dispatchBooking(booking.id, persona.name), "Trip dispatched — vehicle is on trip");
+                            if (res.ok) navigate({ to: "/app/trips" });
+                          }}
+                        >
+                          <Truck className="size-3.5" /> Dispatch Trip Now
+                        </Button>
+                        <Button
+                          size="sm"
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-sm gap-1.5"
+                          onClick={() => {
+                            const res = run(() => markVehicleDelivered(booking.id, persona.name), `Vehicle marked delivered for ${booking.ref}`);
+                            if (res.ok) setSelectedId(queue.find((b) => b.id !== booking.id)?.id);
+                          }}
+                        >
+                          <CheckCircle className="size-3.5" /> Mark Vehicle Delivered
+                        </Button>
+                      </>
+                    )}
+                    {["dispatched", "in_transit"].includes(booking.status) && (
+                      <>
+                        <Button
+                          size="sm"
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-sm gap-1.5"
+                          onClick={() => {
+                            const res = run(() => markVehicleDelivered(booking.id, persona.name), `Vehicle marked delivered for ${booking.ref}`);
+                            if (res.ok) setSelectedId(queue.find((b) => b.id !== booking.id)?.id);
+                          }}
+                        >
+                          <CheckCircle className="size-3.5" /> Mark Vehicle Delivered
+                        </Button>
+                        {booking.tripId && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => navigate({ to: "/app/trips/$tripId", params: { tripId: booking.tripId! } })}
+                          >
+                            Live Trip →
+                          </Button>
+                        )}
+                      </>
                     )}
                     <Button
                       size="sm"
-                      variant={booking.status === "assigned" ? "outline" : "default"}
+                      variant={booking.status === "assigned" || ["dispatched", "in_transit"].includes(booking.status) ? "outline" : "default"}
                       disabled={!vehicleId || !driverId}
                       onClick={() => {
                         const res = run(
@@ -182,6 +229,50 @@ function Dispatch() {
                   </div>
                 }
               >
+                {/* Active Trip & Vehicle Delivery Quick Card */}
+                {activeTrip && (
+                  <div className="mb-4 rounded-lg border border-primary/20 bg-primary/5 p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-sm">{activeTrip.ref}</span>
+                          <StatusBadge status={activeTrip.status} />
+                          <span className="text-xs text-muted-foreground">· Progress: {Math.round(activeTrip.progress * 100)}%</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {booking.pickup.city} → {booking.drop.city} · {booking.distanceKm} km
+                        </p>
+                      </div>
+                      <Button
+                        size="sm"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-sm gap-1.5"
+                        onClick={() => {
+                          const res = run(() => markVehicleDelivered(booking.id, persona.name), `Vehicle marked delivered for ${booking.ref}`);
+                          if (res.ok) setSelectedId(queue.find((b) => b.id !== booking.id)?.id);
+                        }}
+                      >
+                        <CheckCircle className="size-4" /> Mark Vehicle Delivered
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-3 text-xs">
+                      <div>
+                        <span className="text-muted-foreground block text-[11px] uppercase tracking-wide">Assigned Vehicle</span>
+                        <span className="font-medium numeric">{assignedVehicle?.regNo ?? "—"}</span>
+                        <span className="text-muted-foreground block">{assignedVehicle?.type} ({assignedVehicle?.capacityTons}t)</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground block text-[11px] uppercase tracking-wide">Assigned Driver</span>
+                        <span className="font-medium">{assignedDriver?.name ?? "—"}</span>
+                        <span className="text-muted-foreground block">{assignedDriver?.phone}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground block text-[11px] uppercase tracking-wide">Delivery Bay</span>
+                        <span className="font-medium">{booking.drop.city}</span>
+                        <span className="text-muted-foreground block truncate">{booking.drop.address}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 {needsOverride && (
                   <div className="mb-4 rounded-md border border-warning/40 bg-warning/10 p-3">
                     <p className="flex items-center gap-2 text-sm text-warning">
