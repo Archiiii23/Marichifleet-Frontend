@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Sparkles, Truck } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,7 +64,11 @@ export function AuthPage() {
   const [googleAuthBlocked, setGoogleAuthBlocked] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
+  const hasGsiInitialized = useRef(false);
+
   useEffect(() => {
+    if (hasGsiInitialized.current) return;
+
     const googleClientId =
       (import.meta.env as Record<string, string | undefined>)["VITE_GOOGLE_CLIENT_ID"] ||
       "116103213980-jbatdnvs5ckpbamneisc4e8g66v0jgba.apps.googleusercontent.com";
@@ -74,25 +78,24 @@ export function AuthPage() {
         try {
           await loginWithGoogle({ credential: response.credential });
           await refresh();
-          toast.success("Google Sign-In Successful");
           navigate({ to: "/app/dashboard" });
         } catch {
-          // toasted in loginWithGoogle
+          // handled in loginWithGoogle
         }
       }
     };
 
-    let isInitialized = false;
     const renderGoogleBtn = () => {
-      if ((window as any).google?.accounts?.id && !isInitialized) {
+      if ((window as any).google?.accounts?.id && !hasGsiInitialized.current) {
         try {
           (window as any).google.accounts.id.initialize({
             client_id: googleClientId,
             callback: handleGoogleCallback,
             auto_select: false,
             cancel_on_tap_outside: true,
+            itp_support: true,
           });
-          isInitialized = true;
+          hasGsiInitialized.current = true;
 
           const el = document.getElementById("g_id_signin_btn");
           if (el) {
@@ -106,6 +109,7 @@ export function AuthPage() {
               logo_alignment: "left",
               width: 384,
             });
+            setGoogleIframeLoaded(true);
           }
         } catch (err) {
           console.warn("Google Auth initialization:", err);
@@ -115,7 +119,9 @@ export function AuthPage() {
 
     renderGoogleBtn();
     const interval = setInterval(() => {
-      if ((window as any).google?.accounts?.id && !isInitialized) {
+      if (hasGsiInitialized.current) {
+        clearInterval(interval);
+      } else if ((window as any).google?.accounts?.id) {
         renderGoogleBtn();
       }
     }, 250);
