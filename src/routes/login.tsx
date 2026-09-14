@@ -105,7 +105,7 @@ function Login() {
               <Database className="size-3 text-emerald-500" />
               <span>Saves & syncs directly to MongoDB database</span>
             </span>
-            <Link to="/auth" className="text-primary hover:underline font-medium">
+            <Link to="/" className="text-primary hover:underline font-medium">
               More sign-in options →
             </Link>
           </div>
@@ -147,7 +147,7 @@ function Login() {
             New company? Start setup
           </Link>
           <Link to="/" className="hover:text-foreground">
-            Back to website
+            Standard sign-in
           </Link>
         </div>
       </main>

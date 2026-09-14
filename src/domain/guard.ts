@@ -17,5 +17,5 @@ export function isDemoSession() {
 export async function requireSignIn() {
   if (isDemoSession()) return;
   if (typeof window !== "undefined" && window.localStorage.getItem("marichifleet.jwt_token")) return;
-  throw redirect({ to: "/auth" });
+  throw redirect({ to: "/" });
 }
