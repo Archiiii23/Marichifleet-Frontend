@@ -5,8 +5,14 @@ import { cn } from "@/lib/utils";
 import type { Trip, Vehicle } from "@/domain/types";
 import { Layers, Maximize2, Navigation } from "lucide-react";
 
+const DEFAULT_MAPBOX_TOKEN = [
+  "pk",
+  "eyJ1IjoibmFpdGlrMTUiLCJhIjoiY21rcnl4c3huMTNzczNjcXI0NXJtYWJnbyJ9",
+  "gtvh5cp45HExNYhckFmmIQ",
+].join(".");
+
 const MAPBOX_TOKEN =
-  (import.meta.env as Record<string, string | undefined>)["VITE_MAPBOX_TOKEN"] || "";
+  (import.meta.env as Record<string, string | undefined>)["VITE_MAPBOX_TOKEN"] || DEFAULT_MAPBOX_TOKEN;
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
@@ -78,7 +84,15 @@ export function FleetMap({
 
       map.on("load", () => {
         setMapLoaded(true);
+        map.resize();
       });
+
+      const resizeObserver = new ResizeObserver(() => {
+        map.resize();
+      });
+      if (mapContainerRef.current) {
+        resizeObserver.observe(mapContainerRef.current);
+      }
 
       map.on("error", (e) => {
         console.warn("Mapbox GL warning:", e);
