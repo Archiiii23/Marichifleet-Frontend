@@ -1,9 +1,17 @@
 function resolveApiBase(): string {
-  const envUrl = (import.meta.env as Record<string, string | undefined>)["VITE_API_URL"] || '';
+  let envUrl = (import.meta.env as Record<string, string | undefined>)["VITE_API_URL"] || '';
   if (!envUrl) {
-    return 'http://localhost:4000/api';
+    return 'https://marichifleet-backend.onrender.com/api';
   }
-  let clean = envUrl.trim().replace(/\/+$/, '');
+  // Handle case where environment variable has quotes or concatenated env lines
+  const match = envUrl.match(/https?:\/\/[^\s"'\\]+/);
+  if (match) {
+    envUrl = match[0];
+  }
+  let clean = envUrl.trim().replace(/^["']+|["']+$/g, '').replace(/\/+$/, '');
+  if (!clean || !clean.startsWith('http')) {
+    return 'https://marichifleet-backend.onrender.com/api';
+  }
   if (!clean.endsWith('/api')) {
     clean = `${clean}/api`;
   }

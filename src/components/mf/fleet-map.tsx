@@ -16,6 +16,16 @@ const MAPBOX_TOKEN =
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
+// Suppress telemetry events to prevent net::ERR_BLOCKED_BY_CLIENT from ad-blockers
+try {
+  Object.defineProperty(mapboxgl.config, "EVENTS_URL", {
+    get: () => null,
+    set: () => {},
+  });
+} catch {
+  // ignore
+}
+
 export interface MapVehicle {
   vehicle: Vehicle;
   trip?: Trip;
@@ -92,15 +102,30 @@ export function FleetMap({
 
       map.on("load", () => {
         setMapLoaded(true);
-        map.resize();
+        try {
+          map.resize();
+        } catch {}
       });
 
-      const resizeObserver = new ResizeObserver(() => {
-        map.resize();
-      });
-      if (mapContainerRef.current) {
-        resizeObserver.observe(mapContainerRef.current);
+      let resizeObserver: ResizeObserver | null = null;
+      if (typeof ResizeObserver !== "undefined") {
+        resizeObserver = new ResizeObserver(() => {
+          if (mapRef.current) {
+            try {
+              const canvas = mapRef.current.getCanvas();
+              if (canvas && canvas.width && canvas.height) {
+                mapRef.current.resize();
+              }
+            } catch {
+              // Ignore timing during unmount
+            }
+          }
+        });
+        if (mapContainerRef.current) {
+          resizeObserver.observe(mapContainerRef.current);
+        }
       }
+
       map.on("error", (e) => {
         console.warn("Mapbox GL warning:", e);
       });
@@ -112,6 +137,9 @@ export function FleetMap({
     }
 
     return () => {
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
