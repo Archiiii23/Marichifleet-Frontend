@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { Database, Truck } from "lucide-react";
+import { Truck } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -98,13 +98,9 @@ function Login() {
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
             </svg>
-            <span>{googleLoading ? "Authenticating with Google..." : "Continue with Google (MongoDB)"}</span>
+            <span>{googleLoading ? "Authenticating with Google..." : "Continue with Google"}</span>
           </Button>
-          <div className="flex items-center justify-between text-[11px] text-muted-foreground px-1">
-            <span className="flex items-center gap-1">
-              <Database className="size-3 text-emerald-500" />
-              <span>Saves & syncs directly to MongoDB database</span>
-            </span>
+          <div className="flex items-center justify-end text-[11px] text-muted-foreground px-1">
             <Link to="/" className="text-primary hover:underline font-medium">
               More sign-in options →
             </Link>
