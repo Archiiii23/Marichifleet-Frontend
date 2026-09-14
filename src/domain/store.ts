@@ -213,6 +213,85 @@ export function createBooking(input: {
   return { ok: true, id };
 }
 
+export function createVehicle(input: {
+  regNo: string;
+  make: string;
+  type: Vehicle["type"];
+  capacityTons: number;
+  odometerKm?: number;
+  fuelPct?: number;
+  branchId?: string;
+  actor: string;
+}): ActionResult {
+  const d = getDb();
+  const cleanReg = input.regNo.trim().toUpperCase().replace(/\s+/g, "");
+  if (!cleanReg) return { ok: false, reason: "Enter a valid registration number." };
+  if (d.vehicles.some((v) => v.regNo.replace(/\s+/g, "") === cleanReg)) {
+    return { ok: false, reason: `Vehicle ${cleanReg} is already registered in the fleet.` };
+  }
+  if (!input.make.trim()) return { ok: false, reason: "Enter vehicle make and model." };
+  if (input.capacityTons <= 0) return { ok: false, reason: "Capacity must be greater than 0 tons." };
+
+  const id = nid("vh");
+  const branch = input.branchId || d.branches[0]?.id || "br_01";
+  const odo = input.odometerKm && input.odometerKm >= 0 ? input.odometerKm : 0;
+  const vehicle: Vehicle = {
+    id,
+    tenantId: d.tenant.id,
+    branchId: branch,
+    regNo: cleanReg,
+    make: input.make.trim(),
+    type: input.type || "Truck",
+    capacityTons: input.capacityTons,
+    status: "available",
+    odometerKm: odo,
+    fuelPct: input.fuelPct ?? 85,
+    lat: 28.5355,
+    lng: 77.2731,
+    speedKph: 0,
+    lastPingISO: now(),
+    serviceDueKm: odo + 10000,
+  };
+  d.vehicles.unshift(vehicle);
+  audit(input.actor, `Registered vehicle ${cleanReg}`, "vehicle", id, undefined, "available");
+  return { ok: true, id };
+}
+
+export function createDriver(input: {
+  name: string;
+  phone: string;
+  licenceNo: string;
+  licenceExpiryISO: string;
+  branchId?: string;
+  assignedVehicleId?: string;
+  actor: string;
+}): ActionResult {
+  const d = getDb();
+  if (!input.name.trim()) return { ok: false, reason: "Enter driver's full name." };
+  if (!input.phone.trim()) return { ok: false, reason: "Enter driver's contact phone number." };
+  if (!input.licenceNo.trim()) return { ok: false, reason: "Enter driving licence number." };
+  if (!input.licenceExpiryISO) return { ok: false, reason: "Enter licence expiry date." };
+
+  const id = nid("dr");
+  const branch = input.branchId || d.branches[0]?.id || "br_01";
+  const driver: Driver = {
+    id,
+    tenantId: d.tenant.id,
+    branchId: branch,
+    name: input.name.trim(),
+    phone: input.phone.trim(),
+    licenceNo: input.licenceNo.trim().toUpperCase(),
+    licenceExpiryISO: input.licenceExpiryISO,
+    status: "available",
+    rating: 5.0,
+    tripsCompleted: 0,
+    assignedVehicleId: input.assignedVehicleId || undefined,
+  };
+  d.drivers.unshift(driver);
+  audit(input.actor, `Onboarded driver ${input.name}`, "driver", id, undefined, "available");
+  return { ok: true, id };
+}
+
 export function confirmBooking(bookingId: string, actor: string): ActionResult {
   const res = setBookingStatus(bookingId, "confirmed", actor);
   if (!res.ok) return res;
